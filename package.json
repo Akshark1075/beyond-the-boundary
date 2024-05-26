@@ -1,0 +1,17 @@
+{
+  "name": "beyondtheboundary",
+  "version": "1.0.0",
+  "description": "XR App",
+  "scripts": {
+    "start": "node server/server.js",
+    "client": "npm start --prefix client",
+    "server": "nodemon server/server.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "devDependencies": {
+    "concurrently": "^6.2.1",
+    "nodemon": "^2.0.15"
+  },
+  "author": "",
+  "license": "ISC"
+}
