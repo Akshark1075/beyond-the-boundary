@@ -12,6 +12,7 @@
     "@react-three/drei": "^9.106.0",
     "@react-three/fiber": "^8.16.8",
     "@react-three/xr": "^5.7.1",
+    "@tanstack/react-query": "^5.45.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -69,6 +70,7 @@
   },
   "devDependencies": {
     "@types/hammerjs": "^2.0.45",
+    "fork-ts-checker-webpack-plugin": "^9.0.2",
     "webpack": "^5.92.1",
     "webpack-cli": "^5.1.4"
   }

@@ -1,7 +1,7 @@
 import { Canvas } from "@react-three/fiber";
 import { ARButton, XR, Controllers, Hands } from "@react-three/xr";
 import { useRef, useState, useEffect } from "react";
-import { usePinch } from "../touch";
+import { usePinch } from "../utilities/touch";
 const XRCube = () => {
   const ref = useRef<HTMLDivElement>(null);
   const handle = () => {
