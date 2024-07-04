@@ -14,7 +14,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import { Box } from "@mui/material";
-import ScoreCardLoader from "./ScorecardLoader";
+import ScoreCardLoader from "./Loaders/ScorecardLoader";
 export type ScoreCardType = "Batting" | "Bowling";
 
 const fetchScorecard = async (matchID: string): Promise<Response> => {
@@ -53,7 +53,7 @@ const fetchScorecard = async (matchID: string): Promise<Response> => {
   }
 };
 
-export default function DenseTable({
+export default function ScoreCardTable({
   matchID,
   type,
 }: {
@@ -474,7 +474,6 @@ export default function DenseTable({
             </Table>
           </TableContainer>
         ))}
-        )
       </>
     );
 }

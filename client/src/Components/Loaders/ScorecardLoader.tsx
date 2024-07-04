@@ -8,14 +8,9 @@ import {
   Skeleton,
   TableBody,
   Box,
-  Typography,
-  IconButton,
-  Collapse,
 } from "@mui/material";
 import React from "react";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import { ScoreCardType } from "./ScoreCard";
+import { ScoreCardType } from "../ScoreCard";
 
 const ScoreCardLoader = ({ type }: { type: ScoreCardType }) => {
   return (
@@ -29,7 +24,7 @@ const ScoreCardLoader = ({ type }: { type: ScoreCardType }) => {
       </Box>
       <Table sx={{ width: 350 }} size="small" aria-label="a dense table">
         <TableHead>
-          {type == "Batting" ? (
+          {type === "Batting" ? (
             <TableRow className="bg-slate-300">
               <TableCell>Batter</TableCell>
               <TableCell></TableCell>

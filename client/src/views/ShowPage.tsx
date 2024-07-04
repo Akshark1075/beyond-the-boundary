@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import DenseTable from "../Components/ScoreCard";
+import ScoreCardTable from "../Components/ScoreCard";
 import "../styles/ShowPage.css";
 const ShowPage = () => {
   let { matchId } = useParams();
@@ -17,7 +17,7 @@ const ShowPage = () => {
           title="Embedded YouTube Video"
         />
       </div>
-      <DenseTable matchID={matchId ?? ""} type="Batting" />
+      <ScoreCardTable matchID={matchId ?? ""} type="Batting" />
     </>
   );
 };

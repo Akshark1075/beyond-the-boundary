@@ -1,10 +1,4 @@
-import React, {
-  useRef,
-  useState,
-  useEffect,
-  ReactNode,
-  useCallback,
-} from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import Box from "@mui/joy/Box";
 import { useQuery } from "@tanstack/react-query";
 import AspectRatio from "@mui/joy/AspectRatio";
@@ -14,7 +8,7 @@ import IconButton from "@mui/joy/IconButton";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import getTrophyImage from "../utilities/getTrophyImage";
-import MatchLoadingCard from "./MatchLoadingCard";
+import MatchLoadingCard from "./Loaders/MatchLoadingCard";
 import { useNavigate } from "react-router-dom";
 
 interface GetLiveMatches {
@@ -283,7 +277,11 @@ function MatchCard({ type }: MatchCardProps): JSX.Element {
                   size="sm"
                   key={item.matchInfo.matchId}
                   variant="outlined"
-                  onClick={() => handleClick(item.matchInfo.matchId)}
+                  onClick={() => {
+                    if (type !== "upcoming") {
+                      handleClick(item.matchInfo.matchId);
+                    }
+                  }}
                   sx={{
                     display: "flex",
                     justifyContent: "center",
