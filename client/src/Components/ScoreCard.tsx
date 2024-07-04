@@ -16,25 +16,6 @@ import IconButton from "@mui/material/IconButton";
 import { Box } from "@mui/material";
 import ScoreCardLoader from "./ScorecardLoader";
 export type ScoreCardType = "Batting" | "Bowling";
-function createData(
-  name: string,
-  status: string,
-  runs: number,
-  balls: number,
-  fours: number,
-  sixes: number,
-  strikeRate: number
-) {
-  return { name, status, runs, balls, fours, sixes, strikeRate };
-}
-
-const rows = [
-  createData("Frozen yoghurt", "", 159, 6.0, 24, 4.0, 1),
-  createData("Ice cream sandwich", "", 237, 9.0, 37, 4.3, 1),
-  createData("Eclair", "", 262, 16.0, 24, 6.0, 1),
-  createData("Cupcake", "", 305, 3.7, 67, 4.3, 1),
-  createData("Gingerbread", "", 356, 16.0, 49, 3.9, 1),
-];
 
 const fetchScorecard = async (matchID: string): Promise<Response> => {
   try {
@@ -79,7 +60,7 @@ export default function DenseTable({
   matchID: string;
   type: ScoreCardType;
 }) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
   const { isLoading, error, data } = useQuery<GetScorecard>({
     queryKey: ["scoresData", matchID],
     queryFn: useCallback(
@@ -91,16 +72,15 @@ export default function DenseTable({
   else
     return (
       <>
-        (
         {data?.scoreCard.map((row) => (
-          <TableContainer component={Paper}>
+          <TableContainer component={Paper} style={{ boxShadow: "none" }}>
             <Box
               // @ts-ignore: Unreachable code error
               sx={{ width: 350 }}
               className="bg-slate-700 flex justify-between"
             >
-              <Box>{`${row.batTeamDetails.batTeamName} Innings`}</Box>
-              <Box className="flex px-6">
+              <Box className="px-4">{`${row.batTeamDetails.batTeamName} Innings`}</Box>
+              <Box className="flex px-4">
                 <Box className="text-white">
                   {row.scoreDetails.runs +
                     "-" +
@@ -122,19 +102,54 @@ export default function DenseTable({
                 </Box>
               </Box>
             </Box>
-            <Table sx={{ width: 350 }} size="small" aria-label="a dense table">
+            <Table
+              sx={{ width: "350px", tableLayout: "fixed" }}
+              size="small"
+              aria-label="a dense table"
+            >
               <Collapse in={open} timeout="auto" unmountOnExit>
-                {type == "Batting" ? (
+                {type === "Batting" ? (
                   <>
                     <TableHead>
                       <TableRow className="bg-slate-300">
-                        <TableCell>Batter</TableCell>
-                        <TableCell></TableCell>
-                        <TableCell align="center">R</TableCell>
-                        <TableCell align="center">B</TableCell>
-                        <TableCell align="center">4s</TableCell>
-                        <TableCell align="center">6s</TableCell>
-                        <TableCell align="center">SR</TableCell>
+                        <TableCell
+                          style={{ paddingLeft: "2px", paddingRight: "2px" }}
+                        >
+                          Batter
+                        </TableCell>
+                        <TableCell
+                          style={{ paddingLeft: "2px", paddingRight: "2px" }}
+                        ></TableCell>
+                        <TableCell
+                          align="center"
+                          style={{ paddingLeft: "2px", paddingRight: "2px" }}
+                        >
+                          R
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          style={{ paddingLeft: "2px", paddingRight: "2px" }}
+                        >
+                          B
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          style={{ paddingLeft: "2px", paddingRight: "2px" }}
+                        >
+                          4s
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          style={{ paddingLeft: "2px", paddingRight: "2px" }}
+                        >
+                          6s
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          style={{ paddingLeft: "2px", paddingRight: "2px" }}
+                        >
+                          SR
+                        </TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -142,41 +157,84 @@ export default function DenseTable({
                         return (
                           <TableRow
                             key={
-                              row.batTeamDetails.batsmenData[`bowl_${i + 1}`]
+                              row.batTeamDetails.batsmenData[`bat_${i + 1}`]
                                 ?.batId
                             }
                             sx={{
                               "&:last-child td, &:last-child th": { border: 0 },
                             }}
                           >
-                            <TableCell component="th" scope="row">
+                            <TableCell
+                              component="th"
+                              scope="row"
+                              style={{
+                                paddingLeft: "2px",
+                                paddingRight: "2px",
+                              }}
+                            >
                               {
-                                row.batTeamDetails.batsmenData[`bowl_${i + 1}`]
+                                row.batTeamDetails.batsmenData[`bat_${i + 1}`]
                                   ?.batName
                               }
                             </TableCell>
-                            <TableCell align="center">
-                              {row.batTeamDetails.batsmenData[`bowl_${i + 1}`]
+                            <TableCell
+                              align="center"
+                              style={{
+                                paddingLeft: "2px",
+                                paddingRight: "2px",
+                              }}
+                            >
+                              {row.batTeamDetails.batsmenData[`bat_${i + 1}`]
                                 ?.outDesc ?? "Did not bat"}
                             </TableCell>
-                            <TableCell align="center">
-                              {row.batTeamDetails.batsmenData[`bowl_${i + 1}`]
+                            <TableCell
+                              align="center"
+                              style={{
+                                paddingLeft: "2px",
+                                paddingRight: "2px",
+                              }}
+                            >
+                              {row.batTeamDetails.batsmenData[`bat_${i + 1}`]
                                 ?.runs ?? 0}
                             </TableCell>
-                            <TableCell align="center">
-                              {row.batTeamDetails.batsmenData[`bowl_${i + 1}`]
+                            <TableCell
+                              align="center"
+                              style={{
+                                paddingLeft: "2px",
+                                paddingRight: "2px",
+                              }}
+                            >
+                              {row.batTeamDetails.batsmenData[`bat_${i + 1}`]
                                 ?.balls ?? 0}
                             </TableCell>
-                            <TableCell align="center">
-                              {row.batTeamDetails.batsmenData[`bowl_${i + 1}`]
+                            <TableCell
+                              align="center"
+                              style={{
+                                paddingLeft: "2px",
+                                paddingRight: "2px",
+                              }}
+                            >
+                              {row.batTeamDetails.batsmenData[`bat_${i + 1}`]
                                 ?.fours ?? 0}
                             </TableCell>
-                            <TableCell align="center">
-                              {row.batTeamDetails.batsmenData[`bowl_${i + 1}`]
+                            <TableCell
+                              align="center"
+                              style={{
+                                paddingLeft: "2px",
+                                paddingRight: "2px",
+                              }}
+                            >
+                              {row.batTeamDetails.batsmenData[`bat_${i + 1}`]
                                 ?.sixes ?? 0}
                             </TableCell>
-                            <TableCell align="center">
-                              {row.batTeamDetails.batsmenData[`bowl_${i + 1}`]
+                            <TableCell
+                              align="center"
+                              style={{
+                                paddingLeft: "2px",
+                                paddingRight: "2px",
+                              }}
+                            >
+                              {row.batTeamDetails.batsmenData[`bat_${i + 1}`]
                                 ?.strikeRate ?? 0.0}
                             </TableCell>
                           </TableRow>
@@ -193,6 +251,7 @@ export default function DenseTable({
                           component="th"
                           scope="row"
                           align="center"
+                          style={{ paddingLeft: "2px", paddingRight: "2px" }}
                           colSpan={5}
                         >
                           {`${row.extrasData.total}(b ${row.extrasData.byes}, lb ${row.extrasData.legByes}, w ${row.extrasData.wides}, nb ${row.extrasData.noBalls}, p ${row.extrasData.noBalls})`}
@@ -211,9 +270,10 @@ export default function DenseTable({
                           component="th"
                           scope="row"
                           align="center"
+                          style={{ paddingLeft: "2px", paddingRight: "2px" }}
                           colSpan={3}
                         >
-                          {`${row.scoreDetails.runs} (${row.scoreDetails.wickets} Wkts, ${row.scoreDetails.overs}Ov)`}
+                          {`${row.scoreDetails?.runs} (${row.scoreDetails?.wickets} Wkts, ${row.scoreDetails?.overs}Ov)`}
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -224,62 +284,151 @@ export default function DenseTable({
                       <TableRow className="bg-slate-300">
                         <TableCell>Bowling</TableCell>
 
-                        <TableCell align="center">O</TableCell>
-                        <TableCell align="center">M</TableCell>
-                        <TableCell align="center">R</TableCell>
-                        <TableCell align="center">W</TableCell>
-                        <TableCell align="center">NB</TableCell>
-                        <TableCell align="center">WD</TableCell>
-                        <TableCell align="center">ECO</TableCell>
+                        <TableCell
+                          align="center"
+                          style={{ paddingLeft: "2px", paddingRight: "2px" }}
+                        >
+                          O
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          style={{ paddingLeft: "2px", paddingRight: "2px" }}
+                        >
+                          M
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          style={{ paddingLeft: "2px", paddingRight: "2px" }}
+                        >
+                          R
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          style={{ paddingLeft: "2px", paddingRight: "2px" }}
+                        >
+                          W
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          style={{ paddingLeft: "2px", paddingRight: "2px" }}
+                        >
+                          NB
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          style={{ paddingLeft: "2px", paddingRight: "2px" }}
+                        >
+                          WD
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          style={{ paddingLeft: "2px", paddingRight: "2px" }}
+                        >
+                          ECO
+                        </TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {new Array(11).fill(undefined).map((x, i) => {
                         return (
-                          <TableRow
-                            key={
-                              row.bowlTeamDetails.bowlersData[`bowl_${i + 1}`]
-                                ?.bowlerId
-                            }
-                            sx={{
-                              "&:last-child td, &:last-child th": { border: 0 },
-                            }}
-                          >
-                            <TableCell component="th" scope="row">
-                              {
+                          row.bowlTeamDetails.bowlersData[`bowl_${i + 1}`] && (
+                            <TableRow
+                              key={
                                 row.bowlTeamDetails.bowlersData[`bowl_${i + 1}`]
-                                  ?.bowlName
+                                  ?.bowlerId
                               }
-                            </TableCell>
-                            <TableCell align="center">
-                              {row.bowlTeamDetails.bowlersData[`bowl_${i + 1}`]
-                                .overs ?? 0}
-                            </TableCell>
-                            <TableCell align="center">
-                              {row.bowlTeamDetails.bowlersData[`bowl_${i + 1}`]
-                                ?.maidens ?? 0}
-                            </TableCell>
-                            <TableCell align="center">
-                              {row.bowlTeamDetails.bowlersData[`bowl_${i + 1}`]
-                                ?.runs ?? 0}
-                            </TableCell>
-                            <TableCell align="center">
-                              {row.bowlTeamDetails.bowlersData[`bowl_${i + 1}`]
-                                ?.wickets ?? 0}
-                            </TableCell>
-                            <TableCell align="center">
-                              {row.bowlTeamDetails.bowlersData[`bowl_${i + 1}`]
-                                ?.no_balls ?? 0}
-                            </TableCell>
-                            <TableCell align="center">
-                              {row.bowlTeamDetails.bowlersData[`bowl_${i + 1}`]
-                                ?.wides ?? 0}
-                            </TableCell>
-                            <TableCell align="center">
-                              {row.bowlTeamDetails.bowlersData[`bowl_${i + 1}`]
-                                ?.economy ?? 0.0}
-                            </TableCell>
-                          </TableRow>
+                              sx={{
+                                "&:last-child td, &:last-child th": {
+                                  border: 0,
+                                },
+                              }}
+                            >
+                              <TableCell component="th" scope="row">
+                                {
+                                  row.bowlTeamDetails.bowlersData[
+                                    `bowl_${i + 1}`
+                                  ]?.bowlName
+                                }
+                              </TableCell>
+                              <TableCell
+                                align="center"
+                                style={{
+                                  paddingLeft: "2px",
+                                  paddingRight: "2px",
+                                }}
+                              >
+                                {row.bowlTeamDetails.bowlersData[
+                                  `bowl_${i + 1}`
+                                ]?.overs ?? 0}
+                              </TableCell>
+                              <TableCell
+                                align="center"
+                                style={{
+                                  paddingLeft: "2px",
+                                  paddingRight: "2px",
+                                }}
+                              >
+                                {row.bowlTeamDetails.bowlersData[
+                                  `bowl_${i + 1}`
+                                ]?.maidens ?? 0}
+                              </TableCell>
+                              <TableCell
+                                align="center"
+                                style={{
+                                  paddingLeft: "2px",
+                                  paddingRight: "2px",
+                                }}
+                              >
+                                {row.bowlTeamDetails.bowlersData[
+                                  `bowl_${i + 1}`
+                                ]?.runs ?? 0}
+                              </TableCell>
+                              <TableCell
+                                align="center"
+                                style={{
+                                  paddingLeft: "2px",
+                                  paddingRight: "2px",
+                                }}
+                              >
+                                {row.bowlTeamDetails.bowlersData[
+                                  `bowl_${i + 1}`
+                                ]?.wickets ?? 0}
+                              </TableCell>
+                              <TableCell
+                                align="center"
+                                style={{
+                                  paddingLeft: "2px",
+                                  paddingRight: "2px",
+                                }}
+                              >
+                                {row.bowlTeamDetails.bowlersData[
+                                  `bowl_${i + 1}`
+                                ]?.no_balls ?? 0}
+                              </TableCell>
+                              <TableCell
+                                align="center"
+                                style={{
+                                  paddingLeft: "2px",
+                                  paddingRight: "2px",
+                                }}
+                              >
+                                {row.bowlTeamDetails.bowlersData[
+                                  `bowl_${i + 1}`
+                                ]?.wides ?? 0}
+                              </TableCell>
+                              <TableCell
+                                align="center"
+                                style={{
+                                  paddingLeft: "2px",
+                                  paddingRight: "2px",
+                                }}
+                              >
+                                {row.bowlTeamDetails.bowlersData[
+                                  `bowl_${i + 1}`
+                                ]?.economy ?? 0.0}
+                              </TableCell>
+                            </TableRow>
+                          )
                         );
                       })}
                       <TableRow
@@ -293,6 +442,7 @@ export default function DenseTable({
                           component="th"
                           scope="row"
                           align="center"
+                          style={{ paddingLeft: "2px", paddingRight: "2px" }}
                           colSpan={5}
                         >
                           {`${row.extrasData.total}(b ${row.extrasData.byes}, lb ${row.extrasData.legByes}, w ${row.extrasData.wides}, nb ${row.extrasData.noBalls}, p ${row.extrasData.noBalls})`}
@@ -311,6 +461,7 @@ export default function DenseTable({
                           component="th"
                           scope="row"
                           align="center"
+                          style={{ paddingLeft: "2px", paddingRight: "2px" }}
                           colSpan={3}
                         >
                           {`${row.scoreDetails.runs} (${row.scoreDetails.wickets} Wkts, ${row.scoreDetails.overs}Ov)`}

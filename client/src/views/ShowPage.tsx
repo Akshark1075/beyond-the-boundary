@@ -1,7 +1,6 @@
-import { Box } from "@mui/material";
 import { useParams } from "react-router-dom";
-import DenseTable from "./Components/ScoreCard";
-import "./ShowPage.css";
+import DenseTable from "../Components/ScoreCard";
+import "../styles/ShowPage.css";
 const ShowPage = () => {
   let { matchId } = useParams();
   const videoUrl = "https://www.youtube.com/embed/4TLHORImdL4";

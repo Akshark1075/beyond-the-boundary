@@ -1,16 +1,15 @@
 import Box from "@mui/material/Box";
-import DrawerAppBar from "./Components/Navbar";
-import homecover from "../src/assets/homecover.jpg";
+import DrawerAppBar from "../Components/Navbar";
+import homecover from "../assets/homecover.jpg";
 import { Typography } from "@mui/material";
-import MatchCard from "./Components/MatchCard";
+import MatchCard from "../Components/MatchCard";
 const Home = () => {
-  console.log("ff");
   return (
     // @ts-ignore: Unreachable code error
     <Box className={"h-full bg-black sm:flex overflow-y-auto"}>
       <DrawerAppBar />;
       <Box className="mt-28 w-full">
-        <img src={homecover} width="100%" />
+        <img src={homecover} width="100%" alt="Homecover" />
         <Typography variant="h5" sx={{ color: "white", marginY: "1rem" }}>
           Live Matches
         </Typography>

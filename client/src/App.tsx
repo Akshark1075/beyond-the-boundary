@@ -1,9 +1,9 @@
-import "./App.css";
+import "./styles/App.css";
 
-import Home from "./Home";
+import Home from "./views/Home";
 import { useRoutes } from "react-router-dom";
 import XRCube from "./Components/XRCube";
-import ShowPage from "./ShowPage";
+import ShowPage from "./views/ShowPage";
 function App() {
   let element = useRoutes([
     {

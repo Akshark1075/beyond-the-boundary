@@ -240,8 +240,8 @@ function MatchCard({ type }: MatchCardProps): JSX.Element {
     }
     return "🏴‍☠️";
   };
-  const handleClick = (seriesId: number) => {
-    navigate(`/matches/${seriesId}`);
+  const handleClick = (matchId: number) => {
+    navigate(`/matches/${matchId}`);
   };
 
   return (
@@ -283,7 +283,7 @@ function MatchCard({ type }: MatchCardProps): JSX.Element {
                   size="sm"
                   key={item.matchInfo.matchId}
                   variant="outlined"
-                  onClick={() => handleClick(item.matchInfo.seriesId)}
+                  onClick={() => handleClick(item.matchInfo.matchId)}
                   sx={{
                     display: "flex",
                     justifyContent: "center",
@@ -345,7 +345,7 @@ function MatchCard({ type }: MatchCardProps): JSX.Element {
                         {`${getFlag(item.matchInfo.team1.teamName)} ${
                           item.matchInfo.team1.teamName
                         } ${
-                          type != "upcoming"
+                          type !== "upcoming"
                             ? item.matchScore?.team1Score?.inngs1?.runs +
                               " - " +
                               (item.matchScore?.team1Score?.inngs1?.wickets ??
@@ -372,7 +372,7 @@ function MatchCard({ type }: MatchCardProps): JSX.Element {
                         {`${getFlag(item.matchInfo.team2.teamName)} ${
                           item.matchInfo.team2.teamName
                         } ${
-                          type != "upcoming"
+                          type !== "upcoming"
                             ? item.matchScore?.team2Score?.inngs1?.runs +
                               " - " +
                               (item.matchScore?.team2Score?.inngs1?.wickets ??
