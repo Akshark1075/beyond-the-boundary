@@ -229,7 +229,7 @@ function MatchCard({ type }: MatchCardProps): JSX.Element {
     );
   const getFlag = (countryName: string) => {
     if (countriesData) {
-      const foundCountry = countriesData.find((c) => c.name == countryName);
+      const foundCountry = countriesData.find((c) => c.name === countryName);
       return !!foundCountry ? foundCountry.flag : "🏴‍☠️";
     }
     return "🏴‍☠️";

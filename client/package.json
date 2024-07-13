@@ -1,5 +1,5 @@
 {
-  "name": "my-app",
+  "name": "beyond-the-boundary",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -21,8 +21,16 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@types/three": "^0.165.0",
+    "chart.js": "^4.4.3",
+    "chartjs-plugin-annotation": "^3.0.1",
+    "jquery": "^3.7.1",
     "react": "^18.3.1",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.3.1",
+    "react-draggable": "^4.4.6",
+    "react-new-window": "^1.0.1",
+    "react-resizable": "^3.0.5",
+    "react-rnd": "^10.4.11",
     "react-router-dom": "^6.23.1",
     "react-scripts": "^5.0.1",
     "styled-components": "^6.1.11",
@@ -70,6 +78,8 @@
   },
   "devDependencies": {
     "@types/hammerjs": "^2.0.45",
+    "@types/react-resizable": "^3.0.8",
+    "@types/react-rnd": "^8.0.0",
     "fork-ts-checker-webpack-plugin": "^9.0.2",
     "webpack": "^5.92.1",
     "webpack-cli": "^5.1.4"

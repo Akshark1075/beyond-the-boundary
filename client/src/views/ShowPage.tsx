@@ -1,23 +1,30 @@
-import { useParams } from "react-router-dom";
-import ScoreCardTable from "../Components/ScoreCard";
 import "../styles/ShowPage.css";
+import React, { useEffect, useState } from "react";
+
+import FloatingActionButton from "../Components/FloatingActionButton";
+import Video from "../Components/Video";
+import { getArrayFromLocalStorage } from "../utilities/localStorageUtils";
+export interface SelectedOption {
+  name: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 const ShowPage = () => {
-  let { matchId } = useParams();
-  const videoUrl = "https://www.youtube.com/embed/4TLHORImdL4";
+  const [selections, setSelection] = useState<SelectedOption[]>([]);
+  useEffect(() => {
+    // Retrieve the array from local storage on component mount
+    const storedItems = getArrayFromLocalStorage("selectedOptions");
+    setSelection(storedItems);
+  }, []);
   return (
     <>
-      <div className="video-responsive">
-        <iframe
-          width="853"
-          height="480"
-          src={videoUrl}
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          title="Embedded YouTube Video"
-        />
-      </div>
-      <ScoreCardTable matchID={matchId ?? ""} type="Batting" />
+      <Video />
+      <FloatingActionButton
+        selections={selections}
+        setSelection={setSelection}
+      />
     </>
   );
 };
