@@ -12,8 +12,9 @@ import {
 import React from "react";
 import { ScoreCardType } from "../ScoreCard";
 import { DraggableEvent } from "react-draggable";
-import WithTitleBar from "../TitleBar";
+import WithTitleBar from "../WithTitleBar";
 import { Rnd, RndResizeCallback } from "react-rnd";
+import { SelectedOption } from "../../views/ShowPage";
 type Position = { x: number; y: number };
 const ScoreCardLoader = ({
   type,
@@ -22,6 +23,10 @@ const ScoreCardLoader = ({
   position,
   setPosition,
   setSize,
+  storedKey,
+  selections,
+  // handleClose,
+  setSelection,
 }: {
   type: ScoreCardType;
   width: number;
@@ -29,6 +34,10 @@ const ScoreCardLoader = ({
   position: Position;
   setPosition: (x: number, y: number) => void;
   setSize: (width: number, height: number) => void;
+  storedKey: string;
+  selections: SelectedOption[];
+  setSelection: (option: SelectedOption[]) => void;
+  // handleClose: (storedKey: string) => void;
 }) => {
   const componentRef = React.useRef<HTMLDivElement>(null);
   const handleResize: RndResizeCallback = (
@@ -65,6 +74,9 @@ const ScoreCardLoader = ({
           height={
             componentRef.current?.getBoundingClientRect().height ?? height
           }
+          storedKey={storedKey}
+          selections={selections}
+          setSelection={setSelection}
         >
           <TableContainer component={Paper} style={{ boxShadow: "none" }}>
             <Box

@@ -15,7 +15,7 @@ import IconButton from "@mui/material/IconButton";
 import { Box } from "@mui/material";
 import ScoreCardLoader from "./Loaders/ScorecardLoader";
 import { DraggableEvent } from "react-draggable";
-import WithTitleBar from "./TitleBar";
+import WithTitleBar from "./WithTitleBar";
 import { useQuery } from "@tanstack/react-query";
 import { Rnd, RndResizeCallback } from "react-rnd";
 import { SelectedOption } from "../views/ShowPage";
@@ -68,7 +68,6 @@ export default function ScoreCardTable({
 }: {
   matchId: string;
   type: ScoreCardType;
-
   selections: SelectedOption[];
   setSelection: (option: SelectedOption[]) => void;
 }) {
@@ -91,6 +90,7 @@ export default function ScoreCardTable({
               isError={isError}
               selections={selections}
               setSelection={setSelection}
+              key={row.inningsId}
             />
           );
         else
@@ -101,6 +101,7 @@ export default function ScoreCardTable({
               isError={isError}
               selections={selections}
               setSelection={setSelection}
+              key={row.inningsId}
             />
           );
       })}
@@ -146,6 +147,7 @@ const BattingScorecard = ({
       },
     ];
     setSelection(newItems);
+    saveArrayToLocalStorage("selectedOptions", newItems);
   }
 
   const setPosition = (x: number, y: number) => {
@@ -199,6 +201,10 @@ const BattingScorecard = ({
         height={height}
         setPosition={setPosition}
         setSize={setSize}
+        storedKey={`Batting Scorecard ${row.inningsId}`}
+        // handleClose={handleClose}
+        selections={selections}
+        setSelection={setSelection}
       />
     );
   else {
@@ -213,13 +219,20 @@ const BattingScorecard = ({
         bounds="window"
         key={row.batTeamDetails.batTeamName}
       >
-        <div ref={componentRef} style={{ overflow: "scroll" }}>
+        <div
+          ref={componentRef}
+          style={{ width: width, height: height, overflow: "auto" }}
+        >
           <WithTitleBar
-            title="Scorecard"
+            title="Batting Scorecard"
             width={componentRef.current?.getBoundingClientRect().width ?? width}
             height={
               componentRef.current?.getBoundingClientRect().height ?? height
             }
+            storedKey={`Batting Scorecard ${row.inningsId}`}
+            // handleClose={handleClose}
+            selections={selections}
+            setSelection={setSelection}
           >
             <TableContainer component={Paper} style={{ boxShadow: "none" }}>
               <Box
@@ -482,7 +495,6 @@ const BowlingScorecard = ({
   isLoading: boolean;
   isError: boolean;
   selections: SelectedOption[];
-
   setSelection: (option: SelectedOption[]) => void;
 }) => {
   const componentRef = useRef<HTMLDivElement>(null);
@@ -508,6 +520,7 @@ const BowlingScorecard = ({
       },
     ];
     setSelection(newItems);
+    saveArrayToLocalStorage("selectedOptions", newItems);
   }
 
   const handleResize: RndResizeCallback = (
@@ -554,12 +567,16 @@ const BowlingScorecard = ({
   if (isLoading || isError)
     return (
       <ScoreCardLoader
-        type={"Batting"}
+        type={"Bowling"}
         position={{ x: x, y: y }}
         width={width}
         height={height}
         setPosition={setPosition}
         setSize={setSize}
+        storedKey={`Bowling Scorecard ${row.inningsId}`}
+        // handleClose={handleClose}
+        selections={selections}
+        setSelection={setSelection}
       />
     );
   else {
@@ -576,11 +593,14 @@ const BowlingScorecard = ({
       >
         <div ref={componentRef} style={{ overflow: "scroll" }}>
           <WithTitleBar
-            title="Scorecard"
+            title="Bowling Scorecard"
             width={componentRef.current?.getBoundingClientRect().width ?? width}
             height={
               componentRef.current?.getBoundingClientRect().height ?? height
             }
+            storedKey={`Bowling Scorecard ${row.inningsId}`}
+            selections={selections}
+            setSelection={setSelection}
           >
             <TableContainer component={Paper} style={{ boxShadow: "none" }}>
               <Box

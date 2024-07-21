@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -14,9 +14,12 @@ import {
 import { GetScorecard } from "../types/getScorecard";
 import { Skeleton } from "@mui/material";
 import { Rnd, RndResizeCallback } from "react-rnd";
-import WithTitleBar from "./TitleBar";
+import WithTitleBar from "./WithTitleBar";
 import React from "react";
 import { DraggableEvent } from "react-draggable";
+import { SelectedOption } from "../views/ShowPage";
+import getRandomCoordinates from "../utilities/getRandomCoordinates";
+import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
 
 ChartJS.register(
   CategoryScale,
@@ -65,12 +68,12 @@ const fetchOvers = async (matchId: string): Promise<Response> => {
 
 const Scorecomparison = ({
   matchId,
-  x,
-  y,
+  selections,
+  setSelection,
 }: {
   matchId: string;
-  x: number;
-  y: number;
+  selections: SelectedOption[];
+  setSelection: (option: SelectedOption[]) => void;
 }) => {
   const { isLoading, error, data } = useQuery<GetScorecard>({
     queryKey: ["scoresData", matchId],
@@ -79,7 +82,10 @@ const Scorecomparison = ({
       [matchId]
     ),
   });
-
+  const { x: randomX, y: randomY } = getRandomCoordinates();
+  const storedScoreComparison = selections.find(
+    (s) => s.name === `Scorecard comparison`
+  );
   function generateRandomArray(length: number, total: number) {
     if (length <= 0 || total <= 0) {
       return [];
@@ -172,9 +178,48 @@ const Scorecomparison = ({
     },
   };
   const componentRef = React.useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(350);
-  const [height, setHeight] = useState(350);
-  const [position, setPosition] = useState({ x: x, y: y });
+  const {
+    x = randomX,
+    y = randomY,
+    width = 350,
+    height = 350,
+  } = storedScoreComparison ?? {};
+  if (!storedScoreComparison) {
+    const newItems = [
+      ...selections,
+      {
+        name: `Scorecard comparison`,
+        x: x,
+        y: y,
+        width: width,
+        height: height,
+      },
+    ];
+    setSelection(newItems);
+    saveArrayToLocalStorage("selectedOptions", newItems);
+  }
+
+  const setPosition = (x: number, y: number) => {
+    const newSelections = [...selections];
+    const option = newSelections.find((s) => s.name === `Scorecard comparison`);
+    if (option) {
+      option.x = x;
+      option.y = y;
+      setSelection(newSelections);
+      saveArrayToLocalStorage("selectedOptions", newSelections);
+    }
+  };
+
+  const setSize = (w: number, h: number) => {
+    const newSelections = [...selections];
+    const option = newSelections.find((s) => s.name === `Scorecard comparison`);
+    if (option) {
+      option.width = w;
+      option.height = h;
+      setSelection(newSelections);
+      saveArrayToLocalStorage("selectedOptions", newSelections);
+    }
+  };
   const handleResize: RndResizeCallback = (
     e,
     direction,
@@ -185,18 +230,17 @@ const Scorecomparison = ({
     if (ref && ref.style) {
       const newWidth = parseInt(ref.style.width, 10);
       const newHeight = parseInt(ref.style.height, 10);
-      setWidth(newWidth);
-      setHeight(newHeight);
+      setSize(newWidth, newHeight);
     }
   };
 
   const handleDragStop = (e: DraggableEvent, d: { x: number; y: number }) => {
-    setPosition({ x: d.x, y: d.y });
+    setPosition(d.x, d.y);
   };
   return (
     <Rnd
       size={{ width: width, height: height }}
-      position={position}
+      position={{ x: x ?? randomX, y: y ?? randomY }}
       onResize={handleResize}
       onDragStop={handleDragStop}
       minWidth={350}
@@ -205,11 +249,14 @@ const Scorecomparison = ({
     >
       <div style={{ width: `${width}px` }}>
         <WithTitleBar
-          title="Score Comparison"
+          title="Score comparison"
           width={componentRef.current?.getBoundingClientRect().width ?? width}
           height={
             componentRef.current?.getBoundingClientRect().height ?? height
           }
+          storedKey="Scorecard comparison"
+          selections={selections}
+          setSelection={setSelection}
         >
           <div
             style={{
@@ -218,6 +265,7 @@ const Scorecomparison = ({
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-around",
+              overflow: "auto",
             }}
             ref={componentRef}
           >

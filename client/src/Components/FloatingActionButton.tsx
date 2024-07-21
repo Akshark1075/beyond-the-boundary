@@ -1,20 +1,18 @@
 import React, { useState } from "react";
 import { Button } from "@mui/material";
-import ScoreIcon from "@mui/icons-material/Score";
-import GroupsIcon from "@mui/icons-material/Groups";
-import SettingsIcon from "@mui/icons-material/Settings";
-import ListIcon from "@mui/icons-material/List";
-import PinDropIcon from "@mui/icons-material/PinDrop";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
-import CommentIcon from "@mui/icons-material/Comment";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import "../styles/floatingActionButton.css";
 import "../utilities/FloatingActionButton.js";
 import ScoreCardTable from "./ScoreCard";
 import RunsPerOver from "./RunsPerOver";
 import Scorecomparison from "./ScoreComparison";
 import { SelectedOption } from "../views/ShowPage";
+import WagonWheelWrapper from "./WagonWheel";
+import Video from "./Video";
+import Squad from "./Squad";
+import FallOfWickets from "./FallOfWickets";
+import MatchInfo from "./MatchInfo";
+import FieldPosition from "./FieldPosition";
 
 const FloatingActionButton = ({
   selections,
@@ -27,7 +25,7 @@ const FloatingActionButton = ({
     null
   );
 
-  let { matchId } = useParams();
+  const { matchId } = useParams();
   const handleMenuItemClick = (component: string) => {
     setSelectedComponent(component);
   };
@@ -38,8 +36,21 @@ const FloatingActionButton = ({
     const bowlingScorecard = selections.find((s) =>
       s.name.includes("Bowling Scorecard")
     );
-
     const runsPerOver = selections.find((s) => s.name === "Runs per over");
+    const scorecardComparison = selections.find(
+      (s) => s.name === "Scorecard comparison"
+    );
+    const wagonWheel = selections.find((s) => s.name === "Wagonwheel");
+    const video = selections.find((s) => s.name === "Video");
+    const squad = selections.find((s) => s.name === "Squad");
+    const fallOfWickets = selections.find((s) =>
+      s.name.includes("Fall of wickets")
+    );
+
+    const fieldPosition = selections.find((s) =>
+      s.name.includes("Field position")
+    );
+    const matchInfo = selections.find((s) => s.name.includes("Match info"));
     return (
       <>
         {(battingScorecard || selectedComponent === "Batting Scorecard") && (
@@ -67,9 +78,54 @@ const FloatingActionButton = ({
             setSelection={setSelection}
           />
         )}
-        {/* {selections.find((s) => s.name === "Score Comparison") && (
-          <Scorecomparison matchId={matchId ?? ""} x={x} y={y} />
-        )} */}
+        {(scorecardComparison ||
+          selectedComponent === "Scorecard comparison") && (
+          <Scorecomparison
+            matchId={matchId ?? ""}
+            selections={selections}
+            setSelection={setSelection}
+          />
+        )}
+        {(wagonWheel || selectedComponent === "Wagonwheel") && (
+          <WagonWheelWrapper
+            selections={selections}
+            setSelection={setSelection}
+            matchId={matchId ?? ""}
+          />
+        )}
+        {(video || selectedComponent === "Video") && (
+          <Video
+            selections={selections}
+            setSelection={setSelection}
+            matchId={matchId ?? ""}
+          />
+        )}
+        {(squad || selectedComponent === "Squad") && (
+          <Squad
+            selections={selections}
+            setSelection={setSelection}
+            matchId={matchId ?? ""}
+          />
+        )}
+        {(fallOfWickets || selectedComponent === "Fall of wickets") && (
+          <FallOfWickets
+            selections={selections}
+            setSelection={setSelection}
+            matchId={matchId ?? ""}
+          />
+        )}
+
+        {(matchInfo || selectedComponent === "Match info") && (
+          <MatchInfo
+            selections={selections}
+            setSelection={setSelection}
+            matchId={matchId ?? ""}
+          />
+        )}
+
+        {(fieldPosition || selectedComponent === "Field position") && (
+          <FieldPosition selections={selections} setSelection={setSelection} />
+        )}
       </>
     );
   };
@@ -84,6 +140,16 @@ const FloatingActionButton = ({
             <i className="fa fa-plus icon-default"></i>
           </Button>
           <ul className="floatingMenu">
+            <li>
+              <Button onClick={() => handleMenuItemClick("Match info")}>
+                Match Info
+              </Button>
+            </li>
+            <li>
+              <Button onClick={() => handleMenuItemClick("Video")}>
+                Video
+              </Button>
+            </li>
             <li>
               <Button onClick={() => handleMenuItemClick("Batting Scorecard")}>
                 Batting Scorecard
@@ -100,21 +166,32 @@ const FloatingActionButton = ({
               </Button>
             </li>
             <li>
-              <Button onClick={() => handleMenuItemClick("Score Comparison")}>
+              <Button
+                onClick={() => handleMenuItemClick("Scorecard comparison")}
+              >
                 Score Comparison
               </Button>
             </li>
             <li>
-              <Button>Add Menu</Button>
+              <Button onClick={() => handleMenuItemClick("Wagonwheel")}>
+                Wagonwheel
+              </Button>
+            </li>
+
+            <li>
+              <Button onClick={() => handleMenuItemClick("Squad")}>
+                Squad
+              </Button>
             </li>
             <li>
-              <Button>Go To Google</Button>
+              <Button onClick={() => handleMenuItemClick("Fall of wickets")}>
+                Fall Of Wickets
+              </Button>
             </li>
             <li>
-              <Button>Add Inventory</Button>
-            </li>
-            <li>
-              <Button>Add Staff</Button>
+              <Button onClick={() => handleMenuItemClick("Field position")}>
+                Field Position
+              </Button>
             </li>
           </ul>
         </div>

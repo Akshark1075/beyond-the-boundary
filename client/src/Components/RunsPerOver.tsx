@@ -13,7 +13,7 @@ import {
 } from "chart.js";
 import { GetScorecard } from "../types/getScorecard";
 import { Skeleton } from "@mui/material";
-import WithTitleBar from "./TitleBar";
+import WithTitleBar from "./WithTitleBar";
 import React from "react";
 import { Rnd, RndResizeCallback } from "react-rnd";
 import { DraggableEvent } from "react-draggable";
@@ -69,7 +69,6 @@ const fetchOvers = async (matchId: string): Promise<Response> => {
 const RunsPerOver = React.memo(
   ({
     matchId,
-
     selections,
     setSelection,
   }: {
@@ -194,6 +193,7 @@ const RunsPerOver = React.memo(
         },
       ];
       setSelection(newItems);
+      saveArrayToLocalStorage("selectedOptions", newItems);
     }
 
     const setPosition = (x: number, y: number) => {
@@ -252,6 +252,9 @@ const RunsPerOver = React.memo(
             height={
               componentRef.current?.getBoundingClientRect().height ?? height
             }
+            storedKey="Runs per over"
+            selections={selections}
+            setSelection={setSelection}
           >
             <div
               style={{
@@ -260,6 +263,7 @@ const RunsPerOver = React.memo(
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-around",
+                overflow: "auto",
               }}
             >
               {isLoading || error ? (

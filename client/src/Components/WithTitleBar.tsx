@@ -1,38 +1,40 @@
 import React, { ReactNode, useState } from "react";
 import { AppBar, Toolbar, IconButton, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import CropSquareIcon from "@mui/icons-material/CropSquare";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-
 import "../styles/index.css";
 import NewWindow from "react-new-window";
+import { deleteFromLocalStorage } from "../utilities/localStorageUtils";
+import { SelectedOption } from "../views/ShowPage";
 
 const WithTitleBar = ({
   title,
   children,
   width,
   height,
+  storedKey,
+  selections,
+  setSelection,
 }: {
   title: string;
   width: number;
   height: number;
   children: ReactNode;
+  storedKey: string;
+  selections: SelectedOption[];
+  setSelection: (option: SelectedOption[]) => void;
 }) => {
   const [isNewWindow, setOpenWindow] = useState(false);
   const [isShowingComponent, setIsShowingComponent] = useState(true);
   const handleOpenNewWindow = () => {
     setOpenWindow(true);
   };
-  const handleMinimize = () => {
-    console.log("Minimize button clicked");
-  };
 
-  const handleMaximize = () => {
-    console.log("Maximize button clicked");
-  };
-
-  const handleClose = () => {
+  const onClose = () => {
     setIsShowingComponent(false);
+    setSelection(selections.filter((s) => s.name !== storedKey));
+
+    deleteFromLocalStorage(storedKey);
   };
 
   return isShowingComponent ? (
@@ -59,19 +61,12 @@ const WithTitleBar = ({
             >
               <OpenInNewIcon />
             </IconButton>
+
             <IconButton
               edge="end"
               color="inherit"
               className="p-2"
-              onClick={handleMaximize}
-            >
-              <CropSquareIcon />
-            </IconButton>
-            <IconButton
-              edge="end"
-              color="inherit"
-              className="p-2"
-              onClick={handleClose}
+              onClick={onClose}
             >
               <CloseIcon />
             </IconButton>

@@ -1,6 +1,23 @@
+import { SelectedOption } from "../views/ShowPage";
+
 // localStorageUtils.ts
 export const saveArrayToLocalStorage = (key: string, array: any[]) => {
   localStorage.setItem(key, JSON.stringify(array));
+};
+export const deleteFromLocalStorage = (key: string) => {
+  const storedArray = localStorage.getItem("selectedOptions");
+  if (storedArray === "") {
+    localStorage.removeItem("selectedOptions");
+  } else if (storedArray) {
+    localStorage.setItem(
+      "selectedOptions",
+      JSON.stringify(
+        JSON.parse(storedArray).filter(
+          (item: SelectedOption) => item.name !== key
+        )
+      )
+    );
+  }
 };
 
 export const getArrayFromLocalStorage = (key: string): any[] => {
