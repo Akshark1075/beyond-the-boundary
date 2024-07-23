@@ -32,7 +32,7 @@ const Video = ({
     const newItems = [
       ...selections,
       {
-        name: `Runs per over`,
+        name: `Video`,
         x: x,
         y: y,
         width: width,
@@ -45,7 +45,7 @@ const Video = ({
 
   const setPosition = (x: number, y: number) => {
     const newSelections = [...selections];
-    const option = newSelections.find((s) => s.name === `Runs per over`);
+    const option = newSelections.find((s) => s.name === `Video`);
     if (option) {
       option.x = x;
       option.y = y;
@@ -56,7 +56,7 @@ const Video = ({
 
   const setSize = (w: number, h: number) => {
     const newSelections = [...selections];
-    const option = newSelections.find((s) => s.name === `Runs per over`);
+    const option = newSelections.find((s) => s.name === `Video`);
     if (option) {
       option.width = w;
       option.height = h;

@@ -129,6 +129,28 @@ const FloatingActionButton = ({
       </>
     );
   };
+  const components = [
+    { title: "Match Info", key: "Match Info" },
+    { title: "Video", key: "Video" },
+    { title: "Batting Scorecard", key: "Batting Scorecard" },
+    { title: "Bowling Scorecard", key: "Bowling Scorecard" },
+    { title: "Runs Per Over", key: "Runs per over" },
+    { title: "Score Comparison", key: "Scorecard comparison" },
+    {
+      title: "Wagonwheel",
+      key: "Wagonwheel",
+    },
+    { title: "Squad", key: "Squad" },
+    {
+      title: "Fall Of Wickets",
+
+      key: "Fall of wickets",
+    },
+    { title: "Field Placemnents", key: "Field positions" },
+  ];
+  const filteredOptions = components.filter(
+    (c) => !selections.find((s) => s.name === c.key)
+  );
   return (
     <>
       <div className="floatingButtonWrap">
@@ -140,59 +162,13 @@ const FloatingActionButton = ({
             <i className="fa fa-plus icon-default"></i>
           </Button>
           <ul className="floatingMenu">
-            <li>
-              <Button onClick={() => handleMenuItemClick("Match info")}>
-                Match Info
-              </Button>
-            </li>
-            <li>
-              <Button onClick={() => handleMenuItemClick("Video")}>
-                Video
-              </Button>
-            </li>
-            <li>
-              <Button onClick={() => handleMenuItemClick("Batting Scorecard")}>
-                Batting Scorecard
-              </Button>
-            </li>
-            <li>
-              <Button onClick={() => handleMenuItemClick("Bowling Scorecard")}>
-                Bowling Scorecard
-              </Button>
-            </li>
-            <li>
-              <Button onClick={() => handleMenuItemClick("Runs per over")}>
-                Runs per over
-              </Button>
-            </li>
-            <li>
-              <Button
-                onClick={() => handleMenuItemClick("Scorecard comparison")}
-              >
-                Score Comparison
-              </Button>
-            </li>
-            <li>
-              <Button onClick={() => handleMenuItemClick("Wagonwheel")}>
-                Wagonwheel
-              </Button>
-            </li>
-
-            <li>
-              <Button onClick={() => handleMenuItemClick("Squad")}>
-                Squad
-              </Button>
-            </li>
-            <li>
-              <Button onClick={() => handleMenuItemClick("Fall of wickets")}>
-                Fall Of Wickets
-              </Button>
-            </li>
-            <li>
-              <Button onClick={() => handleMenuItemClick("Field position")}>
-                Field Position
-              </Button>
-            </li>
+            {filteredOptions.map((option) => (
+              <li key={option.key}>
+                <Button onClick={() => handleMenuItemClick(option.key)}>
+                  {option.title}
+                </Button>
+              </li>
+            ))}
           </ul>
         </div>
       </div>

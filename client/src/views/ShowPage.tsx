@@ -12,6 +12,7 @@ import ScoreCardTable from "../Components/ScoreCard";
 import Scorecomparison from "../Components/ScoreComparison";
 import FieldPosition from "../Components/FieldPosition";
 import FallOfWickets from "../Components/FallOfWickets";
+import WagonWheelWrapper from "../Components/WagonWheel";
 export interface SelectedOption {
   name: string;
   x: number;
@@ -29,101 +30,111 @@ const ShowPage = () => {
   const { matchId } = useParams();
   return (
     <>
-      <SpinningWheel
-        components={[
-          {
-            component: (
-              <MatchInfo
-                matchId={matchId ?? ""}
-                selections={selections}
-                setSelection={setSelection}
-              />
-            ),
-            title: "Match Info",
-          },
-          {
-            component: (
-              <Squad
-                matchId={matchId ?? ""}
-                selections={selections}
-                setSelection={setSelection}
-              />
-            ),
-            title: "Squad",
-          },
-          {
-            component: (
-              <Video
-                matchId={matchId ?? ""}
-                selections={selections}
-                setSelection={setSelection}
-              />
-            ),
-            title: "Video",
-          },
-          {
-            component: (
-              <ScoreCardTable
-                type="Batting"
-                matchId={matchId ?? ""}
-                selections={selections}
-                setSelection={setSelection}
-              />
-            ),
-            title: "Bat Scorecard",
-          },
-          {
-            component: (
-              <ScoreCardTable
-                type="Bowling"
-                matchId={matchId ?? ""}
-                selections={selections}
-                setSelection={setSelection}
-              />
-            ),
-            title: "Bow Scorecard",
-          },
-          {
-            component: (
-              <Scorecomparison
-                matchId={matchId ?? ""}
-                selections={selections}
-                setSelection={setSelection}
-              />
-            ),
-            title: "Score Comp",
-          },
-          {
-            component: (
-              <RunsPerOver
-                matchId={matchId ?? ""}
-                selections={selections}
-                setSelection={setSelection}
-              />
-            ),
-            title: "Runs Per Over",
-          },
-          {
-            component: (
-              <FieldPosition
-                selections={selections}
-                setSelection={setSelection}
-              />
-            ),
-            title: "Field Pos",
-          },
-          {
-            component: (
-              <FallOfWickets
-                matchId={matchId ?? ""}
-                selections={selections}
-                setSelection={setSelection}
-              />
-            ),
-            title: "FOW",
-          },
-        ]}
-      />
+      {/* //   <SpinningWheel 
+    //     components={[
+    //       {
+    //         component: (
+    //           <MatchInfo
+    //             matchId={matchId ?? ""}
+    //             selections={selections}
+    //             setSelection={setSelection}
+    //           />
+    //         ),
+    //         title: "Match Info",
+    //       },
+    //       {
+    //         component: (
+    //           <Squad
+    //             matchId={matchId ?? ""}
+    //             selections={selections}
+    //             setSelection={setSelection}
+    //           />
+    //         ),
+    //         title: "Squad",
+    //       },
+    //       {
+    //         component: (
+    //           <Video
+    //             matchId={matchId ?? ""}
+    //             selections={selections}
+    //             setSelection={setSelection}
+    //           />
+    //         ),
+    //         title: "Video",
+    //       },
+    //       {
+    //         component: (
+    //           <ScoreCardTable
+    //             type="Batting"
+    //             matchId={matchId ?? ""}
+    //             selections={selections}
+    //             setSelection={setSelection}
+    //           />
+    //         ),
+    //         title: "Bat Scorecard",
+    //       },
+    //       {
+    //         component: (
+    //           <ScoreCardTable
+    //             type="Bowling"
+    //             matchId={matchId ?? ""}
+    //             selections={selections}
+    //             setSelection={setSelection}
+    //           />
+    //         ),
+    //         title: "Bowl Scorecard",
+    //       },
+    //       {
+    //         component: (
+    //           <Scorecomparison
+    //             matchId={matchId ?? ""}
+    //             selections={selections}
+    //             setSelection={setSelection}
+    //           />
+    //         ),
+    //         title: "Score Comp",
+    //       },
+    //       {
+    //         component: (
+    //           <RunsPerOver
+    //             matchId={matchId ?? ""}
+    //             selections={selections}
+    //             setSelection={setSelection}
+    //           />
+    //         ),
+    //         title: "Runs Per Over",
+    //       },
+    //       {
+    //         component: (
+    //           <FieldPosition
+    //             selections={selections}
+    //             setSelection={setSelection}
+    //           />
+    //         ),
+    //         title: "Field Pos",
+    //       },
+    //       {
+    //         component: (
+    //           <FallOfWickets
+    //             matchId={matchId ?? ""}
+    //             selections={selections}
+    //             setSelection={setSelection}
+    //           />
+    //         ),
+    //         title: "FOW",
+    //       },
+    //       {
+    //         component: (
+    //           <WagonWheelWrapper
+    //             matchId={matchId ?? ""}
+    //             selections={selections}
+    //             setSelection={setSelection}
+    //           />
+    //         ),
+    //         title: "Wagonwheel",
+    //       },
+    //     ]}
+    //   />*/}
       <FloatingActionButton
         selections={selections}
         setSelection={setSelection}

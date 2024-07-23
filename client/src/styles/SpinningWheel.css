@@ -194,7 +194,15 @@
   -moz-transform: rotate(360deg);
   -o-transform: rotate(360deg);
   -ms-transform: rotate(360deg);
-  border-color: #b0b5c6 transparent;
+  border-color: #989fb1 transparent;
+}
+#wheel div.sec:nth-child(10) {
+  transform: rotate(360deg);
+  -webkit-transform: rotate(360deg);
+  -moz-transform: rotate(360deg);
+  -o-transform: rotate(360deg);
+  -ms-transform: rotate(360deg);
+  border-color: #747c91 transparent;
 }
 
 #wheel div.sec .fa {
