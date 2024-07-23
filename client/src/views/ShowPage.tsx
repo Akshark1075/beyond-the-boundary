@@ -3,8 +3,15 @@ import React, { useEffect, useState } from "react";
 import FloatingActionButton from "../Components/FloatingActionButton";
 import { getArrayFromLocalStorage } from "../utilities/localStorageUtils";
 import { useParams } from "react-router-dom";
-import SquadComponent from "../Components/Squad";
-import FieldSettings from "../Components/FieldPosition";
+import SpinningWheel from "../Components/SpinningWheel";
+import RunsPerOver from "../Components/RunsPerOver";
+import MatchInfo from "../Components/MatchInfo";
+import Squad from "../Components/Squad";
+import Video from "../Components/Video";
+import ScoreCardTable from "../Components/ScoreCard";
+import Scorecomparison from "../Components/ScoreComparison";
+import FieldPosition from "../Components/FieldPosition";
+import FallOfWickets from "../Components/FallOfWickets";
 export interface SelectedOption {
   name: string;
   x: number;
@@ -22,6 +29,101 @@ const ShowPage = () => {
   const { matchId } = useParams();
   return (
     <>
+      <SpinningWheel
+        components={[
+          {
+            component: (
+              <MatchInfo
+                matchId={matchId ?? ""}
+                selections={selections}
+                setSelection={setSelection}
+              />
+            ),
+            title: "Match Info",
+          },
+          {
+            component: (
+              <Squad
+                matchId={matchId ?? ""}
+                selections={selections}
+                setSelection={setSelection}
+              />
+            ),
+            title: "Squad",
+          },
+          {
+            component: (
+              <Video
+                matchId={matchId ?? ""}
+                selections={selections}
+                setSelection={setSelection}
+              />
+            ),
+            title: "Video",
+          },
+          {
+            component: (
+              <ScoreCardTable
+                type="Batting"
+                matchId={matchId ?? ""}
+                selections={selections}
+                setSelection={setSelection}
+              />
+            ),
+            title: "Bat Scorecard",
+          },
+          {
+            component: (
+              <ScoreCardTable
+                type="Bowling"
+                matchId={matchId ?? ""}
+                selections={selections}
+                setSelection={setSelection}
+              />
+            ),
+            title: "Bow Scorecard",
+          },
+          {
+            component: (
+              <Scorecomparison
+                matchId={matchId ?? ""}
+                selections={selections}
+                setSelection={setSelection}
+              />
+            ),
+            title: "Score Comp",
+          },
+          {
+            component: (
+              <RunsPerOver
+                matchId={matchId ?? ""}
+                selections={selections}
+                setSelection={setSelection}
+              />
+            ),
+            title: "Runs Per Over",
+          },
+          {
+            component: (
+              <FieldPosition
+                selections={selections}
+                setSelection={setSelection}
+              />
+            ),
+            title: "Field Pos",
+          },
+          {
+            component: (
+              <FallOfWickets
+                matchId={matchId ?? ""}
+                selections={selections}
+                setSelection={setSelection}
+              />
+            ),
+            title: "FOW",
+          },
+        ]}
+      />
       <FloatingActionButton
         selections={selections}
         setSelection={setSelection}
