@@ -7,6 +7,9 @@ import {
   TableRow,
   Paper,
   Skeleton,
+  useMediaQuery,
+  AppBar,
+  Toolbar,
 } from "@mui/material";
 import Typography from "@mui/joy/Typography";
 import { useQuery } from "@tanstack/react-query";
@@ -18,6 +21,344 @@ import { Rnd, RndResizeCallback } from "react-rnd";
 import { DraggableEvent } from "react-draggable";
 import WithTitleBar from "./WithTitleBar";
 
+import { useTheme } from "@mui/material/styles";
+const MatchInfoComponent = ({
+  width,
+  height,
+  isMatchDataLoading,
+  matchData,
+}: {
+  width: number;
+  height: number;
+  isMatchDataLoading: boolean;
+  matchData: GetInfo | undefined;
+}) => {
+  return (
+    <div style={{ width: width, height: height, overflow: "auto" }}>
+      <TableContainer component={Paper}>
+        <Table aria-label="match info table">
+          <TableBody>
+            {isMatchDataLoading ? (
+              <>
+                <Skeleton height={"2rem"} />
+                <Skeleton height={"2rem"} />
+                <Skeleton height={"2rem"} />
+                <Skeleton height={"2rem"} />
+                <Skeleton height={"2rem"} />
+              </>
+            ) : (
+              <>
+                <TableRow>
+                  <TableCell component="th" scope="row" sx={{ borderRight: 1 }}>
+                    <Typography
+                      level="title-md"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+
+                        fontWeight: "800",
+                      }}
+                    >
+                      {"Match"}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography
+                      level="body-sm"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+
+                        fontWeight: "800",
+                      }}
+                    >
+                      {matchData?.matchInfo.series.name}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row" sx={{ borderRight: 1 }}>
+                    <Typography
+                      level="title-md"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+
+                        fontWeight: "800",
+                      }}
+                    >
+                      {"Date"}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography
+                      level="body-sm"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+
+                        fontWeight: "800",
+                      }}
+                    >
+                      {matchData?.matchInfo.matchStartTimestamp &&
+                      matchData?.matchInfo.matchCompleteTimestamp
+                        ? new Date(matchData?.matchInfo.matchStartTimestamp) +
+                          " - " +
+                          new Date(matchData?.matchInfo.matchCompleteTimestamp)
+                        : "-"}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row" sx={{ borderRight: 1 }}>
+                    <Typography
+                      level="title-md"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+
+                        fontWeight: "800",
+                      }}
+                    >
+                      {"Match"}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography
+                      level="body-sm"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+
+                        fontWeight: "800",
+                      }}
+                    >
+                      {matchData?.matchInfo.series.name}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row" sx={{ borderRight: 1 }}>
+                    <Typography
+                      level="title-md"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+
+                        fontWeight: "800",
+                      }}
+                    >
+                      {"Toss"}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography
+                      level="body-sm"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+
+                        fontWeight: "800",
+                      }}
+                    >
+                      {`${matchData?.matchInfo.tossResults.tossWinnerName} won the toss and chose to ${matchData?.matchInfo.tossResults.decision}` ??
+                        "-"}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row" sx={{ borderRight: 1 }}>
+                    <Typography
+                      level="title-md"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+
+                        fontWeight: "800",
+                      }}
+                    >
+                      {"Venue"}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography
+                      level="body-sm"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+
+                        fontWeight: "800",
+                      }}
+                    >
+                      {matchData?.matchInfo.venue.city +
+                        " - " +
+                        matchData?.matchInfo.venue.country}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+
+                <TableRow>
+                  <TableCell component="th" scope="row" sx={{ borderRight: 1 }}>
+                    <Typography
+                      level="title-md"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+
+                        fontWeight: "800",
+                      }}
+                    >
+                      {"Umpires"}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography
+                      level="body-sm"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+
+                        fontWeight: "800",
+                      }}
+                    >
+                      {matchData?.matchInfo.umpire1.name +
+                        "," +
+                        matchData?.matchInfo.umpire2.name}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row" sx={{ borderRight: 1 }}>
+                    <Typography
+                      level="title-md"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+
+                        fontWeight: "800",
+                      }}
+                    >
+                      {"Third Umpire"}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography
+                      level="body-sm"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+
+                        fontWeight: "800",
+                      }}
+                    >
+                      {matchData?.matchInfo.umpire3.name}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row" sx={{ borderRight: 1 }}>
+                    <Typography
+                      level="title-md"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+
+                        fontWeight: "800",
+                      }}
+                    >
+                      {"Match Refree"}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography
+                      level="body-sm"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+
+                        fontWeight: "800",
+                      }}
+                    >
+                      {matchData?.matchInfo.referee.name}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row" sx={{ borderRight: 1 }}>
+                    <Typography
+                      level="title-md"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+
+                        fontWeight: "800",
+                      }}
+                    >
+                      {matchData?.matchInfo.team1.name}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography
+                      level="body-sm"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+
+                        fontWeight: "800",
+                      }}
+                    >
+                      {matchData?.matchInfo.team1.playerDetails.reduce(
+                        (accumulator, currentValue, i, a) =>
+                          accumulator +
+                          `${currentValue.name}
+     ${i !== a.length - 1 ? ", " : ""}`,
+                        ""
+                      )}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row" sx={{ borderRight: 1 }}>
+                    <Typography
+                      level="title-md"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+
+                        fontWeight: "800",
+                      }}
+                    >
+                      {matchData?.matchInfo.team2.name}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography
+                      level="body-sm"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+
+                        fontWeight: "800",
+                      }}
+                    >
+                      {matchData?.matchInfo.team2.playerDetails.reduce(
+                        (accumulator, currentValue, i, a) =>
+                          accumulator +
+                          `${currentValue.name}
+     ${i !== a.length - 1 ? ", " : ""}`,
+                        ""
+                      )}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              </>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </div>
+  );
+};
 const MatchInfo = React.memo(
   ({
     matchId,
@@ -85,7 +426,9 @@ const MatchInfo = React.memo(
       width = 350,
       height = 350,
     } = storedInfo ?? {};
-    if (!storedInfo) {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+    if (!storedInfo && !isMobile) {
       const newItems = [
         ...selections,
         {
@@ -139,7 +482,30 @@ const MatchInfo = React.memo(
       setPosition(d.x, d.y);
     };
 
-    return (
+    return isMobile ? (
+      <div style={{ width: "100%", marginBottom: "1rem", overflowY: "scroll" }}>
+        <AppBar
+          position="static"
+          style={{ background: "#334155" }}
+          className="grow"
+        >
+          <Toolbar variant="dense" className="px-2 min-h-8">
+            <Typography
+              component="h6"
+              className="grow cursor-pointer select-none"
+            >
+              {"Match Info"}
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <MatchInfoComponent
+          width={width}
+          height={height}
+          isMatchDataLoading={isMatchDataLoading}
+          matchData={matchData}
+        />
+      </div>
+    ) : (
       <Rnd
         size={{ width: width, height: height }}
         position={{ x: x ?? randomX, y: y ?? randomY }}
@@ -160,373 +526,12 @@ const MatchInfo = React.memo(
             selections={selections}
             setSelection={setSelection}
           >
-            <div style={{ width: width, height: height, overflow: "auto" }}>
-              <TableContainer component={Paper}>
-                <Table aria-label="match info table">
-                  <TableBody>
-                    {isMatchDataLoading ? (
-                      <>
-                        <Skeleton height={"2rem"} />
-                        <Skeleton height={"2rem"} />
-                        <Skeleton height={"2rem"} />
-                        <Skeleton height={"2rem"} />
-                        <Skeleton height={"2rem"} />
-                      </>
-                    ) : (
-                      <>
-                        <TableRow>
-                          <TableCell
-                            component="th"
-                            scope="row"
-                            sx={{ borderRight: 1 }}
-                          >
-                            <Typography
-                              level="title-md"
-                              sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-
-                                fontWeight: "800",
-                              }}
-                            >
-                              {"Match"}
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="right">
-                            <Typography
-                              level="body-sm"
-                              sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-
-                                fontWeight: "800",
-                              }}
-                            >
-                              {matchData?.matchInfo.series.name}
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell
-                            component="th"
-                            scope="row"
-                            sx={{ borderRight: 1 }}
-                          >
-                            <Typography
-                              level="title-md"
-                              sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-
-                                fontWeight: "800",
-                              }}
-                            >
-                              {"Date"}
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="right">
-                            <Typography
-                              level="body-sm"
-                              sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-
-                                fontWeight: "800",
-                              }}
-                            >
-                              {matchData?.matchInfo.matchStartTimestamp &&
-                              matchData?.matchInfo.matchCompleteTimestamp
-                                ? new Date(
-                                    matchData?.matchInfo.matchStartTimestamp
-                                  ) +
-                                  " - " +
-                                  new Date(
-                                    matchData?.matchInfo.matchCompleteTimestamp
-                                  )
-                                : "-"}
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell
-                            component="th"
-                            scope="row"
-                            sx={{ borderRight: 1 }}
-                          >
-                            <Typography
-                              level="title-md"
-                              sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-
-                                fontWeight: "800",
-                              }}
-                            >
-                              {"Match"}
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="right">
-                            <Typography
-                              level="body-sm"
-                              sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-
-                                fontWeight: "800",
-                              }}
-                            >
-                              {matchData?.matchInfo.series.name}
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell
-                            component="th"
-                            scope="row"
-                            sx={{ borderRight: 1 }}
-                          >
-                            <Typography
-                              level="title-md"
-                              sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-
-                                fontWeight: "800",
-                              }}
-                            >
-                              {"Toss"}
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="right">
-                            <Typography
-                              level="body-sm"
-                              sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-
-                                fontWeight: "800",
-                              }}
-                            >
-                              {`${matchData?.matchInfo.tossResults.tossWinnerName} won the toss and chose to ${matchData?.matchInfo.tossResults.decision}` ??
-                                "-"}
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell
-                            component="th"
-                            scope="row"
-                            sx={{ borderRight: 1 }}
-                          >
-                            <Typography
-                              level="title-md"
-                              sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-
-                                fontWeight: "800",
-                              }}
-                            >
-                              {"Venue"}
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="right">
-                            <Typography
-                              level="body-sm"
-                              sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-
-                                fontWeight: "800",
-                              }}
-                            >
-                              {matchData?.matchInfo.venue.city +
-                                " - " +
-                                matchData?.matchInfo.venue.country}
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-
-                        <TableRow>
-                          <TableCell
-                            component="th"
-                            scope="row"
-                            sx={{ borderRight: 1 }}
-                          >
-                            <Typography
-                              level="title-md"
-                              sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-
-                                fontWeight: "800",
-                              }}
-                            >
-                              {"Umpires"}
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="right">
-                            <Typography
-                              level="body-sm"
-                              sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-
-                                fontWeight: "800",
-                              }}
-                            >
-                              {matchData?.matchInfo.umpire1.name +
-                                "," +
-                                matchData?.matchInfo.umpire2.name}
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell
-                            component="th"
-                            scope="row"
-                            sx={{ borderRight: 1 }}
-                          >
-                            <Typography
-                              level="title-md"
-                              sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-
-                                fontWeight: "800",
-                              }}
-                            >
-                              {"Third Umpire"}
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="right">
-                            <Typography
-                              level="body-sm"
-                              sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-
-                                fontWeight: "800",
-                              }}
-                            >
-                              {matchData?.matchInfo.umpire3.name}
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell
-                            component="th"
-                            scope="row"
-                            sx={{ borderRight: 1 }}
-                          >
-                            <Typography
-                              level="title-md"
-                              sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-
-                                fontWeight: "800",
-                              }}
-                            >
-                              {"Match Refree"}
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="right">
-                            <Typography
-                              level="body-sm"
-                              sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-
-                                fontWeight: "800",
-                              }}
-                            >
-                              {matchData?.matchInfo.referee.name}
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell
-                            component="th"
-                            scope="row"
-                            sx={{ borderRight: 1 }}
-                          >
-                            <Typography
-                              level="title-md"
-                              sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-
-                                fontWeight: "800",
-                              }}
-                            >
-                              {matchData?.matchInfo.team1.name}
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="right">
-                            <Typography
-                              level="body-sm"
-                              sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-
-                                fontWeight: "800",
-                              }}
-                            >
-                              {matchData?.matchInfo.team1.playerDetails.reduce(
-                                (accumulator, currentValue, i, a) =>
-                                  accumulator +
-                                  `${currentValue.name}
-                 ${i !== a.length - 1 ? ", " : ""}`,
-                                ""
-                              )}
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell
-                            component="th"
-                            scope="row"
-                            sx={{ borderRight: 1 }}
-                          >
-                            <Typography
-                              level="title-md"
-                              sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-
-                                fontWeight: "800",
-                              }}
-                            >
-                              {matchData?.matchInfo.team2.name}
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="right">
-                            <Typography
-                              level="body-sm"
-                              sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-
-                                fontWeight: "800",
-                              }}
-                            >
-                              {matchData?.matchInfo.team2.playerDetails.reduce(
-                                (accumulator, currentValue, i, a) =>
-                                  accumulator +
-                                  `${currentValue.name}
-                 ${i !== a.length - 1 ? ", " : ""}`,
-                                ""
-                              )}
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                      </>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </div>
+            <MatchInfoComponent
+              width={width}
+              height={height}
+              isMatchDataLoading={isMatchDataLoading}
+              matchData={matchData}
+            />
           </WithTitleBar>
         </div>
       </Rnd>

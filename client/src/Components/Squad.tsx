@@ -9,6 +9,10 @@ import {
   Paper,
   Box,
   Skeleton,
+  useTheme,
+  useMediaQuery,
+  Toolbar,
+  AppBar,
 } from "@mui/material";
 import Typography from "@mui/joy/Typography";
 import { useQuery } from "@tanstack/react-query";
@@ -20,7 +24,192 @@ import getRandomCoordinates from "../utilities/getRandomCoordinates";
 import { Rnd, RndResizeCallback } from "react-rnd";
 import { DraggableEvent } from "react-draggable";
 import WithTitleBar from "./WithTitleBar";
+const SquadComponent = ({
+  width,
+  height,
+  matchData,
+  isMatchDataLoading,
+  isTeam1SquadDataLoading,
+  isTeam2SquadDataLoading,
+  team1SquadData,
+  team2SquadData,
+}: {
+  width: number;
+  height: number;
+  matchData: GetInfo | undefined;
+  isMatchDataLoading: boolean;
+  isTeam1SquadDataLoading: boolean;
+  isTeam2SquadDataLoading: boolean;
+  team1SquadData: GetSquad | undefined;
+  team2SquadData: GetSquad | undefined;
+}) => {
+  return (
+    <div style={{ width: width, height: height, overflow: "auto" }}>
+      <TableContainer component={Paper}>
+        <Table aria-label="squad table">
+          <TableHead>
+            <TableRow>
+              <TableCell>
+                <Typography
+                  level="title-md"
+                  sx={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
 
+                    fontWeight: "900",
+                  }}
+                >
+                  {matchData?.matchInfo.team1.name}
+                </Typography>
+              </TableCell>
+              <TableCell align="right">
+                <Typography
+                  level="title-md"
+                  sx={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+
+                    fontWeight: "900",
+                  }}
+                >
+                  {matchData?.matchInfo.team2.name}
+                </Typography>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {isMatchDataLoading ||
+            isTeam1SquadDataLoading ||
+            isTeam2SquadDataLoading ? (
+              <>
+                <TableRow>
+                  <TableCell component="th" scope="row" sx={{ borderRight: 1 }}>
+                    <Box>
+                      <Skeleton height={"2rem"} />
+                      <Skeleton height={"2rem"} />
+                    </Box>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Box>
+                      <Skeleton height={"2rem"} />
+                      <Skeleton height={"2rem"} />
+                    </Box>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row" sx={{ borderRight: 1 }}>
+                    <Box>
+                      <Skeleton height={"2rem"} />
+                      <Skeleton height={"2rem"} />
+                    </Box>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Box>
+                      <Skeleton height={"2rem"} />
+                      <Skeleton height={"2rem"} />
+                    </Box>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row" sx={{ borderRight: 1 }}>
+                    <Box>
+                      <Skeleton height={"2rem"} />
+                      <Skeleton height={"2rem"} />
+                    </Box>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Box>
+                      <Skeleton height={"2rem"} />
+                      <Skeleton height={"2rem"} />
+                    </Box>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row" sx={{ borderRight: 1 }}>
+                    <Box>
+                      <Skeleton height={"2rem"} />
+                      <Skeleton height={"2rem"} />
+                    </Box>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Box>
+                      <Skeleton height={"2rem"} />
+                      <Skeleton height={"2rem"} />
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              </>
+            ) : (
+              (team1SquadData &&
+                team2SquadData &&
+                team1SquadData.players["playing XI"].map((p, i) => {
+                  return (
+                    <TableRow key={i}>
+                      <TableCell
+                        component="th"
+                        scope="row"
+                        sx={{ borderRight: 1 }}
+                      >
+                        <Box>
+                          <Typography
+                            level="title-md"
+                            sx={{
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+
+                              fontWeight: "800",
+                            }}
+                          >
+                            {team1SquadData?.players["playing XI"][i].name ??
+                              ""}
+                          </Typography>
+                          <Typography
+                            level="body-sm"
+                            sx={{
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
+                            {team1SquadData?.players["playing XI"][i].role ??
+                              ""}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                      <TableCell align="right">
+                        <Box>
+                          <Typography
+                            level="title-md"
+                            sx={{
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+
+                              fontWeight: "800",
+                            }}
+                          >
+                            {team2SquadData?.players["playing XI"][i].name ??
+                              ""}
+                          </Typography>
+                          <Typography
+                            sx={{
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
+                            {team2SquadData?.players["playing XI"][i].role ??
+                              ""}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })) ?? <></>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </div>
+  );
+};
 const Squad = React.memo(
   ({
     matchId,
@@ -151,7 +340,9 @@ const Squad = React.memo(
       width = 350,
       height = 500,
     } = storedSquad ?? {};
-    if (!storedSquad) {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+    if (!storedSquad && !isMobile) {
       const newItems = [
         ...selections,
         {
@@ -205,7 +396,34 @@ const Squad = React.memo(
       setPosition(d.x, d.y);
     };
 
-    return (
+    return isMobile ? (
+      <div style={{ width: "100%", marginBottom: "1rem", overflowY: "scroll" }}>
+        <AppBar
+          position="static"
+          style={{ background: "#334155" }}
+          className="grow"
+        >
+          <Toolbar variant="dense" className="px-2 min-h-8">
+            <Typography
+              component="h6"
+              className="grow cursor-pointer select-none"
+            >
+              {"Squad"}
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <SquadComponent
+          width={window.screen.width}
+          height={window.screen.height}
+          matchData={matchData}
+          isMatchDataLoading={isMatchDataLoading}
+          isTeam1SquadDataLoading={isTeam1SquadDataLoading}
+          isTeam2SquadDataLoading={isTeam2SquadDataLoading}
+          team1SquadData={team1SquadData}
+          team2SquadData={team2SquadData}
+        />
+      </div>
+    ) : (
       <Rnd
         size={{ width: width, height: height }}
         position={{ x: x ?? randomX, y: y ?? randomY }}
@@ -226,186 +444,16 @@ const Squad = React.memo(
             selections={selections}
             setSelection={setSelection}
           >
-            <div style={{ width: width, height: height, overflow: "auto" }}>
-              <TableContainer component={Paper}>
-                <Table aria-label="squad table">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>
-                        <Typography
-                          level="title-md"
-                          sx={{
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-
-                            fontWeight: "900",
-                          }}
-                        >
-                          {matchData?.matchInfo.team1.name}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Typography
-                          level="title-md"
-                          sx={{
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-
-                            fontWeight: "900",
-                          }}
-                        >
-                          {matchData?.matchInfo.team2.name}
-                        </Typography>
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {isMatchDataLoading ||
-                    isTeam1SquadDataLoading ||
-                    isTeam2SquadDataLoading ? (
-                      <>
-                        <TableRow>
-                          <TableCell
-                            component="th"
-                            scope="row"
-                            sx={{ borderRight: 1 }}
-                          >
-                            <Box>
-                              <Skeleton height={"2rem"} />
-                              <Skeleton height={"2rem"} />
-                            </Box>
-                          </TableCell>
-                          <TableCell align="right">
-                            <Box>
-                              <Skeleton height={"2rem"} />
-                              <Skeleton height={"2rem"} />
-                            </Box>
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell
-                            component="th"
-                            scope="row"
-                            sx={{ borderRight: 1 }}
-                          >
-                            <Box>
-                              <Skeleton height={"2rem"} />
-                              <Skeleton height={"2rem"} />
-                            </Box>
-                          </TableCell>
-                          <TableCell align="right">
-                            <Box>
-                              <Skeleton height={"2rem"} />
-                              <Skeleton height={"2rem"} />
-                            </Box>
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell
-                            component="th"
-                            scope="row"
-                            sx={{ borderRight: 1 }}
-                          >
-                            <Box>
-                              <Skeleton height={"2rem"} />
-                              <Skeleton height={"2rem"} />
-                            </Box>
-                          </TableCell>
-                          <TableCell align="right">
-                            <Box>
-                              <Skeleton height={"2rem"} />
-                              <Skeleton height={"2rem"} />
-                            </Box>
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell
-                            component="th"
-                            scope="row"
-                            sx={{ borderRight: 1 }}
-                          >
-                            <Box>
-                              <Skeleton height={"2rem"} />
-                              <Skeleton height={"2rem"} />
-                            </Box>
-                          </TableCell>
-                          <TableCell align="right">
-                            <Box>
-                              <Skeleton height={"2rem"} />
-                              <Skeleton height={"2rem"} />
-                            </Box>
-                          </TableCell>
-                        </TableRow>
-                      </>
-                    ) : (
-                      (team1SquadData &&
-                        team2SquadData &&
-                        team1SquadData.players["playing XI"].map((p, i) => {
-                          return (
-                            <TableRow key={i}>
-                              <TableCell
-                                component="th"
-                                scope="row"
-                                sx={{ borderRight: 1 }}
-                              >
-                                <Box>
-                                  <Typography
-                                    level="title-md"
-                                    sx={{
-                                      overflow: "hidden",
-                                      textOverflow: "ellipsis",
-
-                                      fontWeight: "800",
-                                    }}
-                                  >
-                                    {team1SquadData?.players["playing XI"][i]
-                                      .name ?? ""}
-                                  </Typography>
-                                  <Typography
-                                    level="body-sm"
-                                    sx={{
-                                      overflow: "hidden",
-                                      textOverflow: "ellipsis",
-                                    }}
-                                  >
-                                    {team1SquadData?.players["playing XI"][i]
-                                      .role ?? ""}
-                                  </Typography>
-                                </Box>
-                              </TableCell>
-                              <TableCell align="right">
-                                <Box>
-                                  <Typography
-                                    level="title-md"
-                                    sx={{
-                                      overflow: "hidden",
-                                      textOverflow: "ellipsis",
-
-                                      fontWeight: "800",
-                                    }}
-                                  >
-                                    {team2SquadData?.players["playing XI"][i]
-                                      .name ?? ""}
-                                  </Typography>
-                                  <Typography
-                                    sx={{
-                                      overflow: "hidden",
-                                      textOverflow: "ellipsis",
-                                    }}
-                                  >
-                                    {team2SquadData?.players["playing XI"][i]
-                                      .role ?? ""}
-                                  </Typography>
-                                </Box>
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })) ?? <></>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </div>
+            <SquadComponent
+              width={width}
+              height={height}
+              matchData={matchData}
+              isMatchDataLoading={isMatchDataLoading}
+              isTeam1SquadDataLoading={isTeam1SquadDataLoading}
+              isTeam2SquadDataLoading={isTeam2SquadDataLoading}
+              team1SquadData={team1SquadData}
+              team2SquadData={team2SquadData}
+            />
           </WithTitleBar>
         </div>
       </Rnd>

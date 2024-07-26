@@ -6,6 +6,13 @@ import { Rnd, RndResizeCallback } from "react-rnd";
 import { SelectedOption } from "../views/ShowPage";
 import getRandomCoordinates from "../utilities/getRandomCoordinates";
 import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 const Video = ({
   matchId,
   selections,
@@ -28,7 +35,10 @@ const Video = ({
     width = 853,
     height = 480,
   } = storedVideo ?? {};
-  if (!storedVideo) {
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  if (!storedVideo && !isMobile) {
     const newItems = [
       ...selections,
       {
@@ -81,7 +91,39 @@ const Video = ({
   const handleDragStop = (e: DraggableEvent, d: { x: number; y: number }) => {
     setPosition(d.x, d.y);
   };
-  return (
+  return isMobile ? (
+    <div style={{ width: "100%", marginBottom: "1rem", overflowY: "scroll" }}>
+      <AppBar
+        position="static"
+        style={{ background: "#334155" }}
+        className="grow"
+      >
+        <Toolbar variant="dense" className="px-2 min-h-8">
+          <Typography
+            component="h6"
+            className="grow cursor-pointer select-none"
+          >
+            {"Live"}
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <div
+        className="video-responsive"
+        ref={componentRef}
+        style={{ width: width, height: height, overflow: "auto" }}
+      >
+        <iframe
+          width={width}
+          height={height}
+          src={videoUrl}
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          title="Embedded YouTube Video"
+        />
+      </div>
+    </div>
+  ) : (
     <Rnd
       size={{ width: width, height: height }}
       position={{ x: x ?? randomX, y: y ?? randomY }}

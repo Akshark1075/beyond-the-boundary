@@ -1,35 +1,44 @@
 import $ from "jquery";
+
 $(document).ready(function () {
-  $(".floatingButton").on("click", function (e) {
+  // Event handler for the floating button click
+  $(".floatingButtonWrap").on("click", function (e) {
     e.preventDefault();
+    console.log("a");
     $(this).toggleClass("open");
+
+    // Toggle the icon class
     if ($(this).children(".fa").hasClass("fa-plus")) {
-      $(this).children(".fa").removeClass("fa-plus");
-      $(this).children(".fa").addClass("fa-close");
+      $(this).children(".fa").removeClass("fa-plus").addClass("fa-close");
     } else if ($(this).children(".fa").hasClass("fa-close")) {
-      $(this).children(".fa").removeClass("fa-close");
-      $(this).children(".fa").addClass("fa-plus");
+      $(this).children(".fa").removeClass("fa-close").addClass("fa-plus");
     }
+
+    // Toggle the floating menu
     $(".floatingMenu").stop().slideToggle();
   });
-  $(this).on("click", function (e) {
+
+  // Event handler for clicks outside the floating button and menu
+  $(document).on("click", function (e) {
     var container = $(".floatingButton");
-    // if the target of the click isn't the container nor a descendant of the container
+
+    // If the target of the click isn't the container nor a descendant of the container
     if (
       !container.is(e.target) &&
       $(".floatingButtonWrap").has(e.target).length === 0
     ) {
+      console.log("b");
+
       if (container.hasClass("open")) {
         container.removeClass("open");
       }
       if (container.children(".fa").hasClass("fa-close")) {
-        container.children(".fa").removeClass("fa-close");
-        container.children(".fa").addClass("fa-plus");
+        container.children(".fa").removeClass("fa-close").addClass("fa-plus");
       }
       $(".floatingMenu").hide();
     }
 
-    // if the target of the click isn't the container and a descendant of the menu
+    // If the target of the click isn't the container but is a descendant of the menu
     if (
       !container.is(e.target) &&
       $(".floatingMenu").has(e.target).length > 0

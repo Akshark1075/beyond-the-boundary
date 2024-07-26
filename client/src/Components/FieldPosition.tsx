@@ -6,6 +6,9 @@ import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
 import { SelectedOption } from "../views/ShowPage";
 import getRandomCoordinates from "../utilities/getRandomCoordinates";
 import { DraggableEvent } from "react-draggable";
+import { AppBar, Toolbar, Typography, useMediaQuery } from "@mui/material";
+
+import { useTheme } from "@mui/material/styles";
 
 interface FieldPositionProps {
   selections: SelectedOption[];
@@ -165,8 +168,10 @@ const FieldPosition: React.FC<FieldPositionProps> = ({
     width = 350,
     height = 370,
   } = storedScoreComparison ?? {};
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  if (!storedScoreComparison) {
+  if (!storedScoreComparison && !isMobile) {
     const newItems = [
       ...selections,
       {
@@ -350,7 +355,22 @@ const FieldPosition: React.FC<FieldPositionProps> = ({
     };
   }, [width, height, randArray]);
 
-  return (
+  return isMobile ? (
+    <div style={{ width: "100%", marginBottom: "1rem", overflowY: "scroll" }}>
+      <AppBar
+        position="static"
+        style={{ background: "#334155" }}
+        className="grow"
+      >
+        <Toolbar variant="dense" className="px-2 min-h-8">
+          <Typography variant="h6" className="grow cursor-pointer select-none">
+            {"Field positions"}
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      {<div ref={mountRef} />}
+    </div>
+  ) : (
     <Rnd
       size={{ width: width, height: height }}
       position={{ x: x ?? randomX, y: y ?? randomY }}

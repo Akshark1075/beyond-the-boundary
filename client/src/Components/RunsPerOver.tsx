@@ -12,7 +12,14 @@ import {
   Legend,
 } from "chart.js";
 import { GetScorecard } from "../types/getScorecard";
-import { Skeleton } from "@mui/material";
+import {
+  AppBar,
+  Skeleton,
+  Toolbar,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import WithTitleBar from "./WithTitleBar";
 import React from "react";
 import { Rnd, RndResizeCallback } from "react-rnd";
@@ -181,7 +188,9 @@ const RunsPerOver = React.memo(
       width = 350,
       height = 350,
     } = storedRunsPerOver ?? {};
-    if (!storedRunsPerOver) {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+    if (!storedRunsPerOver && !isMobile) {
       const newItems = [
         ...selections,
         {
@@ -235,7 +244,49 @@ const RunsPerOver = React.memo(
       setPosition(d.x, d.y);
     };
 
-    return (
+    return isMobile ? (
+      <div style={{ width: "100%", marginBottom: "1rem", overflowY: "scroll" }}>
+        <AppBar
+          position="static"
+          style={{ background: "#334155" }}
+          className="grow"
+        >
+          <Toolbar variant="dense" className="px-2 min-h-8">
+            <Typography
+              component="h6"
+              className="grow cursor-pointer select-none"
+            >
+              {"Runs per over"}
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <div
+          style={{
+            width: `${width}px`,
+            height: `${height}px`,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-around",
+            overflow: "auto",
+          }}
+        >
+          {isLoading || error ? (
+            <>
+              <Skeleton height={"2rem"} />
+              <Skeleton height={"2rem"} />
+              <Skeleton height={"2rem"} />
+              <Skeleton height={"2rem"} />
+              <Skeleton height={"2rem"} />
+            </>
+          ) : (
+            <Bar
+              data={chartData}
+              options={{ ...options, maintainAspectRatio: false }}
+            />
+          )}
+        </div>
+      </div>
+    ) : (
       <Rnd
         size={{ width: width, height: height }}
         position={{ x: x ?? randomX, y: y ?? randomY }}

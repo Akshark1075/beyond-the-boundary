@@ -8,6 +8,9 @@ import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
 import React from "react";
 import getRandomCoordinates from "../utilities/getRandomCoordinates";
 import { SelectedOption } from "../views/ShowPage";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { AppBar, Skeleton, Toolbar, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 const fetchScorecard = async (matchId: string): Promise<Response> => {
   try {
     const res = await fetch(
@@ -103,7 +106,10 @@ const Fow = ({
     width = 350,
     height = 350,
   } = storesFallOfWickets ?? {};
-  if (!storesFallOfWickets) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
+  if (!storesFallOfWickets && !isMobile) {
     const newItems = [
       ...selections,
       {
@@ -159,9 +165,44 @@ const Fow = ({
   const handleDragStop = (e: DraggableEvent, d: { x: number; y: number }) => {
     setPosition(d.x, d.y);
   };
-  if (isLoading || isError) return <></>;
-  else {
+
+  if (isLoading || isError)
     return (
+      <>
+        <Skeleton height={"2rem"} />
+        <Skeleton height={"2rem"} />
+        <Skeleton height={"2rem"} />
+        <Skeleton height={"2rem"} />
+        <Skeleton height={"2rem"} />
+      </>
+    );
+  else {
+    return isMobile ? (
+      <div style={{ width: "100%", marginBottom: "1rem", overflowY: "scroll" }}>
+        <AppBar
+          position="static"
+          style={{ background: "#334155" }}
+          className="grow"
+        >
+          <Toolbar variant="dense" className="px-2 min-h-8">
+            <Typography
+              variant="h6"
+              className="grow cursor-pointer select-none"
+            >
+              {`Fall of wickets ${row.inningsId}`}
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        {Object.values(row.wicketsData).reduce(
+          (accumulator, currentValue, i, a) =>
+            accumulator +
+            `${currentValue.wktRuns}-${currentValue.wktNbr}(${
+              currentValue.batName
+            },${currentValue.wktOver})${i !== a.length - 1 ? ", " : ""}`,
+          ""
+        )}
+      </div>
+    ) : (
       <Rnd
         size={{ width: width, height: height }}
         position={{ x: x, y: y }}
@@ -183,7 +224,6 @@ const Fow = ({
               componentRef.current?.getBoundingClientRect().height ?? height
             }
             storedKey={`Fall of wickets ${row.inningsId}`}
-            // handleClose={handleClose}
             selections={selections}
             setSelection={setSelection}
           >

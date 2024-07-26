@@ -10,48 +10,20 @@ interface SpinningWheelProps {
 
 const SpinningWheel: React.FC<SpinningWheelProps> = ({ components }) => {
   const [visible, setVisible] = useState(false);
-  const [idleTimer, setIdleTimer] = useState<NodeJS.Timeout | null>(null);
   const [rotation, setRotation] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const wheelRef = useRef<HTMLDivElement>(null);
 
   const angleStep = 360 / components.length;
-
+  console.log(angleStep);
   const handleVisibility = () => {
-    resetIdleTimer();
-    setVisible((prevVisible) => {
-      if (!prevVisible) {
-        startIdleTimer();
-      }
-
-      return !prevVisible;
-    });
-  };
-
-  const resetIdleTimer = () => {
-    setIdleTimer((prevTimer) => {
-      if (prevTimer) {
-        clearTimeout(prevTimer);
-      }
-      return null;
-    });
-  };
-  const startIdleTimer = () => {
-    setIdleTimer(
-      setTimeout(() => {
-        resetIdleTimer();
-
-        setVisible(false);
-      }, 5000)
-    );
+    setVisible((prevVisible) => !prevVisible);
   };
 
   useEffect(() => {
     document.addEventListener("click", handleVisibility);
-    document.addEventListener("mousedown", resetIdleTimer);
     return () => {
-      document.removeEventListener("click", resetIdleTimer);
-      document.addEventListener("mousedown", resetIdleTimer);
+      document.removeEventListener("click", handleVisibility);
     };
   }, []);
 
@@ -81,42 +53,41 @@ const SpinningWheel: React.FC<SpinningWheelProps> = ({ components }) => {
     const newIndex = Math.floor(adjustedRotation / angleStep);
     if (newIndex !== currentIndex) {
       setCurrentIndex(newIndex);
-      console.log(`Selection changed to: ${newIndex}`);
+      console.log(`Selection changed to: ${components[newIndex].title}`);
     }
   };
 
-  return visible ? (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        height: "100%",
-        transform: "translateY(120px)",
-      }}
-    >
-      <div id="wrapper" ref={wheelRef}>
+  return (
+    <>
+      {visible ? (
         <div
-          id="wheel"
-          onMouseDown={handleMouseDown}
-          style={{
-            transform: `rotate(${rotation}deg)`,
-          }}
+          style={{ display: "flex", justifyContent: "center", height: "100%" }}
         >
-          <div id="inner-wheel">
-            {components.map((component, index) => (
-              <div key={index} className="sec">
-                <span className="fa">{component.title}</span>
+          <div id="wrapper" ref={wheelRef}>
+            <div
+              id="wheel"
+              onMouseDown={handleMouseDown}
+              style={{ transform: `rotate(${rotation}deg)` }}
+            >
+              <div id="inner-wheel">
+                {components.map((component, index) => (
+                  <div key={index} className="sec">
+                    <span className="fa">{component.title}</span>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+            <div id="spin">
+              <div id="inner-spin"></div>
+            </div>
+            <div id="shine"></div>
           </div>
         </div>
-        <div id="spin">
-          <div id="inner-spin"></div>
-        </div>
-      </div>
-    </div>
-  ) : (
-    <></>
+      ) : (
+        <></>
+      )}
+      {components[components.length - currentIndex - 1].component}
+    </>
   );
 };
 

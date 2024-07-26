@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@mui/material";
 import { useParams } from "react-router-dom";
 import "../styles/floatingActionButton.css";
-import "../utilities/FloatingActionButton.js";
 import ScoreCardTable from "./ScoreCard";
 import RunsPerOver from "./RunsPerOver";
 import Scorecomparison from "./ScoreComparison";
@@ -14,21 +13,24 @@ import FallOfWickets from "./FallOfWickets";
 import MatchInfo from "./MatchInfo";
 import FieldPosition from "./FieldPosition";
 
-const FloatingActionButton = ({
-  selections,
-  setSelection,
-}: {
+interface FloatingActionButtonProps {
   selections: SelectedOption[];
   setSelection: (options: SelectedOption[]) => void;
+}
+
+const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
+  selections,
+  setSelection,
 }) => {
   const [selectedComponent, setSelectedComponent] = useState<string | null>(
     null
   );
+  const { matchId } = useParams<{ matchId: string }>();
 
-  const { matchId } = useParams();
   const handleMenuItemClick = (component: string) => {
     setSelectedComponent(component);
   };
+
   const renderComponent = () => {
     const battingScorecard = selections.find((s) =>
       s.name.includes("Batting Scorecard")
@@ -46,11 +48,11 @@ const FloatingActionButton = ({
     const fallOfWickets = selections.find((s) =>
       s.name.includes("Fall of wickets")
     );
-
     const fieldPosition = selections.find((s) =>
       s.name.includes("Field position")
     );
-    const matchInfo = selections.find((s) => s.name.includes("Match info"));
+    const matchInfo = selections.find((s) => s.name.includes("Match Info"));
+
     return (
       <>
         {(battingScorecard || selectedComponent === "Batting Scorecard") && (
@@ -115,7 +117,7 @@ const FloatingActionButton = ({
           />
         )}
 
-        {(matchInfo || selectedComponent === "Match info") && (
+        {(matchInfo || selectedComponent === "Match Info") && (
           <MatchInfo
             selections={selections}
             setSelection={setSelection}
@@ -129,6 +131,91 @@ const FloatingActionButton = ({
       </>
     );
   };
+
+  useEffect(() => {
+    const handleFloatingButtonClick = (e: Event) => {
+      e.preventDefault();
+      console.log("a");
+      const floatingButtonWrap = e.currentTarget as HTMLElement;
+      floatingButtonWrap.classList.toggle("open");
+
+      const icon = floatingButtonWrap.querySelector(".fa") as HTMLElement;
+      if (icon.classList.contains("fa-plus")) {
+        icon.classList.remove("fa-plus");
+        icon.classList.add("fa-close");
+      } else if (icon.classList.contains("fa-close")) {
+        icon.classList.remove("fa-close");
+        icon.classList.add("fa-plus");
+      }
+
+      const floatingMenu = document.querySelector(
+        ".floatingMenu"
+      ) as HTMLElement;
+      if (floatingMenu) {
+        floatingMenu.style.display =
+          floatingMenu.style.display === "none" ? "block" : "none";
+      }
+    };
+
+    const handleClickOutside = (e: MouseEvent) => {
+      const container = document.querySelector(
+        ".floatingButton"
+      ) as HTMLElement;
+
+      if (
+        container &&
+        !container.contains(e.target as Node) &&
+        !document
+          .querySelector(".floatingButtonWrap")
+          ?.contains(e.target as Node)
+      ) {
+        console.log("b");
+
+        if (container.classList.contains("open")) {
+          container.classList.remove("open");
+        }
+        const icon = container.querySelector(".fa") as HTMLElement;
+        if (icon && icon.classList.contains("fa-close")) {
+          icon.classList.remove("fa-close");
+          icon.classList.add("fa-plus");
+        }
+        const floatingMenu = document.querySelector(
+          ".floatingMenu"
+        ) as HTMLElement;
+        if (floatingMenu) {
+          floatingMenu.style.display = "none";
+        }
+      }
+
+      if (
+        container &&
+        !container.contains(e.target as Node) &&
+        document.querySelector(".floatingMenu")?.contains(e.target as Node)
+      ) {
+        container.classList.remove("open");
+        const floatingMenu = document.querySelector(
+          ".floatingMenu"
+        ) as HTMLElement;
+        if (floatingMenu) {
+          floatingMenu.style.display =
+            floatingMenu.style.display === "none" ? "block" : "none";
+        }
+      }
+    };
+
+    const floatingButtonWrap = document.querySelector(".floatingButtonWrap");
+    floatingButtonWrap?.addEventListener("click", handleFloatingButtonClick);
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      floatingButtonWrap?.removeEventListener(
+        "click",
+        handleFloatingButtonClick
+      );
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+
   const components = [
     { title: "Match Info", key: "Match Info" },
     { title: "Video", key: "Video" },
@@ -143,21 +230,22 @@ const FloatingActionButton = ({
     { title: "Squad", key: "Squad" },
     {
       title: "Fall Of Wickets",
-
       key: "Fall of wickets",
     },
-    { title: "Field Placemnents", key: "Field positions" },
+    { title: "Field Placements", key: "Field positions" },
   ];
+
   const filteredOptions = components.filter(
     (c) => !selections.find((s) => s.name === c.key)
   );
+
   return (
     <>
       <div className="floatingButtonWrap">
         <div className="floatingButtonInner">
           <Button
             className="floatingButton"
-            style={{ border: "5px solid #b2bedc", borderRadius: "50% 50%" }}
+            style={{ border: "5px solid #b2bedc", borderRadius: "50%" }}
           >
             <i className="fa fa-plus icon-default"></i>
           </Button>

@@ -7,6 +7,7 @@ import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
 import { SelectedOption } from "../views/ShowPage";
 import getRandomCoordinates from "../utilities/getRandomCoordinates";
 import {
+  AppBar,
   Box,
   FormControl,
   InputLabel,
@@ -14,6 +15,10 @@ import {
   Select,
   SelectChangeEvent,
   Skeleton,
+  Toolbar,
+  Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import "../styles/WagonWheel.css";
 import { GetScorecard } from "../types/getScorecard";
@@ -165,7 +170,9 @@ const WagonWheelWrapper = ({
     width = 350,
     height = 350,
   } = storedScoreComparison ?? {};
-  if (!storedScoreComparison) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  if (!storedScoreComparison && !isMobile) {
     const newItems = [
       ...selections,
       {
@@ -275,7 +282,95 @@ const WagonWheelWrapper = ({
   const teamBatters = Object.values(
     data?.scoreCard[team]?.batTeamDetails.batsmenData ?? {}
   );
-  return (
+  return isMobile ? (
+    <div style={{ width: "100%", marginBottom: "1rem", overflowY: "scroll" }}>
+      <AppBar
+        position="static"
+        style={{ background: "#334155" }}
+        className="grow"
+      >
+        <Toolbar variant="dense" className="px-2 min-h-8">
+          <Typography
+            component="h6"
+            className="grow cursor-pointer select-none"
+          >
+            {"Wagonwheel"}
+          </Typography>
+        </Toolbar>
+      </AppBar>
+
+      <div>
+        <div className="bg-slate-700 flex justify-between p-2 w-full">
+          <Box
+            // @ts-ignore: Unreachable code error
+            sx={{ minWidth: 120 }}
+          >
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label" sx={{ color: "white" }}>
+                Team
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="select-wagon-team"
+                value={String(team)}
+                label="Team"
+                sx={{ color: "white" }}
+                onChange={handleTeamChange}
+              >
+                <MenuItem value={0}>{team1Name}</MenuItem>
+                <MenuItem value={1}>{team2Name}</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+          <Box
+            // @ts-ignore: Unreachable code error
+            sx={{ minWidth: 120 }}
+          >
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label" sx={{ color: "white" }}>
+                Player
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={player}
+                label="Player"
+                sx={{ color: "white" }}
+                onChange={handlePlayerChange}
+              >
+                {teamBatters.map((b) => (
+                  <MenuItem value={b.batName}>{b.batName}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+        </div>
+        {isLoading || error ? (
+          <>
+            <Skeleton height={"2rem"} />
+            <Skeleton height={"2rem"} />
+            <Skeleton height={"2rem"} />
+            <Skeleton height={"2rem"} />
+            <Skeleton height={"2rem"} />
+          </>
+        ) : (
+          <WagonWheel
+            scores={
+              teamBatters.find((b) => b.batName === player) ?? {
+                ones: 0,
+                twos: 0,
+                threes: 0,
+                fours: 0,
+                sixes: 0,
+              }
+            }
+            width={window.screen.width}
+            height={400}
+          />
+        )}
+      </div>
+    </div>
+  ) : (
     <Rnd
       size={{ width: width, height: height }}
       position={{ x: x ?? randomX, y: y ?? randomY }}
