@@ -97,7 +97,7 @@ const Fow = ({
 }) => {
   const componentRef = React.useRef<HTMLDivElement>(null);
   const { x: randomX, y: randomY } = getRandomCoordinates();
-  const storesFallOfWickets = selections.find(
+  const storedFallOfWickets = selections.find(
     (s) => s.name === `Fall of wickets ${row.inningsId}`
   );
   const {
@@ -105,11 +105,16 @@ const Fow = ({
     y = randomY,
     width = 350,
     height = 350,
-  } = storesFallOfWickets ?? {};
+  } = storedFallOfWickets ?? {};
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-
-  if (!storesFallOfWickets && !isMobile) {
+  if (
+    selections.find((s) => s.name.includes("Fall of wickets")) &&
+    !storedFallOfWickets
+  ) {
+    return <></>;
+  }
+  if (!storedFallOfWickets && !isMobile) {
     const newItems = [
       ...selections,
       {
@@ -129,7 +134,7 @@ const Fow = ({
     const option = newSelections.find(
       (s) => s.name === `Fall of wickets ${row.inningsId}`
     );
-    if (option) {
+    if (option && !isMobile) {
       option.x = x;
       option.y = y;
       setSelection(newSelections);
@@ -142,7 +147,7 @@ const Fow = ({
     const option = newSelections.find(
       (s) => s.name === `Fall of wickets ${row.inningsId}`
     );
-    if (option) {
+    if (option && !isMobile) {
       option.width = w;
       option.height = h;
       setSelection(newSelections);
@@ -156,7 +161,7 @@ const Fow = ({
     delta,
     position
   ) => {
-    if (ref && ref.style) {
+    if (ref && ref.style && !isMobile) {
       const newWidth = parseInt(ref.style.width, 10);
       const newHeight = parseInt(ref.style.height, 10);
       setSize(newWidth, newHeight);
@@ -168,17 +173,43 @@ const Fow = ({
 
   if (isLoading || isError)
     return (
-      <>
+      <div
+        style={{
+          width: window.screen.width,
+          marginBottom: "1rem",
+          overflowY: "scroll",
+        }}
+      >
+        <AppBar
+          position="static"
+          style={{ background: "#334155" }}
+          className="grow"
+        >
+          <Toolbar variant="dense" className="px-2 min-h-8">
+            <Typography
+              variant="h6"
+              className="grow cursor-pointer select-none"
+            >
+              {`Fall of wickets ${row.inningsId}`}
+            </Typography>
+          </Toolbar>
+        </AppBar>
         <Skeleton height={"2rem"} />
         <Skeleton height={"2rem"} />
         <Skeleton height={"2rem"} />
         <Skeleton height={"2rem"} />
         <Skeleton height={"2rem"} />
-      </>
+      </div>
     );
   else {
     return isMobile ? (
-      <div style={{ width: "100%", marginBottom: "1rem", overflowY: "scroll" }}>
+      <div
+        style={{
+          width: window.screen.width,
+          marginBottom: "1rem",
+          overflowY: "scroll",
+        }}
+      >
         <AppBar
           position="static"
           style={{ background: "#334155" }}

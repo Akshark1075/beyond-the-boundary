@@ -4,7 +4,6 @@ $(document).ready(function () {
   // Event handler for the floating button click
   $(".floatingButtonWrap").on("click", function (e) {
     e.preventDefault();
-    console.log("a");
     $(this).toggleClass("open");
 
     // Toggle the icon class
@@ -27,8 +26,6 @@ $(document).ready(function () {
       !container.is(e.target) &&
       $(".floatingButtonWrap").has(e.target).length === 0
     ) {
-      console.log("b");
-
       if (container.hasClass("open")) {
         container.removeClass("open");
       }

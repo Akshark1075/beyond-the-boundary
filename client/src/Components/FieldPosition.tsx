@@ -161,15 +161,14 @@ const FieldPosition: React.FC<FieldPositionProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [allPos[0][0]]
   );
-
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const {
     x = randomX,
     y = randomY,
-    width = 350,
-    height = 370,
+    width = isMobile ? window.screen.width : 350,
+    height = isMobile ? window.screen.width + 20 : 370,
   } = storedScoreComparison ?? {};
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   if (!storedScoreComparison && !isMobile) {
     const newItems = [
@@ -189,7 +188,7 @@ const FieldPosition: React.FC<FieldPositionProps> = ({
   const setPosition = (x: number, y: number) => {
     const newSelections = [...selections];
     const option = newSelections.find((s) => s.name === `Field positions`);
-    if (option) {
+    if (option && !isMobile) {
       option.x = x;
       option.y = y;
       setSelection(newSelections);
@@ -200,7 +199,7 @@ const FieldPosition: React.FC<FieldPositionProps> = ({
   const setSize = (w: number, h: number) => {
     const newSelections = [...selections];
     const option = newSelections.find((s) => s.name === `Field positions`);
-    if (option) {
+    if (option && !isMobile) {
       option.width = w;
       option.height = h;
       setSelection(newSelections);
@@ -215,7 +214,7 @@ const FieldPosition: React.FC<FieldPositionProps> = ({
     delta,
     position
   ) => {
-    if (ref && ref.style) {
+    if (ref && ref.style && !isMobile) {
       const newWidth = parseInt(ref.style.width, 10);
       const newHeight = parseInt(ref.style.height, 10);
       setSize(newWidth, newHeight);
@@ -356,7 +355,13 @@ const FieldPosition: React.FC<FieldPositionProps> = ({
   }, [width, height, randArray]);
 
   return isMobile ? (
-    <div style={{ width: "100%", marginBottom: "1rem", overflowY: "scroll" }}>
+    <div
+      style={{
+        width: window.screen.width,
+        marginBottom: "1rem",
+        overflowY: "scroll",
+      }}
+    >
       <AppBar
         position="static"
         style={{ background: "#334155" }}

@@ -25,15 +25,15 @@ export interface SelectedOption {
 }
 const ShowPage = () => {
   const [selections, setSelection] = useState<SelectedOption[]>([]);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   useEffect(() => {
     // Retrieve the array from local storage on component mount
     const storedItems = getArrayFromLocalStorage("selectedOptions");
+
     setSelection(storedItems);
   }, []);
   const { matchId } = useParams();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-
   return (
     <>
       {isMobile ? (
@@ -142,6 +142,10 @@ const ShowPage = () => {
                 ),
                 title: "Video",
               },
+              // {
+              //   component: <></>,
+              //   title: "",
+              // },
             ]}
           />
         </>

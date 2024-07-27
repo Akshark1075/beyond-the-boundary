@@ -163,7 +163,7 @@
   border-color: transparent transparent #fff;
   position: absolute;
   top: -5vmin;
-  left: -1vmin;
+  left: -0.5vmin;
 }
 
 #wheel div.sec {
@@ -171,7 +171,7 @@
   width: 0;
   height: 0;
   border-style: solid;
-  border-width: 40vmin 23vmin 0;
+  border-width: 40vmin 25vmin 0;
   border-color: #19c transparent;
   transform-origin: 25vmin 40vmin;
   left: 14vmin;
@@ -189,7 +189,7 @@
   text-align: center;
   font-size: 2.5vmin;
   margin-left: -12vmin;
-  transform: rotateZ(80deg);
+  transform: rotateZ(90deg);
   text-shadow: rgba(255, 255, 255, 0.1) 0px -1px 0px,
     rgba(0, 0, 0, 0.2) 0px 1px 0px;
   line-height: 150%;
@@ -198,52 +198,52 @@
 
 /* Sections */
 #wheel div.sec:nth-child(1) {
-  transform: rotate(16deg);
+  transform: rotate(36deg);
   border-color: #989fb1 transparent;
   z-index: 5;
 }
 #wheel div.sec:nth-child(2) {
-  transform: rotate(64deg);
+  transform: rotate(72deg);
   border-color: #747c91 transparent;
   z-index: 2;
 }
 #wheel div.sec:nth-child(3) {
-  transform: rotate(96deg);
+  transform: rotate(108deg);
   border-color: #b0b5c6 transparent;
   z-index: 3;
 }
 #wheel div.sec:nth-child(4) {
-  transform: rotate(128deg);
+  transform: rotate(144deg);
   border-color: #e1e4ee transparent;
   z-index: 4;
 }
 #wheel div.sec:nth-child(5) {
-  transform: rotate(160deg);
+  transform: rotate(180deg);
   border-color: #989fb1 transparent;
   z-index: 5;
 }
 #wheel div.sec:nth-child(6) {
-  transform: rotate(192deg);
+  transform: rotate(216deg);
   border-color: #747c91 transparent;
   z-index: 6;
 }
 #wheel div.sec:nth-child(7) {
-  transform: rotate(224deg);
+  transform: rotate(252deg);
   border-color: #b0b5c6 transparent;
   z-index: 7;
 }
 #wheel div.sec:nth-child(8) {
-  transform: rotate(256deg);
+  transform: rotate(288deg);
   border-color: #e1e4ee transparent;
   z-index: 8;
 }
 #wheel div.sec:nth-child(9) {
-  transform: rotate(288deg);
+  transform: rotate(324deg);
   border-color: #989fb1 transparent;
   z-index: 9;
 }
 #wheel div.sec:nth-child(10) {
-  transform: rotate(320deg);
+  transform: rotate(360deg);
   border-color: #747c91 transparent;
   z-index: 10;
 }
@@ -255,6 +255,17 @@
 }
 #wheel div.sec:nth-child(10) .fa {
   margin-left: -5vmin;
+}
+#wheel div.sec:nth-child(1) .fa {
+  margin-left: -3vmin;
+  transform: rotateZ(100deg);
+}
+#wheel div.sec:nth-child(2) .fa {
+  margin-left: -7vmin;
+  transform: rotateZ(90deg);
+}
+#wheel div.sec:nth-child(9) .fa {
+  transform: rotateZ(80deg);
 }
 #shine {
   width: 100%;

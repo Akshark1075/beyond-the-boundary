@@ -15,7 +15,6 @@ const SpinningWheel: React.FC<SpinningWheelProps> = ({ components }) => {
   const wheelRef = useRef<HTMLDivElement>(null);
 
   const angleStep = 360 / components.length;
-  console.log(angleStep);
   const handleVisibility = () => {
     setVisible((prevVisible) => !prevVisible);
   };
@@ -72,7 +71,7 @@ const SpinningWheel: React.FC<SpinningWheelProps> = ({ components }) => {
               <div id="inner-wheel">
                 {components.map((component, index) => (
                   <div key={index} className="sec">
-                    <span className="fa">{component.title}</span>
+                    <span className="fa">{components[index].title}</span>
                   </div>
                 ))}
               </div>

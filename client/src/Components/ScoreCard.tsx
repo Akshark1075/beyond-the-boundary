@@ -89,7 +89,7 @@ export default function ScoreCardTable({
   return (
     <>
       {data?.scoreCard.map((row) => {
-        if (type === "Batting")
+        if (type === "Batting") {
           return (
             <BattingScorecard
               row={row}
@@ -100,7 +100,7 @@ export default function ScoreCardTable({
               key={row.inningsId}
             />
           );
-        else
+        } else {
           return (
             <BowlingScorecard
               row={row}
@@ -111,6 +111,7 @@ export default function ScoreCardTable({
               key={row.inningsId}
             />
           );
+        }
       })}
     </>
   );
@@ -131,11 +132,13 @@ const BattingScorecard = ({
   selections: SelectedOption[];
   setSelection: (option: SelectedOption[]) => void;
 }) => {
+  const [open, setOpen] = React.useState(true);
   const componentRef = React.useRef<HTMLDivElement>(null);
   const { x: randomX, y: randomY } = getRandomCoordinates();
   const storedScorecard = selections.find(
     (s) => s.name === `Batting Scorecard ${row.inningsId}`
   );
+
   const {
     x = randomX,
     y = randomY,
@@ -144,7 +147,12 @@ const BattingScorecard = ({
   } = storedScorecard ?? {};
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  if (!storedScorecard && !isMobile) {
+  if (
+    selections.find((s) => s.name.includes("Batting Scorecard")) &&
+    !storedScorecard
+  ) {
+    return <></>;
+  } else if (!storedScorecard && !isMobile) {
     const newItems = [
       ...selections,
       {
@@ -158,13 +166,12 @@ const BattingScorecard = ({
     setSelection(newItems);
     saveArrayToLocalStorage("selectedOptions", newItems);
   }
-
   const setPosition = (x: number, y: number) => {
     const newSelections = [...selections];
     const option = newSelections.find(
       (s) => s.name === `Batting Scorecard ${row.inningsId}`
     );
-    if (option) {
+    if (option && !isMobile) {
       option.x = x;
       option.y = y;
       setSelection(newSelections);
@@ -177,7 +184,7 @@ const BattingScorecard = ({
     const option = newSelections.find(
       (s) => s.name === `Batting Scorecard ${row.inningsId}`
     );
-    if (option) {
+    if (option && !isMobile) {
       option.width = w;
       option.height = h;
       setSelection(newSelections);
@@ -191,7 +198,7 @@ const BattingScorecard = ({
     delta,
     position
   ) => {
-    if (ref && ref.style) {
+    if (ref && ref.style && !isMobile) {
       const newWidth = parseInt(ref.style.width, 10);
       const newHeight = parseInt(ref.style.height, 10);
       setSize(newWidth, newHeight);
@@ -200,14 +207,19 @@ const BattingScorecard = ({
   const handleDragStop = (e: DraggableEvent, d: { x: number; y: number }) => {
     setPosition(d.x, d.y);
   };
-  const [open, setOpen] = React.useState(true);
 
-  const BattingScorecardComponent = () => {
+  const BattingScorecardComponent = ({
+    width,
+    height,
+  }: {
+    width?: number;
+    height?: number;
+  }) => {
     return (
       <TableContainer component={Paper} style={{ boxShadow: "none" }}>
         <Box
           // @ts-ignore: Unreachable code error
-          sx={{ width: width }}
+          sx={{ width: width ? width : window.screen.width }}
           className="bg-slate-700 flex justify-between"
         >
           <Box className="px-4 text-white">{`${row.batTeamDetails.batTeamName} Innings`}</Box>
@@ -234,7 +246,10 @@ const BattingScorecard = ({
           </Box>
         </Box>
         <Table
-          sx={{ width: `${width}px`, tableLayout: "fixed" }}
+          sx={{
+            width: width ? `${width}px` : window.screen.width,
+            tableLayout: "fixed",
+          }}
           size="small"
           aria-label="a dense table"
         >
@@ -455,7 +470,13 @@ const BattingScorecard = ({
     );
   else {
     return isMobile ? (
-      <div style={{ width: "100%", marginBottom: "1rem", overflowY: "scroll" }}>
+      <div
+        style={{
+          width: window.screen.width,
+          marginBottom: "1rem",
+          overflowY: "scroll",
+        }}
+      >
         <AppBar
           position="static"
           style={{ background: "#334155" }}
@@ -520,6 +541,7 @@ const BowlingScorecard = ({
   selections: SelectedOption[];
   setSelection: (option: SelectedOption[]) => void;
 }) => {
+  const [open, setOpen] = React.useState(true);
   const componentRef = useRef<HTMLDivElement>(null);
   const { x: randomX, y: randomY } = getRandomCoordinates();
   const storedScorecard = selections.find(
@@ -534,7 +556,12 @@ const BowlingScorecard = ({
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  if (!storedScorecard && !isMobile) {
+  if (
+    selections.find((s) => s.name.includes("Bowling Scorecard")) &&
+    !storedScorecard
+  ) {
+    return <></>;
+  } else if (!storedScorecard && !isMobile) {
     const newItems = [
       ...selections,
       {
@@ -556,7 +583,7 @@ const BowlingScorecard = ({
     delta,
     position
   ) => {
-    if (ref && ref.style) {
+    if (ref && ref.style && !isMobile) {
       const newWidth = parseInt(ref.style.width, 10);
       const newHeight = parseInt(ref.style.height, 10);
       setSize(newWidth, newHeight);
@@ -567,7 +594,7 @@ const BowlingScorecard = ({
     const option = newSelections.find(
       (s) => s.name === `Bowling Scorecard ${row.inningsId}`
     );
-    if (option) {
+    if (option && !isMobile) {
       option.x = x;
       option.y = y;
       setSelection(newSelections);
@@ -579,7 +606,7 @@ const BowlingScorecard = ({
     const option = newSelections.find(
       (s) => s.name === `Bowling Scorecard ${row.inningsId}`
     );
-    if (option) {
+    if (option && !isMobile) {
       option.width = w;
       option.height = h;
       setSelection(newSelections);
@@ -589,13 +616,18 @@ const BowlingScorecard = ({
   const handleDragStop = (e: DraggableEvent, d: { x: number; y: number }) => {
     setPosition(d.x, d.y);
   };
-  const [open, setOpen] = React.useState(true);
-  const BowlingScorecardComponent = () => {
+  const BowlingScorecardComponent = ({
+    width,
+    height,
+  }: {
+    width?: number;
+    height?: number;
+  }) => {
     return (
       <TableContainer component={Paper} style={{ boxShadow: "none" }}>
         <Box
           // @ts-ignore: Unreachable code error
-          sx={{ width: width }}
+          sx={{ width: width ? width : window.screen.width }}
           className="bg-slate-700 flex justify-between"
         >
           <Box className="px-4 text-white">{`${row.batTeamDetails.batTeamName} Innings`}</Box>
@@ -622,7 +654,10 @@ const BowlingScorecard = ({
           </Box>
         </Box>
         <Table
-          sx={{ width: `${width}px`, tableLayout: "fixed" }}
+          sx={{
+            width: width ? `${width}px` : window.screen.width,
+            tableLayout: "fixed",
+          }}
           size="small"
           aria-label="a dense table"
         >
@@ -859,7 +894,13 @@ const BowlingScorecard = ({
     );
   else {
     return isMobile ? (
-      <div style={{ width: "100%", marginBottom: "1rem", overflowY: "scroll" }}>
+      <div
+        style={{
+          width: window.screen.width,
+          marginBottom: "1rem",
+          overflowY: "scroll",
+        }}
+      >
         <AppBar
           position="static"
           style={{ background: "#334155" }}

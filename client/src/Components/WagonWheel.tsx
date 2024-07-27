@@ -164,14 +164,15 @@ const WagonWheelWrapper = ({
   const { x: randomX, y: randomY } = getRandomCoordinates();
   const storedScoreComparison = selections.find((s) => s.name === `Wagonwheel`);
   const componentRef = React.useRef<HTMLDivElement>(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const {
     x = randomX,
     y = randomY,
-    width = 350,
-    height = 350,
+    width = isMobile ? window.screen.width : 350,
+    height = isMobile ? window.screen.width + 20 : 370,
   } = storedScoreComparison ?? {};
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
   if (!storedScoreComparison && !isMobile) {
     const newItems = [
       ...selections,
@@ -190,7 +191,7 @@ const WagonWheelWrapper = ({
   const setPosition = (x: number, y: number) => {
     const newSelections = [...selections];
     const option = newSelections.find((s) => s.name === `Wagonwheel`);
-    if (option) {
+    if (option && !isMobile) {
       option.x = x;
       option.y = y;
       setSelection(newSelections);
@@ -201,7 +202,7 @@ const WagonWheelWrapper = ({
   const setSize = (w: number, h: number) => {
     const newSelections = [...selections];
     const option = newSelections.find((s) => s.name === `Wagonwheel`);
-    if (option) {
+    if (option && !isMobile) {
       option.width = w;
       option.height = h;
       setSelection(newSelections);
@@ -215,7 +216,7 @@ const WagonWheelWrapper = ({
     delta,
     position
   ) => {
-    if (ref && ref.style) {
+    if (ref && ref.style && !isMobile) {
       const newWidth = parseInt(ref.style.width, 10);
       const newHeight = parseInt(ref.style.height, 10);
       setSize(newWidth, newHeight);
@@ -283,7 +284,7 @@ const WagonWheelWrapper = ({
     data?.scoreCard[team]?.batTeamDetails.batsmenData ?? {}
   );
   return isMobile ? (
-    <div style={{ width: "100%", marginBottom: "1rem", overflowY: "scroll" }}>
+    <div style={{ width: width, marginBottom: "1rem", overflowY: "scroll" }}>
       <AppBar
         position="static"
         style={{ background: "#334155" }}
@@ -364,8 +365,8 @@ const WagonWheelWrapper = ({
                 sixes: 0,
               }
             }
-            width={window.screen.width}
-            height={400}
+            width={width}
+            height={height}
           />
         )}
       </div>

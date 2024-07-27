@@ -35,6 +35,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
     const battingScorecard = selections.find((s) =>
       s.name.includes("Batting Scorecard")
     );
+
     const bowlingScorecard = selections.find((s) =>
       s.name.includes("Bowling Scorecard")
     );
@@ -49,7 +50,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
       s.name.includes("Fall of wickets")
     );
     const fieldPosition = selections.find((s) =>
-      s.name.includes("Field position")
+      s.name.includes("Field positions")
     );
     const matchInfo = selections.find((s) => s.name.includes("Match Info"));
 
@@ -125,7 +126,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
           />
         )}
 
-        {(fieldPosition || selectedComponent === "Field position") && (
+        {(fieldPosition || selectedComponent === "Field positions") && (
           <FieldPosition selections={selections} setSelection={setSelection} />
         )}
       </>
@@ -135,7 +136,6 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   useEffect(() => {
     const handleFloatingButtonClick = (e: Event) => {
       e.preventDefault();
-      console.log("a");
       const floatingButtonWrap = e.currentTarget as HTMLElement;
       floatingButtonWrap.classList.toggle("open");
 
@@ -169,8 +169,6 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
           .querySelector(".floatingButtonWrap")
           ?.contains(e.target as Node)
       ) {
-        console.log("b");
-
         if (container.classList.contains("open")) {
           container.classList.remove("open");
         }

@@ -56,7 +56,7 @@ const Video = ({
   const setPosition = (x: number, y: number) => {
     const newSelections = [...selections];
     const option = newSelections.find((s) => s.name === `Video`);
-    if (option) {
+    if (option && !isMobile) {
       option.x = x;
       option.y = y;
       setSelection(newSelections);
@@ -67,7 +67,7 @@ const Video = ({
   const setSize = (w: number, h: number) => {
     const newSelections = [...selections];
     const option = newSelections.find((s) => s.name === `Video`);
-    if (option) {
+    if (option && !isMobile) {
       option.width = w;
       option.height = h;
       setSelection(newSelections);
@@ -81,7 +81,7 @@ const Video = ({
     delta,
     position
   ) => {
-    if (ref && ref.style) {
+    if (ref && ref.style && !isMobile) {
       const newWidth = parseInt(ref.style.width, 10);
       const newHeight = parseInt(ref.style.height, 10);
       setSize(newWidth, newHeight);
@@ -110,10 +110,10 @@ const Video = ({
       <div
         className="video-responsive"
         ref={componentRef}
-        style={{ width: width, height: height, overflow: "auto" }}
+        style={{ width: window.screen.width, height: height, overflow: "auto" }}
       >
         <iframe
-          width={width}
+          width={window.screen.width}
           height={height}
           src={videoUrl}
           frameBorder="0"

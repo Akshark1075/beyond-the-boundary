@@ -203,7 +203,6 @@ function MatchCard({ type }: MatchCardProps): JSX.Element {
       });
       const { scrollLeft, scrollWidth, clientWidth } =
         scrollContainerRef.current;
-      console.log(scrollLeft < scrollWidth - clientWidth);
       setShowRightButton(scrollLeft < scrollWidth - clientWidth);
     }
   };

@@ -31,10 +31,9 @@ const WithTitleBar = ({
   };
 
   const onClose = () => {
+    deleteFromLocalStorage(storedKey);
     setIsShowingComponent(false);
     setSelection(selections.filter((s) => s.name !== storedKey));
-
-    deleteFromLocalStorage(storedKey);
   };
 
   return isShowingComponent ? (

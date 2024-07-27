@@ -208,7 +208,7 @@ const RunsPerOver = React.memo(
     const setPosition = (x: number, y: number) => {
       const newSelections = [...selections];
       const option = newSelections.find((s) => s.name === `Runs per over`);
-      if (option) {
+      if (option && !isMobile) {
         option.x = x;
         option.y = y;
         setSelection(newSelections);
@@ -219,7 +219,7 @@ const RunsPerOver = React.memo(
     const setSize = (w: number, h: number) => {
       const newSelections = [...selections];
       const option = newSelections.find((s) => s.name === `Runs per over`);
-      if (option) {
+      if (option && !isMobile) {
         option.width = w;
         option.height = h;
         setSelection(newSelections);
@@ -233,7 +233,7 @@ const RunsPerOver = React.memo(
       delta,
       position
     ) => {
-      if (ref && ref.style) {
+      if (ref && ref.style && !isMobile) {
         const newWidth = parseInt(ref.style.width, 10);
         const newHeight = parseInt(ref.style.height, 10);
         setSize(newWidth, newHeight);

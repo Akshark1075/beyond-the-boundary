@@ -1,5 +1,4 @@
 const getTrophyImage = (seriesName: string) => {
-  console.log(seriesName);
   if (seriesName.toLocaleLowerCase().includes("ashes")) return "ashesLog.png";
   else if (
     seriesName.toLocaleLowerCase().includes("bbl") ||

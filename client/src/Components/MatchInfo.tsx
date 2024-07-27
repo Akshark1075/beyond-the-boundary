@@ -499,7 +499,7 @@ const MatchInfo = React.memo(
           </Toolbar>
         </AppBar>
         <MatchInfoComponent
-          width={width}
+          width={window.screen.width}
           height={height}
           isMatchDataLoading={isMatchDataLoading}
           matchData={matchData}

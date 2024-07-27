@@ -211,7 +211,7 @@ const Scorecomparison = ({
   const setPosition = (x: number, y: number) => {
     const newSelections = [...selections];
     const option = newSelections.find((s) => s.name === `Scorecard comparison`);
-    if (option) {
+    if (option && !isMobile) {
       option.x = x;
       option.y = y;
       setSelection(newSelections);
@@ -222,7 +222,7 @@ const Scorecomparison = ({
   const setSize = (w: number, h: number) => {
     const newSelections = [...selections];
     const option = newSelections.find((s) => s.name === `Scorecard comparison`);
-    if (option) {
+    if (option && !isMobile) {
       option.width = w;
       option.height = h;
       setSelection(newSelections);
@@ -236,7 +236,7 @@ const Scorecomparison = ({
     delta,
     position
   ) => {
-    if (ref && ref.style) {
+    if (ref && ref.style && !isMobile) {
       const newWidth = parseInt(ref.style.width, 10);
       const newHeight = parseInt(ref.style.height, 10);
       setSize(newWidth, newHeight);
@@ -266,8 +266,8 @@ const Scorecomparison = ({
 
       <div
         style={{
-          width: `${width}px`,
-          height: `${height}px`,
+          width: `${window.screen.width}px`,
+          height: `${window.screen.height}px`,
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-around",
