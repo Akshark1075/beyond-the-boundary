@@ -39,7 +39,7 @@ ChartJS.register(
   Legend
 );
 
-const fetchOvers = async (matchId: string): Promise<Response> => {
+const fetchOvers = async (matchId: string): Promise<GetScorecard> => {
   const res = await fetchWithRetry(
     `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`
   );
@@ -57,10 +57,7 @@ const Scorecomparison = ({
 }) => {
   const { isLoading, error, data } = useQuery<GetScorecard>({
     queryKey: ["scoresData", matchId],
-    queryFn: useCallback(
-      () => fetchOvers(matchId).then((res) => res.json()),
-      [matchId]
-    ),
+    queryFn: useCallback(() => fetchOvers(matchId), [matchId]),
   });
   const { x: randomX, y: randomY } = getRandomCoordinates();
   const storedScoreComparison = selections.find(

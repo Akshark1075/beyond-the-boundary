@@ -194,8 +194,11 @@ const BattingScorecard = ({
       <TableContainer component={Paper} style={{ boxShadow: "none" }}>
         <Box
           // @ts-ignore: Unreachable code error
-          sx={{ width: width ? width : window.screen.width }}
-          className="bg-slate-700 flex justify-between"
+          sx={{
+            width: width ? width : window.screen.width,
+            backgroundColor: "#303036",
+          }}
+          className=" flex justify-between"
         >
           <Box className="px-4 text-white">{`${row.batTeamDetails.batTeamName} Innings`}</Box>
           <Box className="flex px-4">
@@ -454,7 +457,7 @@ const BattingScorecard = ({
       >
         <AppBar
           position="static"
-          style={{ background: "#334155" }}
+          style={{ background: "#303036" }}
           className="grow"
         >
           <Toolbar variant="dense" className="px-2 min-h-8">
@@ -602,8 +605,11 @@ const BowlingScorecard = ({
       <TableContainer component={Paper} style={{ boxShadow: "none" }}>
         <Box
           // @ts-ignore: Unreachable code error
-          sx={{ width: width ? width : window.screen.width }}
-          className="bg-slate-700 flex justify-between"
+          sx={{
+            width: width ? width : window.screen.width,
+            backgroundColor: "#303036",
+          }}
+          className=" flex justify-between"
         >
           <Box className="px-4 text-white">{`${row.batTeamDetails.batTeamName} Innings`}</Box>
           <Box className="flex px-4">
@@ -878,7 +884,7 @@ const BowlingScorecard = ({
       >
         <AppBar
           position="static"
-          style={{ background: "#334155" }}
+          style={{ background: "#303036" }}
           className="grow"
         >
           <Toolbar variant="dense" className="px-2 min-h-8">

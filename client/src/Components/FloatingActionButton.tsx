@@ -249,12 +249,18 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
             className="floatingButton"
             style={{ border: "5px solid #b2bedc", borderRadius: "50%" }}
           >
-            <i className="fa fa-plus icon-default"></i>
+            <i
+              className="fa fa-plus icon-default"
+              style={{ color: "white" }}
+            ></i>
           </Button>
           <ul className="floatingMenu">
             {filteredOptions.map((option) => (
               <li key={option.key}>
-                <Button onClick={() => handleMenuItemClick(option.key)}>
+                <Button
+                  onClick={() => handleMenuItemClick(option.key)}
+                  className="floatingButtonItem"
+                >
                   {option.title}
                 </Button>
               </li>

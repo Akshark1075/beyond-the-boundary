@@ -187,15 +187,9 @@ function MatchCard({ type }: MatchCardProps): JSX.Element {
     }
   }, []);
 
-  if (isPending || isCountriesPending)
+  if (isPending || isCountriesPending || error || isCountriesError)
     return <MatchLoadingCard showLeftButton showRightButton />;
 
-  if (error || isCountriesError)
-    return (
-      <>
-        <div>"An error has occurred: " + error.message</div>
-      </>
-    );
   const getFlag = (countryName: string) => {
     if (countriesData) {
       const foundCountry = countriesData.find((c) => c.name === countryName);

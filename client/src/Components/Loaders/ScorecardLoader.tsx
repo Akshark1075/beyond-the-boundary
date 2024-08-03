@@ -66,8 +66,8 @@ const ScoreCardLoader = ({
       <TableContainer component={Paper} style={{ boxShadow: "none" }}>
         <Box
           // @ts-ignore: Unreachable code error
-          className="bg-slate-700"
-          sx={{ width: width }}
+
+          sx={{ width: width, backgroundColor: "#303036" }}
         >
           <Skeleton variant="text" />
         </Box>

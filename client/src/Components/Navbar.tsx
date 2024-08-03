@@ -2,7 +2,6 @@ import * as React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
-import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
@@ -13,8 +12,6 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Button from "@mui/material/Button";
 import logo from "../assets/logo1.png";
-import SearchIcon from "@mui/icons-material/Search";
-import { Search, SearchIconWrapper, StyledInputBase } from "./Search";
 import { useMediaQuery, useTheme } from "@mui/material";
 import { Link } from "react-router-dom";
 
@@ -25,7 +22,7 @@ interface Props {
 const drawerWidth = 240;
 const navItems = [
   { title: "Live Scores", path: "/" },
-  { title: "Schedule", path: "/schedule" },
+  { title: "News", path: "/news" },
   { title: "Rankings", path: "/rankings" },
 ];
 
@@ -76,8 +73,11 @@ export default function DrawerAppBar(props: Props) {
           >
             <MenuIcon sx={{ fontSize: "2rem" }} />
           </IconButton>
+
           <Box sx={{ display: { md: "flex", flexGrow: 1 } }}>
-            <img src={logo} className="my-8 w-96 mr-12 " />
+            <Link to="/">
+              <img src={logo} className="my-8 w-96 mr-12 " alt="logo" />
+            </Link>
             {!isSmallScreen &&
               navItems.map((item) => (
                 <Button
@@ -91,27 +91,6 @@ export default function DrawerAppBar(props: Props) {
                   {<Link to={item.path}>{item.title}</Link>}
                 </Button>
               ))}
-          </Box>
-          <Box sx={{ display: { xs: "none", lg: "flex" } }}>
-            {" "}
-            <Search sx={{ marginRight: { xs: "16px", lg: "24px" } }}>
-              <SearchIconWrapper>
-                <SearchIcon />
-              </SearchIconWrapper>
-              <StyledInputBase
-                placeholder="Search…"
-                inputProps={{ "aria-label": "search" }}
-              />
-            </Search>
-            <Button
-              sx={{
-                color: "#fff",
-                fontSize: { xs: "16px", lg: "20px" },
-                marginX: "24px",
-              }}
-            >
-              {"Hello User!"}
-            </Button>
           </Box>
         </Toolbar>
       </AppBar>

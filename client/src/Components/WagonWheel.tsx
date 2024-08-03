@@ -23,6 +23,7 @@ import {
 import "../styles/WagonWheel.css";
 import { GetScorecard } from "../types/getScorecard";
 import { useQuery } from "@tanstack/react-query";
+import fetchWithRetry from "../api/fetch";
 
 interface WagonWheelProps {
   scores: {
@@ -226,48 +227,17 @@ const WagonWheelWrapper = ({
     setPosition(d.x, d.y);
   };
 
-  const fetchOvers = async (matchId: string): Promise<Response> => {
-    try {
-      const res = await fetch(
-        `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`,
-        {
-          headers: {
-            "x-rapidapi-host": "cricbuzz-cricket.p.rapidapi.com",
-            "x-rapidapi-key":
-              "71c49e5ccfmsh4e7224d6d7fbb0ap11128bjsnd1bdf317c93e",
-          },
-        }
-      );
-      if (!res.ok) {
-        throw new Error("First API call failed");
-      }
-      return res;
-    } catch (error) {
-      const fallbackRes = await fetch(
-        `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`,
-        {
-          headers: {
-            "x-rapidapi-host": "cricbuzz-cricket.p.rapidapi.com",
-            "x-rapidapi-key":
-              "34bc3eb86dmsh62c3088fe607e6fp186023jsnf139d6bf65e7",
-            // "7a2ed3513cmsh433f85b7a4ab9f8p1883cfjsn1b4c80608f1b",
-          },
-        }
-      );
-      if (!fallbackRes.ok) {
-        throw new Error("Both API calls failed");
-      }
-      return fallbackRes;
-    }
+  const fetchOvers = async (matchId: string): Promise<GetScorecard> => {
+    const res = await fetchWithRetry(
+      `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`
+    );
+    return res;
   };
   const [team, setTeam] = React.useState(0);
   const [player, setPlayer] = React.useState("");
   const { isLoading, error, data } = useQuery<GetScorecard>({
     queryKey: ["scoresData", matchId],
-    queryFn: useCallback(
-      () => fetchOvers(matchId).then((res) => res.json()),
-      [matchId]
-    ),
+    queryFn: useCallback(() => fetchOvers(matchId), [matchId]),
   });
   const handleTeamChange = (event: SelectChangeEvent) => {
     setTeam(Number(event.target.value));
@@ -287,7 +257,7 @@ const WagonWheelWrapper = ({
     <div style={{ width: width, marginBottom: "1rem", overflowY: "scroll" }}>
       <AppBar
         position="static"
-        style={{ background: "#334155" }}
+        style={{ background: "#303036" }}
         className="grow"
       >
         <Toolbar variant="dense" className="px-2 min-h-8">
@@ -301,7 +271,10 @@ const WagonWheelWrapper = ({
       </AppBar>
 
       <div>
-        <div className="bg-slate-700 flex justify-between p-2 w-full">
+        <div
+          className=" flex justify-between p-2 w-full"
+          style={{ background: "#303036" }}
+        >
           <Box
             // @ts-ignore: Unreachable code error
             sx={{ minWidth: 120 }}
@@ -394,8 +367,8 @@ const WagonWheelWrapper = ({
         >
           <div>
             <Box // @ts-ignore: Unreachable code error
-              sx={{ width: 350 }}
-              className="bg-slate-700 flex justify-between p-2"
+              sx={{ width: width, background: "#303036" }}
+              className=" flex justify-between p-2"
             >
               <Box sx={{ minWidth: 120 }}>
                 <FormControl fullWidth>

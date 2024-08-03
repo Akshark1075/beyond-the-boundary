@@ -155,7 +155,7 @@ const Fow = ({
       >
         <AppBar
           position="static"
-          style={{ background: "#334155" }}
+          style={{ background: "#303036" }}
           className="grow"
         >
           <Toolbar variant="dense" className="px-2 min-h-8">
@@ -185,7 +185,7 @@ const Fow = ({
       >
         <AppBar
           position="static"
-          style={{ background: "#334155" }}
+          style={{ background: "#303036" }}
           className="grow"
         >
           <Toolbar variant="dense" className="px-2 min-h-8">

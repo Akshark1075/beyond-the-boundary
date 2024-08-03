@@ -20,9 +20,9 @@ body {
   width: 60px;
   height: 60px;
   text-align: center;
-  background: -webkit-linear-gradient(45deg, #8769a9, #507cb3);
-  background: -o-linear-gradient(45deg, #8769a9, #507cb3);
-  background: linear-gradient(45deg, #8769a9, #507cb3);
+  background: -webkit-linear-gradient(45deg, #fffaff, #303036);
+  background: -o-linear-gradient(45deg, #fffaff, #303036);
+  background: linear-gradient(45deg, #fffaff, #303036);
   color: #fff;
   line-height: 50px;
   position: absolute;
@@ -46,7 +46,14 @@ body {
   opacity: 1;
   color: #fff;
 }
-
+.floatingMenu .floatingButtonItem {
+  color: #fffaff;
+  background-color: #303036;
+}
+.floatingMenu .floatingButtonItem:hover {
+  background-color: #fffaff;
+  color: #303036;
+}
 .floatingButton .fa {
   transform: rotate(0deg);
   transition: all 0.4s;

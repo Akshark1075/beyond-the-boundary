@@ -20,7 +20,7 @@ const SpinningWheel: React.FC<SpinningWheelProps> = ({ components }) => {
     resetIdleTimer();
     setVisible((prevVisible) => {
       if (!prevVisible) {
-        startIdleTimer();
+        // startIdleTimer();
       }
 
       return !prevVisible;
