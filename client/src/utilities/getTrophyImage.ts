@@ -1,12 +1,12 @@
 const getTrophyImage = (seriesName: string) => {
-  if (seriesName.toLocaleLowerCase().includes("ashes")) return "ashesLog.png";
+  if (seriesName.toLocaleLowerCase().includes("ashes")) return "ashesLogo.png";
   else if (
     seriesName.toLocaleLowerCase().includes("bbl") ||
     seriesName.toLocaleLowerCase().includes("big bash")
   )
     return "bigBashLogo.png";
   else if (seriesName.toLocaleLowerCase().includes("county"))
-    return "countyLogo.png";
+    return "countyLogo.webp";
   else if (
     seriesName.toLocaleLowerCase().includes("ipl") ||
     seriesName.toLocaleLowerCase().includes("indian")
@@ -16,19 +16,19 @@ const getTrophyImage = (seriesName: string) => {
     seriesName.toLocaleLowerCase().includes("mlc") ||
     seriesName.toLocaleLowerCase().includes("major")
   )
-    return "mlcLogo.png";
+    return "mlcLogo.svg";
   else if (
     seriesName.toLocaleLowerCase().includes("psl") ||
     seriesName.toLocaleLowerCase().includes("pakistan")
   )
     return "pslLogo.png";
   else if (seriesName.toLocaleLowerCase().includes("sa20"))
-    return "sa20Logo.png";
+    return "sa20Logo.svg";
   else if (
     seriesName.toLocaleLowerCase().includes("icc") ||
     seriesName.toLocaleLowerCase().includes("worldcup")
   )
     return "worldCupLogo.png";
-  return "defaultLogo.png";
+  return "defaultLogo.jpeg";
 };
 export default getTrophyImage;

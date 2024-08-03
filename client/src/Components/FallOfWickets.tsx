@@ -11,56 +11,29 @@ import { SelectedOption } from "../views/ShowPage";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { AppBar, Skeleton, Toolbar, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-const fetchScorecard = async (matchId: string): Promise<Response> => {
-  try {
-    const res = await fetch(
-      `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`,
-      {
-        headers: {
-          "x-rapidapi-host": "cricbuzz-cricket.p.rapidapi.com",
-          "x-rapidapi-key":
-            // "71c49e5ccfmsh4e7224d6d7fbb0ap11128bjsnd1bdf317c93e",
-            "34bc3eb86dmsh62c3088fe607e6fp186023jsnf139d6bf65e7",
-        },
-      }
-    );
-    if (!res.ok) {
-      throw new Error("First API call failed");
-    }
-    return res;
-  } catch (error) {
-    const fallbackRes = await fetch(
-      `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`,
-      {
-        headers: {
-          "x-rapidapi-host": "cricbuzz-cricket.p.rapidapi.com",
-          "x-rapidapi-key":
-            "34bc3eb86dmsh62c3088fe607e6fp186023jsnf139d6bf65e7",
-          // "7a2ed3513cmsh433f85b7a4ab9f8p1883cfjsn1b4c80608f1b",
-        },
-      }
-    );
-    if (!fallbackRes.ok) {
-      throw new Error("Both API calls failed");
-    }
-    return fallbackRes;
-  }
+import fetchWithRetry from "../api/fetch";
+const fetchScorecard = async (matchId: string): Promise<GetScorecard> => {
+  const res = await fetchWithRetry(
+    `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`
+  );
+
+  return res;
 };
 const FallOfWickets = ({
   matchId,
   selections,
   setSelection,
+  isLive,
 }: {
   matchId: string;
   selections: SelectedOption[];
   setSelection: (option: SelectedOption[]) => void;
+  isLive: boolean;
 }) => {
   const { isLoading, isError, data } = useQuery<GetScorecard>({
     queryKey: ["scoresData", matchId],
-    queryFn: useCallback(
-      () => fetchScorecard(matchId).then((res) => res.json()),
-      [matchId]
-    ),
+    queryFn: useCallback(() => fetchScorecard(matchId), [matchId]),
+    refetchInterval: isLive ? 30000 : undefined,
   });
   return (
     <>

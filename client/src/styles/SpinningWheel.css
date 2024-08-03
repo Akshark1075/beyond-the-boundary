@@ -261,7 +261,7 @@
   transform: rotateZ(100deg);
 }
 #wheel div.sec:nth-child(2) .fa {
-  margin-left: -7vmin;
+  margin-left: -7.5vmin;
   transform: rotateZ(90deg);
 }
 #wheel div.sec:nth-child(9) .fa {

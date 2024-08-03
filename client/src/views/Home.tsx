@@ -6,9 +6,9 @@ import MatchCard from "../Components/MatchCard";
 const Home = () => {
   return (
     // @ts-ignore: Unreachable code error
-    <Box className={"h-full bg-black sm:flex overflow-y-auto"}>
+    <Box className={"h-full bg-black sm:flex overflow-y-auto "}>
       <DrawerAppBar />;
-      <Box className="mt-28 w-full">
+      <Box className="mt-14 sm:mt-28 w-full p-4 ">
         <img src={homecover} width="100%" alt="Homecover" />
         <Typography variant="h5" sx={{ color: "white", marginY: "1rem" }}>
           Live Matches

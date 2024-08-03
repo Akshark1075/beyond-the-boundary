@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import "../styles/floatingActionButton.css";
 import ScoreCardTable from "./ScoreCard";
 import RunsPerOver from "./RunsPerOver";
@@ -25,8 +25,9 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   const [selectedComponent, setSelectedComponent] = useState<string | null>(
     null
   );
-  const { matchId } = useParams<{ matchId: string }>();
-
+  const { matchId } = useParams();
+  const [searchParams] = useSearchParams();
+  const isLive = searchParams.get("isLive");
   const handleMenuItemClick = (component: string) => {
     setSelectedComponent(component);
   };
@@ -62,6 +63,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
             type={"Batting"}
             selections={selections}
             setSelection={setSelection}
+            isLive={isLive === "y"}
           />
         )}
 
@@ -71,6 +73,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
             type={"Bowling"}
             selections={selections}
             setSelection={setSelection}
+            isLive={isLive === "y"}
           />
         )}
 
@@ -115,6 +118,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
             selections={selections}
             setSelection={setSelection}
             matchId={matchId ?? ""}
+            isLive={isLive === "y"}
           />
         )}
 

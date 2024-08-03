@@ -10,6 +10,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import getTrophyImage from "../utilities/getTrophyImage";
 import MatchLoadingCard from "./Loaders/MatchLoadingCard";
 import { useNavigate } from "react-router-dom";
+import fetchWithRetry from "../api/fetch";
 
 interface GetLiveMatches {
   typeMatches: {
@@ -117,47 +118,16 @@ type CardTypes = "live" | "upcoming" | "recent";
 interface MatchCardProps {
   type: CardTypes;
 }
-const fetchMatches = async (type: string): Promise<Response> => {
-  try {
-    const res = await fetch(
-      `https://cricbuzz-cricket.p.rapidapi.com/matches/v1/${type}`,
-      {
-        headers: {
-          "x-rapidapi-host": "cricbuzz-cricket.p.rapidapi.com",
-          "x-rapidapi-key":
-            "71c49e5ccfmsh4e7224d6d7fbb0ap11128bjsnd1bdf317c93e",
-        },
-      }
-    );
-    if (!res.ok) {
-      throw new Error("First API call failed");
-    }
-    return res;
-  } catch (error) {
-    const fallbackRes = await fetch(
-      `https://cricbuzz-cricket.p.rapidapi.com/matches/v1/${type}`,
-      {
-        headers: {
-          "x-rapidapi-host": "cricbuzz-cricket.p.rapidapi.com",
-          "x-rapidapi-key":
-            "34bc3eb86dmsh62c3088fe607e6fp186023jsnf139d6bf65e7",
-          // "7a2ed3513cmsh433f85b7a4ab9f8p1883cfjsn1b4c80608f1b",
-        },
-      }
-    );
-    if (!fallbackRes.ok) {
-      throw new Error("Both API calls failed");
-    }
-    return fallbackRes;
-  }
+const fetchMatches = async (type: string): Promise<GetLiveMatches> => {
+  const res = await fetchWithRetry(
+    `https://cricbuzz-cricket.p.rapidapi.com/matches/v1/${type}`
+  );
+  return res;
 };
 function MatchCard({ type }: MatchCardProps): JSX.Element {
   const { isPending, error, data } = useQuery<GetLiveMatches>({
     queryKey: [`matchesData-${type}`],
-    queryFn: useCallback(
-      () => fetchMatches(type).then((res) => res.json()),
-      [type]
-    ),
+    queryFn: useCallback(() => fetchMatches(type), [type]),
   });
   const {
     isPending: isCountriesPending,
@@ -234,7 +204,7 @@ function MatchCard({ type }: MatchCardProps): JSX.Element {
     return "🏴‍☠️";
   };
   const handleClick = (matchId: number) => {
-    navigate(`/matches/${matchId}`);
+    navigate(`/matches/${matchId}?isLive=${type === "live" ? "y" : "n"}`);
   };
 
   return (

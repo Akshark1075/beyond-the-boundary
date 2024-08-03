@@ -24,6 +24,7 @@ import getRandomCoordinates from "../utilities/getRandomCoordinates";
 import { Rnd, RndResizeCallback } from "react-rnd";
 import { DraggableEvent } from "react-draggable";
 import WithTitleBar from "./WithTitleBar";
+import fetchWithRetry from "../api/fetch";
 const SquadComponent = ({
   width,
   height,
@@ -220,78 +221,21 @@ const Squad = React.memo(
     selections: SelectedOption[];
     setSelection: (option: SelectedOption[]) => void;
   }) => {
-    const fetchInfo = async (matchId: string): Promise<Response> => {
-      try {
-        const res = await fetch(
-          `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}`,
-          {
-            headers: {
-              "x-rapidapi-host": "cricbuzz-cricket.p.rapidapi.com",
-              "x-rapidapi-key":
-                // "71c49e5ccfmsh4e7224d6d7fbb0ap11128bjsnd1bdf317c93e",
-                "34bc3eb86dmsh62c3088fe607e6fp186023jsnf139d6bf65e7",
-            },
-          }
-        );
-        if (!res.ok) {
-          throw new Error("First API call failed");
-        }
-        return res;
-      } catch (error) {
-        const fallbackRes = await fetch(
-          `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}`,
-          {
-            headers: {
-              "x-rapidapi-host": "cricbuzz-cricket.p.rapidapi.com",
-              "x-rapidapi-key":
-                "34bc3eb86dmsh62c3088fe607e6fp186023jsnf139d6bf65e7",
-              // "7a2ed3513cmsh433f85b7a4ab9f8p1883cfjsn1b4c80608f1b",
-            },
-          }
-        );
-        if (!fallbackRes.ok) {
-          throw new Error("Both API calls failed");
-        }
-        return fallbackRes;
-      }
+    const fetchInfo = async (matchId: string): Promise<GetInfo> => {
+      const res = await fetchWithRetry(
+        `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}`
+      );
+      return res;
     };
     const fetchSquad = async (
       matchId: string,
       teamId: number | undefined
-    ): Promise<Response> => {
-      try {
-        const res = await fetch(
-          `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/team/${teamId}`,
-          {
-            headers: {
-              "x-rapidapi-host": "cricbuzz-cricket.p.rapidapi.com",
-              "x-rapidapi-key":
-                // "71c49e5ccfmsh4e7224d6d7fbb0ap11128bjsnd1bdf317c93e",
-                "34bc3eb86dmsh62c3088fe607e6fp186023jsnf139d6bf65e7",
-            },
-          }
-        );
-        if (!res.ok) {
-          throw new Error("First API call failed");
-        }
-        return res;
-      } catch (error) {
-        const fallbackRes = await fetch(
-          `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/team/${teamId}`,
-          {
-            headers: {
-              "x-rapidapi-host": "cricbuzz-cricket.p.rapidapi.com",
-              "x-rapidapi-key":
-                "34bc3eb86dmsh62c3088fe607e6fp186023jsnf139d6bf65e7",
-              // "7a2ed3513cmsh433f85b7a4ab9f8p1883cfjsn1b4c80608f1b",
-            },
-          }
-        );
-        if (!fallbackRes.ok) {
-          throw new Error("Both API calls failed");
-        }
-        return fallbackRes;
-      }
+    ): Promise<GetSquad> => {
+      const res = await fetchWithRetry(
+        `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/team/${teamId}`
+      );
+
+      return res;
     };
     const {
       isLoading: isMatchDataLoading,
@@ -299,10 +243,7 @@ const Squad = React.memo(
       data: matchData,
     } = useQuery<GetInfo>({
       queryKey: ["infoData", matchId],
-      queryFn: useCallback(
-        () => fetchInfo(matchId).then((res) => res.json()),
-        [matchId]
-      ),
+      queryFn: useCallback(() => fetchInfo(matchId), [matchId]),
     });
     const team1Id = matchData?.matchInfo.team1.id;
     const team2Id = matchData?.matchInfo.team2.id;
@@ -313,7 +254,7 @@ const Squad = React.memo(
     } = useQuery<GetSquad>({
       queryKey: [`squadData${team1Id}`, matchId],
       queryFn: useCallback(
-        () => fetchSquad(matchId, team1Id).then((res) => res.json()),
+        () => fetchSquad(matchId, team1Id),
         [matchId, team1Id]
       ),
       enabled: !!matchId && !!team1Id,
@@ -326,7 +267,7 @@ const Squad = React.memo(
     } = useQuery<GetSquad>({
       queryKey: [`squadData${team2Id}`, matchId],
       queryFn: useCallback(
-        () => fetchSquad(matchId, team2Id).then((res) => res.json()),
+        () => fetchSquad(matchId, team2Id),
         [matchId, team2Id]
       ),
       enabled: !!matchId && !!team2Id,

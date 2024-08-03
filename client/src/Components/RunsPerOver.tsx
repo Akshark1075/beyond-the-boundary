@@ -14,6 +14,7 @@ import {
 import { GetScorecard } from "../types/getScorecard";
 import {
   AppBar,
+  Card,
   Skeleton,
   Toolbar,
   Typography,
@@ -27,6 +28,7 @@ import { DraggableEvent } from "react-draggable";
 import { SelectedOption } from "../views/ShowPage";
 import getRandomCoordinates from "../utilities/getRandomCoordinates";
 import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
+import fetchWithRetry from "../api/fetch";
 
 ChartJS.register(
   CategoryScale,
@@ -38,39 +40,11 @@ ChartJS.register(
   Legend
 );
 
-const fetchOvers = async (matchId: string): Promise<Response> => {
-  try {
-    const res = await fetch(
-      `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`,
-      {
-        headers: {
-          "x-rapidapi-host": "cricbuzz-cricket.p.rapidapi.com",
-          "x-rapidapi-key":
-            "71c49e5ccfmsh4e7224d6d7fbb0ap11128bjsnd1bdf317c93e",
-        },
-      }
-    );
-    if (!res.ok) {
-      throw new Error("First API call failed");
-    }
-    return res;
-  } catch (error) {
-    const fallbackRes = await fetch(
-      `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`,
-      {
-        headers: {
-          "x-rapidapi-host": "cricbuzz-cricket.p.rapidapi.com",
-          "x-rapidapi-key":
-            "34bc3eb86dmsh62c3088fe607e6fp186023jsnf139d6bf65e7",
-          // "7a2ed3513cmsh433f85b7a4ab9f8p1883cfjsn1b4c80608f1b",
-        },
-      }
-    );
-    if (!fallbackRes.ok) {
-      throw new Error("Both API calls failed");
-    }
-    return fallbackRes;
-  }
+const fetchOvers = async (matchId: string): Promise<GetScorecard> => {
+  const res = await fetchWithRetry(
+    `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`
+  );
+  return res;
 };
 
 const RunsPerOver = React.memo(
@@ -86,10 +60,7 @@ const RunsPerOver = React.memo(
   }) => {
     const { isLoading, error, data } = useQuery<GetScorecard>({
       queryKey: ["scoresData", matchId],
-      queryFn: useCallback(
-        () => fetchOvers(matchId).then((res) => res.json()),
-        [matchId]
-      ),
+      queryFn: useCallback(() => fetchOvers(matchId), [matchId]),
     });
     const { x: randomX, y: randomY } = getRandomCoordinates();
     const storedRunsPerOver = selections.find(
@@ -245,7 +216,13 @@ const RunsPerOver = React.memo(
     };
 
     return isMobile ? (
-      <div style={{ width: "100%", marginBottom: "1rem", overflowY: "scroll" }}>
+      <Card
+        style={{
+          width: `${window.screen.width}px`,
+          marginBottom: "1rem",
+          overflowY: "scroll",
+        }}
+      >
         <AppBar
           position="static"
           style={{ background: "#334155" }}
@@ -262,8 +239,8 @@ const RunsPerOver = React.memo(
         </AppBar>
         <div
           style={{
-            width: `${width}px`,
-            height: `${height}px`,
+            width: `${window.screen.width}px`,
+            height: `${window.innerHeight - 110}px`,
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-around",
@@ -285,7 +262,7 @@ const RunsPerOver = React.memo(
             />
           )}
         </div>
-      </div>
+      </Card>
     ) : (
       <Rnd
         size={{ width: width, height: height }}

@@ -15,18 +15,26 @@ import Button from "@mui/material/Button";
 import logo from "../assets/logo1.png";
 import SearchIcon from "@mui/icons-material/Search";
 import { Search, SearchIconWrapper, StyledInputBase } from "./Search";
+import { useMediaQuery, useTheme } from "@mui/material";
+import { Link } from "react-router-dom";
 
 interface Props {
   window?: () => Window;
 }
 
 const drawerWidth = 240;
-const navItems = ["Live Scores", "Schedule", "Rankings"];
+const navItems = [
+  { title: "Live Scores", path: "/" },
+  { title: "Schedule", path: "/schedule" },
+  { title: "Rankings", path: "/rankings" },
+];
 
 export default function DrawerAppBar(props: Props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("lg"));
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
   };
@@ -35,14 +43,15 @@ export default function DrawerAppBar(props: Props) {
     (
       // @ts-ignore: Unreachable code error
       <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
-        <img src={logo} className="my-2" />
-        <Divider />
+        <img src={logo} className="p-4" />
         <List>
           {navItems.map((item) => (
-            <ListItem key={item} disablePadding>
-              <ListItemButton sx={{ textAlign: "center" }}>
-                <ListItemText primary={item} />
-              </ListItemButton>
+            <ListItem key={item.title} disablePadding>
+              <Link to={item.path}>
+                <ListItemButton sx={{ textAlign: "center" }}>
+                  <ListItemText primary={item.title} />
+                </ListItemButton>
+              </Link>
             </ListItem>
           ))}
         </List>
@@ -55,31 +64,37 @@ export default function DrawerAppBar(props: Props) {
   return (
     <>
       <CssBaseline />
-      <AppBar component="nav" style={{ background: "transparent" }}>
+      <AppBar component="nav" style={{ background: "black", color: "white" }}>
         <Toolbar>
           <IconButton
             color="inherit"
             aria-label="open drawer"
             edge="start"
+            size="large"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: "none" } }}
+            sx={{ mr: 2, display: { lg: "none" } }}
           >
-            <MenuIcon />
+            <MenuIcon sx={{ fontSize: "2rem" }} />
           </IconButton>
-          <Box sx={{ display: { xs: "none", sm: "flex", flexGrow: 1 } }}>
-            <img src={logo} className="my-8 w-96 mr-12" />
-            {navItems.map((item) => (
-              <Button
-                key={item}
-                sx={{ color: "#fff", fontSize: "20px", marginX: "24px" }}
-              >
-                {item}
-              </Button>
-            ))}
+          <Box sx={{ display: { md: "flex", flexGrow: 1 } }}>
+            <img src={logo} className="my-8 w-96 mr-12 " />
+            {!isSmallScreen &&
+              navItems.map((item) => (
+                <Button
+                  key={item.title}
+                  sx={{
+                    color: "#fff",
+                    fontSize: { xs: "16px", lg: "20px" },
+                    marginX: "24px",
+                  }}
+                >
+                  {<Link to={item.path}>{item.title}</Link>}
+                </Button>
+              ))}
           </Box>
-          <Box sx={{ display: { xs: "none", sm: "flex" } }}>
+          <Box sx={{ display: { xs: "none", lg: "flex" } }}>
             {" "}
-            <Search style={{ marginRight: "24px" }}>
+            <Search sx={{ marginRight: { xs: "16px", lg: "24px" } }}>
               <SearchIconWrapper>
                 <SearchIcon />
               </SearchIconWrapper>
@@ -88,7 +103,13 @@ export default function DrawerAppBar(props: Props) {
                 inputProps={{ "aria-label": "search" }}
               />
             </Search>
-            <Button sx={{ color: "#fff", fontSize: "20px", marginX: "24px" }}>
+            <Button
+              sx={{
+                color: "#fff",
+                fontSize: { xs: "16px", lg: "20px" },
+                marginX: "24px",
+              }}
+            >
               {"Hello User!"}
             </Button>
           </Box>
@@ -104,10 +125,12 @@ export default function DrawerAppBar(props: Props) {
             keepMounted: true, // Better open performance on mobile.
           }}
           sx={{
-            display: { xs: "block", sm: "none" },
+            display: { xs: "block", lg: "none" },
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,
+              background: "black",
+              color: "white",
             },
           }}
         >

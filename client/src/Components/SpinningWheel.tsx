@@ -12,17 +12,43 @@ const SpinningWheel: React.FC<SpinningWheelProps> = ({ components }) => {
   const [visible, setVisible] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [_, setIdleTimer] = useState<NodeJS.Timeout | null>(null);
   const wheelRef = useRef<HTMLDivElement>(null);
 
   const angleStep = 360 / components.length;
   const handleVisibility = () => {
-    setVisible((prevVisible) => !prevVisible);
+    resetIdleTimer();
+    setVisible((prevVisible) => {
+      if (!prevVisible) {
+        startIdleTimer();
+      }
+
+      return !prevVisible;
+    });
+  };
+  const resetIdleTimer = () => {
+    setIdleTimer((prevTimer) => {
+      if (prevTimer) {
+        clearTimeout(prevTimer);
+      }
+      return null;
+    });
+  };
+  const startIdleTimer = () => {
+    setIdleTimer(
+      setTimeout(() => {
+        resetIdleTimer();
+        setVisible(false);
+      }, 5000)
+    );
   };
 
   useEffect(() => {
     document.addEventListener("click", handleVisibility);
+    document.addEventListener("mousedown", resetIdleTimer);
     return () => {
-      document.removeEventListener("click", handleVisibility);
+      document.removeEventListener("click", resetIdleTimer);
+      document.addEventListener("mousedown", resetIdleTimer);
     };
   }, []);
 
@@ -58,10 +84,9 @@ const SpinningWheel: React.FC<SpinningWheelProps> = ({ components }) => {
 
   return (
     <>
-      {visible ? (
-        <div
-          style={{ display: "flex", justifyContent: "center", height: "100%" }}
-        >
+      {components[components.length - currentIndex - 1].component}
+      {visible && (
+        <div style={{ display: "flex", justifyContent: "center" }}>
           <div id="wrapper" ref={wheelRef}>
             <div
               id="wheel"
@@ -82,10 +107,7 @@ const SpinningWheel: React.FC<SpinningWheelProps> = ({ components }) => {
             <div id="shine"></div>
           </div>
         </div>
-      ) : (
-        <></>
       )}
-      {components[components.length - currentIndex - 1].component}
     </>
   );
 };

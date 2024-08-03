@@ -27,6 +27,7 @@ import { DraggableEvent } from "react-draggable";
 import { SelectedOption } from "../views/ShowPage";
 import getRandomCoordinates from "../utilities/getRandomCoordinates";
 import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
+import fetchWithRetry from "../api/fetch";
 
 ChartJS.register(
   CategoryScale,
@@ -39,38 +40,10 @@ ChartJS.register(
 );
 
 const fetchOvers = async (matchId: string): Promise<Response> => {
-  try {
-    const res = await fetch(
-      `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`,
-      {
-        headers: {
-          "x-rapidapi-host": "cricbuzz-cricket.p.rapidapi.com",
-          "x-rapidapi-key":
-            "71c49e5ccfmsh4e7224d6d7fbb0ap11128bjsnd1bdf317c93e",
-        },
-      }
-    );
-    if (!res.ok) {
-      throw new Error("First API call failed");
-    }
-    return res;
-  } catch (error) {
-    const fallbackRes = await fetch(
-      `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`,
-      {
-        headers: {
-          "x-rapidapi-host": "cricbuzz-cricket.p.rapidapi.com",
-          "x-rapidapi-key":
-            "34bc3eb86dmsh62c3088fe607e6fp186023jsnf139d6bf65e7",
-          // "7a2ed3513cmsh433f85b7a4ab9f8p1883cfjsn1b4c80608f1b",
-        },
-      }
-    );
-    if (!fallbackRes.ok) {
-      throw new Error("Both API calls failed");
-    }
-    return fallbackRes;
-  }
+  const res = await fetchWithRetry(
+    `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`
+  );
+  return res;
 };
 
 const Scorecomparison = ({
@@ -248,7 +221,13 @@ const Scorecomparison = ({
   };
 
   return isMobile ? (
-    <div style={{ width: "100%", marginBottom: "1rem", overflowY: "scroll" }}>
+    <div
+      style={{
+        width: `${window.screen.width}px`,
+        marginBottom: "1rem",
+        overflowY: "scroll",
+      }}
+    >
       <AppBar
         position="static"
         style={{ background: "#334155" }}
