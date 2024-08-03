@@ -24,7 +24,9 @@ const getTrophyImage = (seriesName: string) => {
     return "pslLogo.png";
   else if (seriesName.toLocaleLowerCase().includes("sa20"))
     return "sa20Logo.svg";
-  else if (
+  else if (seriesName.toLocaleLowerCase().includes("hundred")) {
+    return "hundred.png";
+  } else if (
     seriesName.toLocaleLowerCase().includes("icc") ||
     seriesName.toLocaleLowerCase().includes("worldcup")
   )
