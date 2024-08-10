@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@mui/material";
 import { useParams, useSearchParams } from "react-router-dom";
 import "../styles/floatingActionButton.css";
@@ -16,11 +16,17 @@ import FieldPosition from "./FieldPosition";
 interface FloatingActionButtonProps {
   selections: SelectedOption[];
   setSelection: (options: SelectedOption[]) => void;
+  isARMode: boolean;
+  setShouldShowReticle?: (shouldShowReticle: boolean) => void;
+  setSelectedARComponent?: (component: string) => void;
 }
 
 const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   selections,
   setSelection,
+  isARMode,
+  setShouldShowReticle,
+  setSelectedARComponent,
 }) => {
   const [selectedComponent, setSelectedComponent] = useState<string | null>(
     null
@@ -29,7 +35,13 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   const [searchParams] = useSearchParams();
   const isLive = searchParams.get("isLive");
   const handleMenuItemClick = (component: string) => {
-    setSelectedComponent(component);
+    console.log(isARMode);
+    if (isARMode && !!setShouldShowReticle && !!setSelectedARComponent) {
+      setShouldShowReticle(true);
+      setSelectedARComponent(component);
+    } else {
+      setSelectedComponent(component);
+    }
   };
 
   const renderComponent = () => {
@@ -64,6 +76,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
             selections={selections}
             setSelection={setSelection}
             isLive={isLive === "y"}
+            isARMode={isARMode}
           />
         )}
 
@@ -74,6 +87,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
             selections={selections}
             setSelection={setSelection}
             isLive={isLive === "y"}
+            isARMode={isARMode}
           />
         )}
 
@@ -82,6 +96,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
             matchId={matchId ?? ""}
             selections={selections}
             setSelection={setSelection}
+            isARMode={isARMode}
           />
         )}
         {(scorecardComparison ||
@@ -90,6 +105,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
             matchId={matchId ?? ""}
             selections={selections}
             setSelection={setSelection}
+            isARMode={isARMode}
           />
         )}
         {(wagonWheel || selectedComponent === "Wagonwheel") && (
@@ -97,6 +113,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
             selections={selections}
             setSelection={setSelection}
             matchId={matchId ?? ""}
+            isARMode={isARMode}
           />
         )}
         {(video || selectedComponent === "Video") && (
@@ -104,6 +121,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
             selections={selections}
             setSelection={setSelection}
             matchId={matchId ?? ""}
+            isARMode={isARMode}
           />
         )}
         {(squad || selectedComponent === "Squad") && (
@@ -111,6 +129,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
             selections={selections}
             setSelection={setSelection}
             matchId={matchId ?? ""}
+            isARMode={isARMode}
           />
         )}
         {(fallOfWickets || selectedComponent === "Fall of wickets") && (
@@ -119,6 +138,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
             setSelection={setSelection}
             matchId={matchId ?? ""}
             isLive={isLive === "y"}
+            isARMode={isARMode}
           />
         )}
 
@@ -127,11 +147,16 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
             selections={selections}
             setSelection={setSelection}
             matchId={matchId ?? ""}
+            isARMode={isARMode}
           />
         )}
 
         {(fieldPosition || selectedComponent === "Field positions") && (
-          <FieldPosition selections={selections} setSelection={setSelection} />
+          <FieldPosition
+            selections={selections}
+            setSelection={setSelection}
+            isARMode={isARMode}
+          />
         )}
       </>
     );
@@ -238,9 +263,8 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   ];
 
   const filteredOptions = components.filter(
-    (c) => !selections.find((s) => s.name === c.key)
+    (c) => !selections.find((s) => s.name === c.key && !isARMode)
   );
-
   return (
     <>
       <div className="floatingButtonWrap">
@@ -268,7 +292,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
           </ul>
         </div>
       </div>
-      {renderComponent()}
+      {!isARMode && renderComponent()}
     </>
   );
 };

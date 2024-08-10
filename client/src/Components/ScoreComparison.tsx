@@ -28,6 +28,8 @@ import { SelectedOption } from "../views/ShowPage";
 import getRandomCoordinates from "../utilities/getRandomCoordinates";
 import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
 import fetchWithRetry from "../api/fetch";
+import ARLineGraph from "./ARLineGraph";
+import { Box } from "@react-three/drei";
 
 ChartJS.register(
   CategoryScale,
@@ -50,10 +52,12 @@ const Scorecomparison = ({
   matchId,
   selections,
   setSelection,
+  isARMode,
 }: {
   matchId: string;
   selections: SelectedOption[];
   setSelection: (option: SelectedOption[]) => void;
+  isARMode: boolean;
 }) => {
   const { isLoading, error, data } = useQuery<GetScorecard>({
     queryKey: ["scoresData", matchId],
@@ -216,24 +220,28 @@ const Scorecomparison = ({
   const handleDragStop = (e: DraggableEvent, d: { x: number; y: number }) => {
     setPosition(d.x, d.y);
   };
+  if ((isLoading || error) && isARMode) return <Box></Box>;
 
-  return isMobile ? (
+  return isARMode ? (
+    <ARLineGraph data={chartData.datasets} />
+  ) : isMobile ? (
     <div
       style={{
         width: `${window.screen.width}px`,
         marginBottom: "1rem",
         overflowY: "scroll",
       }}
+      className={isARMode ? "bg-white" : ""}
     >
       <AppBar
         position="static"
-        style={{ background: "#334155" }}
+        style={{ background: "#303036" }}
         className="grow"
       >
         <Toolbar variant="dense" className="px-2 min-h-8">
           <Typography
             component="h6"
-            className="grow cursor-pointer select-none"
+            className="grow cursor-pointer select-none text-white"
           >
             {"Score Comparison"}
           </Typography>
@@ -250,6 +258,7 @@ const Scorecomparison = ({
           overflow: "auto",
         }}
         ref={componentRef}
+        className={isARMode ? "bg-white" : ""}
       >
         {isLoading || error ? (
           <>

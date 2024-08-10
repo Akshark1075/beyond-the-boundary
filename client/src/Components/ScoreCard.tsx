@@ -45,12 +45,14 @@ export default function ScoreCardTable({
   isLive,
   selections,
   setSelection,
+  isARMode,
 }: {
   matchId: string;
   type: ScoreCardType;
   isLive: boolean;
   selections: SelectedOption[];
   setSelection: (option: SelectedOption[]) => void;
+  isARMode: boolean;
 }) {
   const { isLoading, isError, data } = useQuery<GetScorecard>({
     queryKey: ["scoresData", matchId],

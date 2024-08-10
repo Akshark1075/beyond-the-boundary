@@ -1,7 +1,7 @@
 import "../styles/ShowPage.css";
 import { DraggableEvent } from "react-draggable";
 import WithTitleBar from "./WithTitleBar";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { Rnd, RndResizeCallback } from "react-rnd";
 import { SelectedOption } from "../views/ShowPage";
 import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
@@ -16,14 +16,21 @@ import { useQuery } from "@tanstack/react-query";
 import { GetInfo } from "../types/getInfo";
 import { VideoResource } from "../types/getVideo";
 import fetchWithRetry from "../api/fetch";
+import * as THREE from "three";
+import {
+  CSS3DObject,
+  CSS3DRenderer,
+} from "three/examples/jsm/renderers/CSS3DRenderer.js";
 const Video = ({
   matchId,
   selections,
   setSelection,
+  isARMode,
 }: {
   matchId: string;
   selections: SelectedOption[];
   setSelection: (option: SelectedOption[]) => void;
+  isARMode: boolean;
 }) => {
   const componentRef = React.useRef<HTMLDivElement>(null);
   const storedVideo = selections.find((s) => s.name === `Video`);
@@ -95,7 +102,7 @@ const Video = ({
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  if (!storedVideo && !isMobile) {
+  if (!storedVideo && !isMobile && !isARMode) {
     const newItems = [
       ...selections,
       {
@@ -148,14 +155,77 @@ const Video = ({
   const handleDragStop = (e: DraggableEvent, d: { x: number; y: number }) => {
     setPosition(d.x, d.y);
   };
+  const VideoPlane = ({
+    videoUrl,
+  }: {
+    videoUrl: VideoResource | undefined;
+  }) => {
+    const planeRef = useRef<THREE.Mesh | null>(null);
+    const sceneRef = useRef<THREE.Scene>(new THREE.Scene());
+    const cameraRef = useRef<THREE.PerspectiveCamera>(
+      new THREE.PerspectiveCamera(
+        45,
+        window.innerWidth / window.innerHeight,
+        1,
+        2000
+      )
+    );
+
+    useEffect(() => {
+      if (!videoUrl) {
+        console.error("No video URL provided");
+        return;
+      }
+
+      const camera = cameraRef.current;
+      camera.position.set(0, 0, 100); // Adjusted camera position
+
+      // Create a video element
+      const videoElement = document.createElement("video");
+      videoElement.src = `https://www.youtube.com/embed/${videoUrl.id.videoId}`;
+      videoElement.crossOrigin = "anonymous"; // Allow cross-origin access
+      videoElement.loop = true;
+      videoElement.muted = true; // Mute the video for autoplay
+      videoElement.play(); // Start playing the video
+
+      // Create a texture from the video element
+      const videoTexture = new THREE.VideoTexture(videoElement);
+
+      const geometry = new THREE.PlaneGeometry(300, 200);
+      const material = new THREE.MeshBasicMaterial({ map: videoTexture });
+      const mesh = new THREE.Mesh(geometry, material);
+      sceneRef.current.add(mesh);
+
+      const animate = () => {
+        requestAnimationFrame(animate);
+        // Update the video texture
+        if (videoTexture) {
+          videoTexture.needsUpdate = true;
+        }
+      };
+
+      animate();
+
+      return () => {
+        sceneRef.current.remove(mesh);
+        videoElement.pause();
+        videoElement.src = ""; // Clean up the video source
+      };
+    }, [videoUrl]);
+
+    return null; // This component does not render anything directly
+  };
+
   if (isLoading || isError) {
     return <></>;
   }
-  return isMobile ? (
+  return isARMode ? (
+    <VideoPlane videoUrl={videoUrl} />
+  ) : isMobile ? (
     <div style={{ width: "100%", marginBottom: "1rem", overflowY: "scroll" }}>
       <AppBar
         position="static"
-        style={{ background: "#334155" }}
+        style={{ background: "#303036" }}
         className="grow"
       >
         <Toolbar variant="dense" className="px-2 min-h-8">

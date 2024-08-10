@@ -1,0 +1,119 @@
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import * as THREE from "three";
+import { useTexture } from "@react-three/drei";
+import { useThree } from "@react-three/fiber";
+import domtoimage from "dom-to-image-more"; // Import dom-to-image-more
+import { renderToString } from "react-dom/server";
+
+// Prevents dom-to-image-more warnings
+HTMLCanvasElement.prototype.getContext = (function (origFn) {
+  return function (type, attribs) {
+    attribs = attribs || {};
+    attribs.preserveDrawingBuffer = true;
+    return origFn.call(this, type, attribs);
+  };
+})(HTMLCanvasElement.prototype.getContext);
+
+let container = document.querySelector("#htmlContainer");
+if (!container) {
+  const node = document.createElement("div");
+  node.setAttribute("id", "htmlContainer");
+  node.style.position = "fixed";
+  node.style.opacity = "0";
+  node.style.pointerEvents = "none";
+  document.body.appendChild(node);
+  container = node;
+}
+
+export default function Html({
+  children,
+  width,
+  height,
+  color = "transparent",
+  delay = 1000, // Default delay of 1 second
+}) {
+  const { camera, size: viewSize, gl } = useThree();
+
+  const sceneSize = useMemo(() => {
+    const cam = camera;
+    const fov = (cam.fov * Math.PI) / 180; // convert vertical fov to radians
+    const height = 2 * Math.tan(fov / 2) * 5; // visible height
+    const width = height * (viewSize.width / viewSize.height);
+    return { width, height };
+  }, [camera, viewSize]);
+
+  const lastUrl = useRef(null);
+
+  const [image, setImage] = useState(
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+  );
+  const [textureSize, setTextureSize] = useState({ width, height });
+
+  const node = useMemo(() => {
+    const node = document.createElement("div");
+    node.innerHTML = renderToString(children);
+    return node;
+  }, [children]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      container.appendChild(node);
+      domtoimage.toBlob(node, { bgcolor: color }).then((blob) => {
+        const { width: blobWidth, height: blobHeight } =
+          node.getBoundingClientRect();
+        setTextureSize({ width: blobWidth, height: blobHeight });
+        if (container.contains(node)) {
+          container.removeChild(node);
+        }
+        if (blob === null) return;
+        if (lastUrl.current !== null) {
+          URL.revokeObjectURL(lastUrl.current);
+        }
+        const url = URL.createObjectURL(blob);
+        lastUrl.current = url;
+        setImage(url);
+      });
+    }, delay);
+
+    return () => {
+      clearTimeout(timer);
+      if (container && container.contains(node)) {
+        container.removeChild(node);
+      }
+    };
+  }, [node, viewSize, sceneSize, color, delay]);
+
+  const texture = useTexture(image);
+
+  const size = useMemo(() => {
+    const imageAspect = texture.image.width / texture.image.height;
+    let w = width || sceneSize.width;
+    let h = height || w / imageAspect;
+
+    if (width === undefined && height !== undefined) {
+      w = height * imageAspect;
+    }
+
+    return { width: w, height: h };
+  }, [texture, width, height, sceneSize]);
+
+  useMemo(() => {
+    texture.matrixAutoUpdate = false;
+    const aspect = size.width / size.height;
+    const imageAspect = texture.image.width / texture.image.height;
+    texture.anisotropy = gl.capabilities.getMaxAnisotropy();
+    texture.minFilter = THREE.LinearFilter;
+    if (aspect < imageAspect) {
+      texture.matrix.setUvTransform(0, 0, 1, imageAspect / aspect, 0, 0.5, 0.5);
+    } else {
+      texture.matrix.setUvTransform(0, 0, aspect / imageAspect, 1, 0, 0.5, 0.5);
+    }
+  }, [texture, size]);
+
+  return (
+    <mesh>
+      <planeGeometry args={[size.width, size.height]} />
+      <meshBasicMaterial map={texture} side={THREE.DoubleSide} transparent />
+    </mesh>
+  );
+}

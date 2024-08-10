@@ -20,6 +20,7 @@ import getRandomCoordinates from "../utilities/getRandomCoordinates";
 import { Rnd, RndResizeCallback } from "react-rnd";
 import { DraggableEvent } from "react-draggable";
 import WithTitleBar from "./WithTitleBar";
+import { Text, Plane } from "@react-three/drei";
 
 import { useTheme } from "@mui/material/styles";
 import fetchWithRetry from "../api/fetch";
@@ -28,14 +29,23 @@ const MatchInfoComponent = ({
   height,
   isMatchDataLoading,
   matchData,
+  isARMode,
 }: {
   width: number;
   height: number;
   isMatchDataLoading: boolean;
   matchData: GetInfo | undefined;
+  isARMode: boolean;
 }) => {
   return (
-    <div style={{ width: width, height: height, overflow: "auto" }}>
+    <div
+      style={{
+        width: width,
+        height: height,
+        overflow: "auto",
+      }}
+      className={isARMode ? "bg-white" : ""}
+    >
       <TableContainer component={Paper}>
         <Table aria-label="match info table">
           <TableBody>
@@ -373,15 +383,18 @@ const MatchInfoComponent = ({
     </div>
   );
 };
+
 const MatchInfo = React.memo(
   ({
     matchId,
     selections,
     setSelection,
+    isARMode,
   }: {
     matchId: string;
     selections: SelectedOption[];
     setSelection: (option: SelectedOption[]) => void;
+    isARMode: boolean;
   }) => {
     const fetchInfo = async (matchId: string): Promise<GetInfo> => {
       const res = await fetchWithRetry(
@@ -463,12 +476,17 @@ const MatchInfo = React.memo(
     const handleDragStop = (e: DraggableEvent, d: { x: number; y: number }) => {
       setPosition(d.x, d.y);
     };
-
-    return isMobile ? (
-      <div style={{ width: "100%", marginBottom: "1rem", overflowY: "scroll" }}>
+    return isARMode || isMobile ? (
+      <div
+        style={{
+          width: "100%",
+          marginBottom: "1rem",
+          overflowY: "scroll",
+        }}
+      >
         <AppBar
           position="static"
-          style={{ background: "#334155" }}
+          style={{ background: "#303036" }}
           className="grow"
         >
           <Toolbar variant="dense" className="px-2 min-h-8">
@@ -480,11 +498,13 @@ const MatchInfo = React.memo(
             </Typography>
           </Toolbar>
         </AppBar>
+
         <MatchInfoComponent
           width={window.screen.width}
           height={height}
           isMatchDataLoading={isMatchDataLoading}
           matchData={matchData}
+          isARMode={isARMode}
         />
       </div>
     ) : (
@@ -513,6 +533,7 @@ const MatchInfo = React.memo(
               height={height}
               isMatchDataLoading={isMatchDataLoading}
               matchData={matchData}
+              isARMode={isARMode}
             />
           </WithTitleBar>
         </div>

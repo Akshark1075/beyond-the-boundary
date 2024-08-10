@@ -24,11 +24,13 @@ const FallOfWickets = ({
   selections,
   setSelection,
   isLive,
+  isARMode,
 }: {
   matchId: string;
   selections: SelectedOption[];
   setSelection: (option: SelectedOption[]) => void;
   isLive: boolean;
+  isARMode: boolean;
 }) => {
   const { isLoading, isError, data } = useQuery<GetScorecard>({
     queryKey: ["scoresData", matchId],
@@ -46,6 +48,7 @@ const FallOfWickets = ({
             selections={selections}
             setSelection={setSelection}
             key={row.inningsId}
+            isARMode={isARMode}
           />
         );
       })}
@@ -60,6 +63,7 @@ const Fow = ({
   isError,
   selections,
   setSelection,
+  isARMode,
 }: {
   row: ScoreCard;
 
@@ -67,6 +71,7 @@ const Fow = ({
   isError: boolean;
   selections: SelectedOption[];
   setSelection: (option: SelectedOption[]) => void;
+  isARMode: boolean;
 }) => {
   const componentRef = React.useRef<HTMLDivElement>(null);
   const { x: randomX, y: randomY } = getRandomCoordinates();
@@ -175,7 +180,7 @@ const Fow = ({
       </div>
     );
   else {
-    return isMobile ? (
+    return isMobile || isARMode ? (
       <div
         style={{
           width: window.screen.width,

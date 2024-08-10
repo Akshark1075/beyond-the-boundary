@@ -34,6 +34,7 @@ const SquadComponent = ({
   isTeam2SquadDataLoading,
   team1SquadData,
   team2SquadData,
+  isARMode,
 }: {
   width: number;
   height: number;
@@ -43,9 +44,13 @@ const SquadComponent = ({
   isTeam2SquadDataLoading: boolean;
   team1SquadData: GetSquad | undefined;
   team2SquadData: GetSquad | undefined;
+  isARMode: boolean;
 }) => {
   return (
-    <div style={{ width: width, height: height, overflow: "auto" }}>
+    <div
+      style={{ width: width, height: height, overflow: "auto" }}
+      className={isARMode ? "bg-white" : ""}
+    >
       <TableContainer component={Paper}>
         <Table aria-label="squad table">
           <TableHead>
@@ -216,10 +221,12 @@ const Squad = React.memo(
     matchId,
     selections,
     setSelection,
+    isARMode,
   }: {
     matchId: string;
     selections: SelectedOption[];
     setSelection: (option: SelectedOption[]) => void;
+    isARMode: boolean;
   }) => {
     const fetchInfo = async (matchId: string): Promise<GetInfo> => {
       const res = await fetchWithRetry(
@@ -337,11 +344,17 @@ const Squad = React.memo(
       setPosition(d.x, d.y);
     };
 
-    return isMobile ? (
-      <div style={{ width: "100%", marginBottom: "1rem", overflowY: "scroll" }}>
+    return isARMode ? (
+      <div
+        style={{
+          width: "100%",
+          marginBottom: "1rem",
+          background: "white",
+        }}
+      >
         <AppBar
           position="static"
-          style={{ background: "#334155" }}
+          style={{ background: "#303036" }}
           className="grow"
         >
           <Toolbar variant="dense" className="px-2 min-h-8">
@@ -362,6 +375,41 @@ const Squad = React.memo(
           isTeam2SquadDataLoading={isTeam2SquadDataLoading}
           team1SquadData={team1SquadData}
           team2SquadData={team2SquadData}
+          isARMode={isARMode}
+        />
+      </div>
+    ) : isMobile ? (
+      <div
+        style={{
+          width: "100%",
+          marginBottom: "1rem",
+          overflowY: "scroll",
+        }}
+      >
+        <AppBar
+          position="static"
+          style={{ background: "#303036" }}
+          className="grow"
+        >
+          <Toolbar variant="dense" className="px-2 min-h-8">
+            <Typography
+              component="h6"
+              className="grow cursor-pointer select-none"
+            >
+              {"Squad"}
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <SquadComponent
+          width={window.screen.width}
+          height={window.screen.height}
+          matchData={matchData}
+          isMatchDataLoading={isMatchDataLoading}
+          isTeam1SquadDataLoading={isTeam1SquadDataLoading}
+          isTeam2SquadDataLoading={isTeam2SquadDataLoading}
+          team1SquadData={team1SquadData}
+          team2SquadData={team2SquadData}
+          isARMode={isARMode}
         />
       </div>
     ) : (
@@ -394,6 +442,7 @@ const Squad = React.memo(
               isTeam2SquadDataLoading={isTeam2SquadDataLoading}
               team1SquadData={team1SquadData}
               team2SquadData={team2SquadData}
+              isARMode={isARMode}
             />
           </WithTitleBar>
         </div>

@@ -157,10 +157,12 @@ const WagonWheelWrapper = ({
   matchId,
   selections,
   setSelection,
+  isARMode,
 }: {
   matchId: string;
   selections: SelectedOption[];
   setSelection: (option: SelectedOption[]) => void;
+  isARMode: boolean;
 }) => {
   const { x: randomX, y: randomY } = getRandomCoordinates();
   const storedScoreComparison = selections.find((s) => s.name === `Wagonwheel`);
@@ -253,7 +255,7 @@ const WagonWheelWrapper = ({
   const teamBatters = Object.values(
     data?.scoreCard[team]?.batTeamDetails.batsmenData ?? {}
   );
-  return isMobile ? (
+  return isMobile || isARMode ? (
     <div style={{ width: width, marginBottom: "1rem", overflowY: "scroll" }}>
       <AppBar
         position="static"

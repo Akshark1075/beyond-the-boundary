@@ -29,6 +29,8 @@ import { SelectedOption } from "../views/ShowPage";
 import getRandomCoordinates from "../utilities/getRandomCoordinates";
 import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
 import fetchWithRetry from "../api/fetch";
+import ARBarGraph from "./ARBarGraph";
+import { Box } from "@react-three/drei";
 
 ChartJS.register(
   CategoryScale,
@@ -52,11 +54,13 @@ const RunsPerOver = React.memo(
     matchId,
     selections,
     setSelection,
+    isARMode,
   }: {
     matchId: string;
 
     selections: SelectedOption[];
     setSelection: (option: SelectedOption[]) => void;
+    isARMode: boolean;
   }) => {
     const { isLoading, error, data } = useQuery<GetScorecard>({
       queryKey: ["scoresData", matchId],
@@ -215,7 +219,11 @@ const RunsPerOver = React.memo(
       setPosition(d.x, d.y);
     };
 
-    return isMobile ? (
+    if ((isLoading || error) && isARMode) return <Box></Box>;
+
+    return isARMode ? (
+      <ARBarGraph data={chartData.datasets[0].data} />
+    ) : isMobile ? (
       <Card
         style={{
           width: `${window.screen.width}px`,
@@ -225,7 +233,7 @@ const RunsPerOver = React.memo(
       >
         <AppBar
           position="static"
-          style={{ background: "#334155" }}
+          style={{ background: "#303036" }}
           className="grow"
         >
           <Toolbar variant="dense" className="px-2 min-h-8">
@@ -245,6 +253,7 @@ const RunsPerOver = React.memo(
             flexDirection: "column",
             justifyContent: "space-around",
             overflow: "auto",
+            background: "black",
           }}
         >
           {isLoading || error ? (
@@ -256,6 +265,9 @@ const RunsPerOver = React.memo(
               <Skeleton height={"2rem"} />
             </>
           ) : (
+            // <D3Graph data={chartData.datasets[0].data} />
+            // <D3BarChart data={chartData.datasets[0].data} />
+
             <Bar
               data={chartData}
               options={{ ...options, maintainAspectRatio: false }}
