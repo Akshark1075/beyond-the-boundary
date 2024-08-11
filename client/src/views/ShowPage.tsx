@@ -291,6 +291,7 @@ const ShowPage = () => {
         />
       )}
       {!isARMode && (
+        // @ts-ignore: Unreachable code error
         <Box className={"h-full sm:flex overflow-y-auto "}>
           <DrawerAppBar />;
           <Box className="mt-20 sm:mt-28 w-full ">
