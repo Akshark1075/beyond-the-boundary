@@ -1,5 +1,5 @@
 import "../styles/ShowPage.css";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import FloatingActionButton from "../Components/FloatingActionButton";
 import {
   getArrayFromLocalStorage,
@@ -33,6 +33,9 @@ import { Reticle } from "../Components/Reticle";
 import { OrbitControls } from "@react-three/drei";
 import WithXRPlane from "../Components/PlaneWithContent";
 import WithXR from "../Components/WithXR";
+import fetchWithRetry from "../api/fetch";
+import { useQuery } from "@tanstack/react-query";
+import { GetScorecard } from "../types/getScorecard";
 
 export interface SelectedOption {
   name: string;
@@ -45,6 +48,14 @@ const ShowPage = () => {
   const [selections, setSelection] = useState<SelectedOption[]>([]);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const [isARMode, setIsARMode] = useState(false);
+  const fetchScorecard = async (matchId: string): Promise<Response> => {
+    const res = await fetchWithRetry(
+      `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`
+    );
+    console.log(res);
+    return res;
+  };
   useEffect(() => {
     // Retrieve the array from local storage on component mount
     let storedItems = getArrayFromLocalStorage("selectedOptions");
@@ -82,6 +93,15 @@ const ShowPage = () => {
   const { matchId } = useParams();
   const [searchParams] = useSearchParams();
   const isLive = searchParams.get("isLive");
+  useQuery<GetScorecard>({
+    queryKey: [`scoresData-${matchId}`],
+    queryFn: useCallback(
+      () => fetchScorecard(matchId ?? "").then((res) => res.json()),
+      [matchId]
+    ),
+    enabled: !!matchId,
+    // refetchInterval: isLive ? 30000 : undefined,
+  });
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -104,7 +124,7 @@ const ShowPage = () => {
   //   },
   //   []
   // );
-  const [isARMode, setIsARMode] = useState(false);
+
   useEffect(() => {
     const canvas = document.getElementById("canvas");
     if (canvas) {

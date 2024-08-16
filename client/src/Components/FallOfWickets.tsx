@@ -33,13 +33,23 @@ const FallOfWickets = ({
   isARMode: boolean;
 }) => {
   const { isLoading, isError, data } = useQuery<GetScorecard>({
-    queryKey: ["scoresData", matchId],
+    queryKey: [`scoresData-${matchId}`],
     queryFn: useCallback(() => fetchScorecard(matchId), [matchId]),
     refetchInterval: isLive ? 30000 : undefined,
   });
   return (
+    // <Fow
+    //   row={data.scoreCard[data.scoreCard.length - 1]}
+    //   isLoading={isLoading}
+    //   isError={isError}
+    //   selections={selections}
+    //   setSelection={setSelection}
+    //   key={data.scoreCard[data?.scoreCard.length - 1].inningsId}
+    //   isARMode={isARMode}
+    // />
     <>
       {data?.scoreCard.map((row) => {
+        console.log("loaded");
         return (
           <Fow
             row={row}
@@ -75,6 +85,8 @@ const Fow = ({
 }) => {
   const componentRef = React.useRef<HTMLDivElement>(null);
   const { x: randomX, y: randomY } = getRandomCoordinates();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const storedFallOfWickets = selections.find(
     (s) => s.name === `Fall of wickets ${row.inningsId}`
   );
@@ -84,15 +96,14 @@ const Fow = ({
     width = 350,
     height = 350,
   } = storedFallOfWickets ?? {};
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  if (
-    selections.find((s) => s.name.includes("Fall of wickets")) &&
-    !storedFallOfWickets
-  ) {
-    return <></>;
-  }
-  if (!storedFallOfWickets && !isMobile) {
+
+  // if (
+  //   selections.find((s) => s.name.includes("Fall of wickets")) &&
+  //   !storedFallOfWickets
+  // ) {
+  //   return <></>;
+  // }
+  if (!storedFallOfWickets && !isMobile && !isARMode) {
     const newItems = [
       ...selections,
       {
@@ -153,7 +164,7 @@ const Fow = ({
     return (
       <div
         style={{
-          width: window.screen.width,
+          width: isMobile ? window.screen.width : "350px",
           marginBottom: "1rem",
           overflowY: "scroll",
         }}
@@ -167,6 +178,7 @@ const Fow = ({
             <Typography
               variant="h6"
               className="grow cursor-pointer select-none"
+              style={{ color: "white" }}
             >
               {`Fall of wickets ${row.inningsId}`}
             </Typography>
@@ -186,6 +198,8 @@ const Fow = ({
           width: window.screen.width,
           marginBottom: "1rem",
           overflowY: "scroll",
+          color: "black",
+          background: "white",
         }}
       >
         <AppBar
@@ -197,6 +211,7 @@ const Fow = ({
             <Typography
               variant="h6"
               className="grow cursor-pointer select-none"
+              style={{ color: "white" }}
             >
               {`Fall of wickets ${row.inningsId}`}
             </Typography>

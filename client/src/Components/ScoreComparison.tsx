@@ -60,10 +60,12 @@ const Scorecomparison = ({
   isARMode: boolean;
 }) => {
   const { isLoading, error, data } = useQuery<GetScorecard>({
-    queryKey: ["scoresData", matchId],
+    queryKey: [`scoresData-${matchId}`],
     queryFn: useCallback(() => fetchOvers(matchId), [matchId]),
   });
   const { x: randomX, y: randomY } = getRandomCoordinates();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const storedScoreComparison = selections.find(
     (s) => s.name === `Scorecard comparison`
   );
@@ -165,8 +167,7 @@ const Scorecomparison = ({
     width = 350,
     height = 350,
   } = storedScoreComparison ?? {};
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
   if (!storedScoreComparison && !isMobile) {
     const newItems = [
       ...selections,

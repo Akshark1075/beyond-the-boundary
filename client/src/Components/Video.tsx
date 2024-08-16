@@ -31,6 +31,9 @@ const Video = ({
   isARMode: boolean;
 }) => {
   const componentRef = React.useRef<HTMLDivElement>(null);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const storedVideo = selections.find((s) => s.name === `Video`);
 
   const API_KEY = "AIzaSyDxhrWwxckMwaHOj1ma7hje53GjV_aY1FM";
@@ -95,8 +98,6 @@ const Video = ({
     height = 480,
   } = storedVideo ?? {};
 
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   if (!storedVideo && !isMobile && !isARMode) {
     const newItems = [
       ...selections,
@@ -172,7 +173,13 @@ const Video = ({
   return isARMode ? (
     <VideoPlane />
   ) : isMobile ? (
-    <div style={{ width: "100%", marginBottom: "1rem", overflowY: "scroll" }}>
+    <div
+      style={{
+        width: "100%",
+        marginBottom: "1rem",
+        overflowY: "scroll",
+      }}
+    >
       <AppBar
         position="static"
         style={{ background: "#303036" }}
@@ -182,6 +189,7 @@ const Video = ({
           <Typography
             component="h6"
             className="grow cursor-pointer select-none"
+            style={{ color: "white" }}
           >
             {"Live"}
           </Typography>
@@ -190,11 +198,15 @@ const Video = ({
       <div
         className="video-responsive"
         ref={componentRef}
-        style={{ width: window.screen.width, height: height, overflow: "auto" }}
+        style={{
+          width: window.screen.width,
+          height: window.screen.width,
+          overflow: "auto",
+        }}
       >
         <iframe
           width={window.screen.width}
-          height={height}
+          height={window.screen.width}
           src={`https://www.youtube.com/embed/${videoUrl?.id.videoId}`}
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

@@ -281,6 +281,9 @@ const Squad = React.memo(
     });
     const { x: randomX, y: randomY } = getRandomCoordinates();
     const componentRef = React.useRef<HTMLDivElement>(null);
+
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
     const storedSquad = selections.find((s) => s.name === `Squad`);
     const {
       x = randomX,
@@ -288,8 +291,6 @@ const Squad = React.memo(
       width = 350,
       height = 500,
     } = storedSquad ?? {};
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
     if (!storedSquad && !isMobile) {
       const newItems = [
         ...selections,
@@ -360,7 +361,8 @@ const Squad = React.memo(
           <Toolbar variant="dense" className="px-2 min-h-8">
             <Typography
               component="h6"
-              className="grow cursor-pointer select-none"
+              className="grow cursor-pointer select-none "
+              style={{ color: "white" }}
             >
               {"Squad"}
             </Typography>
@@ -395,6 +397,7 @@ const Squad = React.memo(
             <Typography
               component="h6"
               className="grow cursor-pointer select-none"
+              style={{ color: "white" }}
             >
               {"Squad"}
             </Typography>

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useContext, useEffect, useRef } from "react";
 import * as THREE from "three";
 import WithTitleBar from "./WithTitleBar";
 import { DraggableEvent } from "react-draggable";
@@ -24,6 +24,7 @@ import "../styles/WagonWheel.css";
 import { GetScorecard } from "../types/getScorecard";
 import { useQuery } from "@tanstack/react-query";
 import fetchWithRetry from "../api/fetch";
+import { PositionContext } from "./PlaneWithContent";
 
 interface WagonWheelProps {
   scores: {
@@ -165,7 +166,7 @@ const WagonWheelWrapper = ({
   isARMode: boolean;
 }) => {
   const { x: randomX, y: randomY } = getRandomCoordinates();
-  const storedScoreComparison = selections.find((s) => s.name === `Wagonwheel`);
+  const storedWagonWheel = selections.find((s) => s.name === `Wagonwheel`);
   const componentRef = React.useRef<HTMLDivElement>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -174,9 +175,9 @@ const WagonWheelWrapper = ({
     y = randomY,
     width = isMobile ? window.screen.width : 350,
     height = isMobile ? window.screen.width + 20 : 370,
-  } = storedScoreComparison ?? {};
+  } = storedWagonWheel ?? {};
 
-  if (!storedScoreComparison && !isMobile) {
+  if (!storedWagonWheel && !isMobile) {
     const newItems = [
       ...selections,
       {
@@ -238,7 +239,7 @@ const WagonWheelWrapper = ({
   const [team, setTeam] = React.useState(0);
   const [player, setPlayer] = React.useState("");
   const { isLoading, error, data } = useQuery<GetScorecard>({
-    queryKey: ["scoresData", matchId],
+    queryKey: [`scoresData-${matchId}`],
     queryFn: useCallback(() => fetchOvers(matchId), [matchId]),
   });
   const handleTeamChange = (event: SelectChangeEvent) => {
@@ -255,7 +256,196 @@ const WagonWheelWrapper = ({
   const teamBatters = Object.values(
     data?.scoreCard[team]?.batTeamDetails.batsmenData ?? {}
   );
-  return isMobile || isARMode ? (
+  const position = useContext(PositionContext);
+  const Circle = ({
+    radius,
+    color,
+    position,
+  }: {
+    position: THREE.Vector3 | undefined;
+    radius: number;
+    color: string | undefined;
+  }) => {
+    return (
+      <mesh position={position}>
+        <circleGeometry args={[radius, 16]} />
+        <meshBasicMaterial color={color} transparent opacity={0.2} />
+      </mesh>
+    );
+  };
+
+  const DrawLines = ({
+    count,
+    length,
+    color,
+    lineWidth,
+    angleOffset,
+    angleRange,
+    position,
+  }: {
+    count: number;
+    length: number;
+    color: number;
+    lineWidth: number;
+    angleOffset: number;
+    angleRange: number;
+    position: THREE.Vector3;
+  }) => {
+    const drawLines = () => {
+      const lines = [];
+      for (let i = 0; i < count; i++) {
+        const angle = angleOffset + Math.random() * angleRange;
+        const x = length * Math.cos(angle);
+        const y = length * Math.sin(angle);
+
+        const points = [
+          position
+            ? new THREE.Vector3(position.x, position.y, position.z + 0.2)
+            : new THREE.Vector3(0, 1, 0.2),
+          position
+            ? new THREE.Vector3(position.x + x, position.y + y, position.z)
+            : new THREE.Vector3(x, y, 0),
+        ];
+
+        // const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        var tubeGeometry = new THREE.TubeGeometry(
+          new THREE.CatmullRomCurve3(points),
+          512, // path segments
+          0.04, // THICKNESS
+          8, //Roundness of Tube
+          false //closed
+        );
+        const material = new THREE.LineBasicMaterial({
+          color,
+
+          linewidth: lineWidth,
+        });
+        const line = new THREE.Line(tubeGeometry, material);
+        lines.push(line);
+      }
+      return lines;
+    };
+
+    return (
+      <>
+        {drawLines().map((line, index) => (
+          <primitive key={index} object={line} />
+        ))}
+      </>
+    );
+  };
+  console.log(teamBatters);
+  return isARMode ? (
+    <>
+      <DrawLines
+        count={teamBatters[0].ones}
+        length={2}
+        color={0x800080}
+        lineWidth={0.3}
+        angleOffset={0}
+        angleRange={Math.PI * 2}
+        position={
+          position
+            ? new THREE.Vector3(position.x, position.y, position.z - 1.5)
+            : new THREE.Vector3(0, 0, -1.5)
+        }
+
+        // Position in AR space
+      />
+      <DrawLines
+        count={teamBatters[0].twos}
+        length={3}
+        color={0x8b4513}
+        lineWidth={0.3}
+        angleOffset={0}
+        angleRange={Math.PI * 2}
+        position={
+          position
+            ? new THREE.Vector3(position.x, position.y, position.z - 1.5)
+            : new THREE.Vector3(0, 0, -1.5)
+        }
+      />
+      <DrawLines
+        count={teamBatters[0].threes}
+        length={6}
+        color={0xffff00}
+        lineWidth={0.3}
+        angleOffset={0}
+        angleRange={Math.PI * 2}
+        position={
+          position
+            ? new THREE.Vector3(position.x, position.y, position.z - 1.5)
+            : new THREE.Vector3(0, 0, -1.5)
+        }
+      />
+      <DrawLines
+        count={teamBatters[0].fours}
+        length={8.5}
+        color={0xffffff}
+        lineWidth={0.3}
+        angleOffset={0}
+        angleRange={Math.PI * 2}
+        position={
+          position
+            ? new THREE.Vector3(position.x, position.y, position.z - 1.5)
+            : new THREE.Vector3(0, 0, -1.5)
+        }
+      />
+      <DrawLines
+        count={teamBatters[0].sixes}
+        length={9}
+        color={0xff0000}
+        lineWidth={0.3}
+        angleOffset={0}
+        angleRange={Math.PI * 2}
+        position={
+          position
+            ? new THREE.Vector3(position.x, position.y, position.z - 1.5)
+            : new THREE.Vector3(0, 0, -1.5)
+        }
+      />
+      <Circle
+        radius={8}
+        color="green"
+        position={
+          position
+            ? new THREE.Vector3(position.x, position.y, position.z - 0.5)
+            : new THREE.Vector3(0, 0, -0.5)
+        }
+      />
+
+      {/* Pitch in the center */}
+      <mesh
+        position={
+          position
+            ? new THREE.Vector3(position.x, position.y, position.z - 0.1)
+            : new THREE.Vector3(0, 0, 0.1)
+        }
+      >
+        <boxGeometry args={[0.5, 2, -0.01]} />
+        <meshBasicMaterial color="saddlebrown" />
+      </mesh>
+      <Circle
+        radius={3}
+        color="white"
+        position={
+          position
+            ? new THREE.Vector3(position.x, position.y, position.z - 1.1)
+            : new THREE.Vector3(0, 0, -1.1)
+        }
+      />
+
+      <Circle
+        radius={9}
+        color="red"
+        position={
+          position
+            ? new THREE.Vector3(position.x, position.y, position.z - 1)
+            : new THREE.Vector3(0, 0, -1)
+        }
+      />
+    </>
+  ) : isMobile ? (
     <div style={{ width: width, marginBottom: "1rem", overflowY: "scroll" }}>
       <AppBar
         position="static"

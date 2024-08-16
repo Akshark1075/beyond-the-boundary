@@ -39,61 +39,6 @@ const fetchScorecard = async (matchId: string): Promise<Response> => {
   return res;
 };
 
-export default function ScoreCardTable({
-  matchId,
-  type,
-  isLive,
-  selections,
-  setSelection,
-  isARMode,
-}: {
-  matchId: string;
-  type: ScoreCardType;
-  isLive: boolean;
-  selections: SelectedOption[];
-  setSelection: (option: SelectedOption[]) => void;
-  isARMode: boolean;
-}) {
-  const { isLoading, isError, data } = useQuery<GetScorecard>({
-    queryKey: ["scoresData", matchId],
-    queryFn: useCallback(
-      () => fetchScorecard(matchId).then((res) => res.json()),
-      [matchId]
-    ),
-    refetchInterval: isLive ? 30000 : undefined,
-  });
-
-  return (
-    <>
-      {data?.scoreCard.map((row) => {
-        if (type === "Batting") {
-          return (
-            <BattingScorecard
-              row={row}
-              isLoading={isLoading}
-              isError={isError}
-              selections={selections}
-              setSelection={setSelection}
-              key={row.inningsId}
-            />
-          );
-        } else {
-          return (
-            <BowlingScorecard
-              row={row}
-              isLoading={isLoading}
-              isError={isError}
-              selections={selections}
-              setSelection={setSelection}
-              key={row.inningsId}
-            />
-          );
-        }
-      })}
-    </>
-  );
-}
-
 const BattingScorecard = ({
   row,
 
@@ -101,9 +46,10 @@ const BattingScorecard = ({
   isError,
   selections,
   setSelection,
+  isARMode,
 }: {
   row: ScoreCard;
-
+  isARMode: boolean;
   isLoading: boolean;
   isError: boolean;
   selections: SelectedOption[];
@@ -112,6 +58,8 @@ const BattingScorecard = ({
   const [open, setOpen] = React.useState(true);
   const componentRef = React.useRef<HTMLDivElement>(null);
   const { x: randomX, y: randomY } = getRandomCoordinates();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const storedScorecard = selections.find(
     (s) => s.name === `Batting Scorecard ${row.inningsId}`
   );
@@ -122,8 +70,7 @@ const BattingScorecard = ({
     width = 350,
     height = 350,
   } = storedScorecard ?? {};
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
   if (
     selections.find((s) => s.name.includes("Batting Scorecard")) &&
     !storedScorecard
@@ -193,7 +140,17 @@ const BattingScorecard = ({
     height?: number;
   }) => {
     return (
-      <TableContainer component={Paper} style={{ boxShadow: "none" }}>
+      <TableContainer
+        component={Paper}
+        style={{
+          boxShadow: "none",
+          width: isMobile
+            ? window.screen.width
+            : width
+            ? `${width}px`
+            : "350px",
+        }}
+      >
         <Box
           // @ts-ignore: Unreachable code error
           sx={{
@@ -227,7 +184,11 @@ const BattingScorecard = ({
         </Box>
         <Table
           sx={{
-            width: width ? `${width}px` : window.screen.width,
+            width: isMobile
+              ? window.screen.width
+              : width
+              ? `${width}px`
+              : "350px",
             tableLayout: "fixed",
           }}
           size="small"
@@ -433,89 +394,74 @@ const BattingScorecard = ({
       </TableContainer>
     );
   };
-  if (isLoading || isError)
-    return (
-      <ScoreCardLoader
-        type={"Batting"}
-        position={{ x: x, y: y }}
-        width={width}
-        height={height}
-        setPosition={setPosition}
-        setSize={setSize}
-        storedKey={`Batting Scorecard ${row.inningsId}`}
-        // handleClose={handleClose}
-        selections={selections}
-        setSelection={setSelection}
-      />
-    );
-  else {
-    return isMobile ? (
-      <div
-        style={{
-          width: window.screen.width,
-          marginBottom: "1rem",
-          overflowY: "scroll",
-        }}
+
+  return isMobile || isARMode ? (
+    <div
+      style={{
+        width: window.screen.width,
+        marginBottom: "1rem",
+        overflowY: "scroll",
+      }}
+    >
+      <AppBar
+        position="static"
+        style={{ background: "#303036" }}
+        className="grow"
       >
-        <AppBar
-          position="static"
-          style={{ background: "#303036" }}
-          className="grow"
-        >
-          <Toolbar variant="dense" className="px-2 min-h-8">
-            <Typography
-              component="h6"
-              className="grow cursor-pointer select-none"
-            >
-              {`Batting Scorecard ${row.inningsId}`}
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <BattingScorecardComponent />
-      </div>
-    ) : (
-      <Rnd
-        size={{ width: width, height: height }}
-        position={{ x: x, y: y }}
-        onResize={handleResize}
-        onDragStop={handleDragStop}
-        minWidth={350}
-        minHeight={350}
-        bounds="window"
-        key={row.batTeamDetails.batTeamName}
-      >
-        <div
-          ref={componentRef}
-          style={{ width: width, height: height, overflow: "auto" }}
-        >
-          <WithTitleBar
-            title={`Batting Scorecard ${row.inningsId}`}
-            width={componentRef.current?.getBoundingClientRect().width ?? width}
-            height={
-              componentRef.current?.getBoundingClientRect().height ?? height
-            }
-            storedKey={`Batting Scorecard ${row.inningsId}`}
-            // handleClose={handleClose}
-            selections={selections}
-            setSelection={setSelection}
+        <Toolbar variant="dense" className="px-2 min-h-8">
+          <Typography
+            component="h6"
+            className="grow cursor-pointer select-none"
           >
-            <BattingScorecardComponent />
-          </WithTitleBar>
-        </div>
-      </Rnd>
-    );
-  }
+            {`Batting Scorecard ${row.inningsId}`}
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <BattingScorecardComponent />
+    </div>
+  ) : (
+    <Rnd
+      size={{ width: width, height: height }}
+      position={{ x: x, y: y }}
+      onResize={handleResize}
+      onDragStop={handleDragStop}
+      minWidth={350}
+      minHeight={350}
+      bounds="window"
+      key={row.batTeamDetails.batTeamName}
+    >
+      <div
+        ref={componentRef}
+        style={{ width: width, height: height, overflow: "auto" }}
+      >
+        <WithTitleBar
+          title={`Batting Scorecard ${row.inningsId}`}
+          width={componentRef.current?.getBoundingClientRect().width ?? width}
+          height={
+            componentRef.current?.getBoundingClientRect().height ?? height
+          }
+          storedKey={`Batting Scorecard ${row.inningsId}`}
+          // handleClose={handleClose}
+          selections={selections}
+          setSelection={setSelection}
+        >
+          <BattingScorecardComponent width={width} height={height} />
+        </WithTitleBar>
+      </div>
+    </Rnd>
+  );
 };
+
 const BowlingScorecard = ({
   row,
-
+  isARMode,
   isLoading,
   isError,
   selections,
   setSelection,
 }: {
   row: ScoreCard;
-
+  isARMode: boolean;
   isLoading: boolean;
   isError: boolean;
   selections: SelectedOption[];
@@ -524,8 +470,10 @@ const BowlingScorecard = ({
   const [open, setOpen] = React.useState(true);
   const componentRef = useRef<HTMLDivElement>(null);
   const { x: randomX, y: randomY } = getRandomCoordinates();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const storedScorecard = selections.find(
-    (s) => s.name === `Bowling Scorecard ${row.inningsId}`
+    (s) => s.name === `Bowling Scorecard ${row.inningsId}` && !isMobile
   );
   const {
     x = randomX,
@@ -534,14 +482,7 @@ const BowlingScorecard = ({
     height = 350,
   } = storedScorecard ?? {};
 
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  if (
-    selections.find((s) => s.name.includes("Bowling Scorecard")) &&
-    !storedScorecard
-  ) {
-    return <></>;
-  } else if (!storedScorecard && !isMobile) {
+  if (!storedScorecard && !isMobile) {
     const newItems = [
       ...selections,
       {
@@ -861,70 +802,142 @@ const BowlingScorecard = ({
       </TableContainer>
     );
   };
-  if (isLoading || isError)
-    return (
-      <ScoreCardLoader
-        type={"Bowling"}
-        position={{ x: x, y: y }}
-        width={width}
-        height={height}
-        setPosition={setPosition}
-        setSize={setSize}
-        storedKey={`Bowling Scorecard ${row.inningsId}`}
-        selections={selections}
-        setSelection={setSelection}
-      />
-    );
-  else {
-    return isMobile ? (
-      <div
-        style={{
-          width: window.screen.width,
-          marginBottom: "1rem",
-          overflowY: "scroll",
-        }}
+
+  return isMobile || isARMode ? (
+    <div
+      style={{
+        width: window.screen.width,
+        marginBottom: "1rem",
+        overflowY: "scroll",
+      }}
+    >
+      <AppBar
+        position="static"
+        style={{ background: "#303036" }}
+        className="grow"
       >
-        <AppBar
-          position="static"
-          style={{ background: "#303036" }}
-          className="grow"
+        <Toolbar variant="dense" className="px-2 min-h-8">
+          <Typography
+            component="h6"
+            className="grow cursor-pointer select-none"
+          >
+            {`Bowling Scorecard ${row.inningsId}`}
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <BowlingScorecardComponent />
+    </div>
+  ) : (
+    <Rnd
+      size={{ width: width, height: height }}
+      position={{ x: x, y: y }}
+      onResize={handleResize}
+      onDragStop={handleDragStop}
+      minWidth={350}
+      minHeight={350}
+      bounds="window"
+      key={row.bowlTeamDetails.bowlTeamName}
+    >
+      <div ref={componentRef} style={{ overflow: "scroll" }}>
+        <WithTitleBar
+          title={`Bowling Scorecard ${row.inningsId}`}
+          width={componentRef.current?.getBoundingClientRect().width ?? width}
+          height={
+            componentRef.current?.getBoundingClientRect().height ?? height
+          }
+          storedKey={`Bowling Scorecard ${row.inningsId}`}
+          selections={selections}
+          setSelection={setSelection}
         >
-          <Toolbar variant="dense" className="px-2 min-h-8">
-            <Typography
-              component="h6"
-              className="grow cursor-pointer select-none"
-            >
-              {`Bowling Scorecard ${row.inningsId}`}
-            </Typography>
-          </Toolbar>
-        </AppBar>
+          <BowlingScorecardComponent width={width} height={height} />
+        </WithTitleBar>
       </div>
-    ) : (
-      <Rnd
-        size={{ width: width, height: height }}
-        position={{ x: x, y: y }}
-        onResize={handleResize}
-        onDragStop={handleDragStop}
-        minWidth={350}
-        minHeight={350}
-        bounds="window"
-        key={row.bowlTeamDetails.bowlTeamName}
-      >
-        <div ref={componentRef} style={{ overflow: "scroll" }}>
-          <WithTitleBar
-            title={`Bowling Scorecard ${row.inningsId}`}
-            width={componentRef.current?.getBoundingClientRect().width ?? width}
-            height={
-              componentRef.current?.getBoundingClientRect().height ?? height
-            }
-            storedKey={`Bowling Scorecard ${row.inningsId}`}
+    </Rnd>
+  );
+};
+
+export default function ScoreCardTable({
+  matchId,
+  type,
+  isLive,
+  selections,
+  setSelection,
+  isARMode,
+}: {
+  matchId: string;
+  type: ScoreCardType;
+  isLive: boolean;
+  selections: SelectedOption[];
+  setSelection: (option: SelectedOption[]) => void;
+  isARMode: boolean;
+}) {
+  const { isLoading, isError, data } = useQuery<GetScorecard>({
+    queryKey: [`scoresData-${matchId}`],
+    queryFn: useCallback(
+      () => fetchScorecard(matchId).then((res) => res.json()),
+      [matchId]
+    ),
+    refetchInterval: isLive ? 30000 : undefined,
+  });
+  console.log(data, "sc");
+  if (isARMode) {
+    if (data?.scoreCard) {
+      if (type === "Batting") {
+        return (
+          <BattingScorecard
+            row={data.scoreCard[data.scoreCard.length - 1]}
+            isLoading={isLoading}
+            isError={isError}
             selections={selections}
             setSelection={setSelection}
-          >
-            <BowlingScorecardComponent />
-          </WithTitleBar>
-        </div>
-      </Rnd>
-    );
+            key={data.scoreCard[data.scoreCard.length - 1].inningsId}
+            isARMode={isARMode}
+          />
+        );
+      } else {
+        return (
+          <BowlingScorecard
+            row={data.scoreCard[data.scoreCard.length - 1]}
+            isLoading={isLoading}
+            isError={isError}
+            selections={selections}
+            setSelection={setSelection}
+            key={data.scoreCard[data.scoreCard.length - 1].inningsId}
+            isARMode={isARMode}
+          />
+        );
+      }
+    }
   }
-};
+  return (
+    <>
+      {data?.scoreCard.map((row) => {
+        if (type === "Batting") {
+          return (
+            <BattingScorecard
+              row={row}
+              isLoading={isLoading}
+              isError={isError}
+              selections={selections}
+              setSelection={setSelection}
+              key={row.inningsId}
+              isARMode={isARMode}
+            />
+          );
+        } else {
+          return (
+            <BowlingScorecard
+              row={row}
+              isLoading={isLoading}
+              isError={isError}
+              selections={selections}
+              setSelection={setSelection}
+              key={row.inningsId}
+              isARMode={isARMode}
+            />
+          );
+        }
+      })}
+    </>
+  );
+}

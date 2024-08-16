@@ -5,6 +5,7 @@ import { useRoutes } from "react-router-dom";
 import ShowPage from "./views/ShowPage";
 import Rankings from "./views/RankingsPage";
 import News from "./views/News";
+
 function App() {
   let element = useRoutes([
     { path: "matches/:matchId", element: <ShowPage /> },

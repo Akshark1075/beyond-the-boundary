@@ -20,7 +20,6 @@ import getRandomCoordinates from "../utilities/getRandomCoordinates";
 import { Rnd, RndResizeCallback } from "react-rnd";
 import { DraggableEvent } from "react-draggable";
 import WithTitleBar from "./WithTitleBar";
-import { Text, Plane } from "@react-three/drei";
 
 import { useTheme } from "@mui/material/styles";
 import fetchWithRetry from "../api/fetch";
@@ -414,6 +413,8 @@ const MatchInfo = React.memo(
 
     const { x: randomX, y: randomY } = getRandomCoordinates();
     const componentRef = React.useRef<HTMLDivElement>(null);
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
     const storedInfo = selections.find((s) => s.name === `Match Info`);
     const {
       x = randomX,
@@ -421,8 +422,7 @@ const MatchInfo = React.memo(
       width = 350,
       height = 350,
     } = storedInfo ?? {};
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
     if (!storedInfo && !isMobile) {
       const newItems = [
         ...selections,
@@ -493,6 +493,7 @@ const MatchInfo = React.memo(
             <Typography
               component="h6"
               className="grow cursor-pointer select-none"
+              style={{ color: "white" }}
             >
               {"Match Info"}
             </Typography>

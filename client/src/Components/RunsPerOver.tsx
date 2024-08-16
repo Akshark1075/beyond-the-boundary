@@ -63,10 +63,12 @@ const RunsPerOver = React.memo(
     isARMode: boolean;
   }) => {
     const { isLoading, error, data } = useQuery<GetScorecard>({
-      queryKey: ["scoresData", matchId],
+      queryKey: [`scoresData-${matchId}`],
       queryFn: useCallback(() => fetchOvers(matchId), [matchId]),
     });
     const { x: randomX, y: randomY } = getRandomCoordinates();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
     const storedRunsPerOver = selections.find(
       (s) => s.name === `Runs per over`
     );
@@ -163,8 +165,7 @@ const RunsPerOver = React.memo(
       width = 350,
       height = 350,
     } = storedRunsPerOver ?? {};
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
     if (!storedRunsPerOver && !isMobile) {
       const newItems = [
         ...selections,
@@ -253,7 +254,6 @@ const RunsPerOver = React.memo(
             flexDirection: "column",
             justifyContent: "space-around",
             overflow: "auto",
-            background: "black",
           }}
         >
           {isLoading || error ? (
@@ -265,9 +265,6 @@ const RunsPerOver = React.memo(
               <Skeleton height={"2rem"} />
             </>
           ) : (
-            // <D3Graph data={chartData.datasets[0].data} />
-            // <D3BarChart data={chartData.datasets[0].data} />
-
             <Bar
               data={chartData}
               options={{ ...options, maintainAspectRatio: false }}
