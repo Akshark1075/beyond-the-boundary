@@ -40,7 +40,8 @@ interface WagonWheelProps {
 
 const WagonWheel: React.FC<WagonWheelProps> = ({ scores, width, height }) => {
   const mountRef = useRef<HTMLDivElement>(null);
-
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   useEffect(() => {
     const { ones, twos, threes, fours, sixes } = scores;
 
@@ -48,7 +49,10 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ scores, width, height }) => {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000); // Aspect ratio is 1 for a square canvas
     const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(width, height);
+    renderer.setSize(
+      isMobile ? window.screen.width : width,
+      isMobile ? window.screen.width : height
+    );
     mountRef.current?.appendChild(renderer.domElement);
 
     // Set ground color
@@ -446,7 +450,13 @@ const WagonWheelWrapper = ({
       />
     </>
   ) : isMobile ? (
-    <div style={{ width: width, marginBottom: "1rem", overflowY: "scroll" }}>
+    <div
+      style={{
+        width: window.screen.width,
+        marginBottom: "1rem",
+        overflowY: "scroll",
+      }}
+    >
       <AppBar
         position="static"
         style={{ background: "#303036" }}
