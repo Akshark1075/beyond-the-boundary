@@ -6,7 +6,6 @@ const WithXR = ({
   setIsARMode: (isARMode: boolean) => void;
 }) => {
   const { isPresenting } = useXR();
-  console.log(isPresenting);
 
   setIsARMode(isPresenting);
   return <></>;

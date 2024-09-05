@@ -48,8 +48,7 @@ const FallOfWickets = ({
     //   isARMode={isARMode}
     // />
     <>
-      {data?.scoreCard.map((row) => {
-        console.log("loaded");
+      {data?.scoreCard.map((row, i) => {
         return (
           <Fow
             row={row}
@@ -57,7 +56,7 @@ const FallOfWickets = ({
             isError={isError}
             selections={selections}
             setSelection={setSelection}
-            key={row.inningsId}
+            key={i}
             isARMode={isARMode}
           />
         );

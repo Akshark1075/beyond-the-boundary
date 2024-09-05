@@ -21,11 +21,13 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { Box } from "@mui/material";
 import DrawerAppBar from "../Components/Navbar";
 import {
-  ARButton,
+  XRButton,
   Controllers,
   Hands,
   XR,
   XRInteractionEvent,
+  RayGrab,
+  ARButton,
 } from "@react-three/xr";
 import { Canvas } from "@react-three/fiber";
 import Interface from "../Components/Overlay";
@@ -36,6 +38,8 @@ import WithXR from "../Components/WithXR";
 import fetchWithRetry from "../api/fetch";
 import { useQuery } from "@tanstack/react-query";
 import { GetScorecard } from "../types/getScorecard";
+import * as THREE from "three";
+import { fieldPositions } from "../utilities/getFieldPositions";
 
 export interface SelectedOption {
   name: string;
@@ -49,6 +53,9 @@ const ShowPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [isARMode, setIsARMode] = useState(false);
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const cameraRef = useRef<THREE.Camera | null>(null);
+
   const fetchScorecard = async (matchId: string): Promise<Response> => {
     const res = await fetchWithRetry(
       `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`
@@ -93,23 +100,22 @@ const ShowPage = () => {
   const { matchId } = useParams();
   const [searchParams] = useSearchParams();
   const isLive = searchParams.get("isLive");
-  useQuery<GetScorecard>({
-    queryKey: [`scoresData-${matchId}`],
-    queryFn: useCallback(
-      () => fetchScorecard(matchId ?? "").then((res) => res.json()),
-      [matchId]
-    ),
-    enabled: !!matchId,
-    // refetchInterval: isLive ? 30000 : undefined,
-  });
+  // useQuery<GetScorecard>({
+  //   queryKey: [`scoresData-${matchId}`],
+  //   queryFn: useCallback(
+  //     () => fetchScorecard(matchId ?? "").then((res) => res.json()),
+  //     [matchId]
+  //   ),
+  //   enabled: !!matchId,
+  //   // refetchInterval: isLive ? 30000 : undefined,
+  //   staleTime: 30000,
+  // });
 
   const ref = useRef<HTMLDivElement>(null);
 
   const [overlayContent, setOverlayContent] = useState<HTMLDivElement | null>(
     null
   );
-  // @ts-ignore: Unreachable code error
-  // usePinch(handle, { ref });
 
   useEffect(() => {
     if (ref.current !== null) {
@@ -140,9 +146,10 @@ const ShowPage = () => {
     }
   }, [isARMode]);
   const [models, setModels] = useState<Array<{ [key: string]: any }>>([]);
-  const [shouldShowReticle, setShouldShowReticle] = useState(false);
+  const [shouldShowReticle, setShouldShowReticle] = useState(true);
   const [selectedARComponent, setSelectedARComponent] = useState<string | null>(
-    null
+    // "Video"
+    "Match Info"
   );
   const placeModel = (
     e: XRInteractionEvent,
@@ -157,6 +164,7 @@ const ShowPage = () => {
     ]);
     setShouldShowReticle(false);
   };
+
   const getARComponent = (componentName: string) => {
     switch (componentName) {
       case "Match Info":
@@ -243,6 +251,7 @@ const ShowPage = () => {
             selections={selections}
             setSelection={setSelection}
             isARMode={isARMode}
+            fieldPosArr={fieldPositions}
           />
         );
       case "Runs per over":
@@ -266,6 +275,7 @@ const ShowPage = () => {
         );
     }
   };
+
   return (
     <>
       {/* <div id="overlay" className="overlay" ref={ref} /> */}
@@ -273,6 +283,10 @@ const ShowPage = () => {
       <Canvas
         id="canvas"
         style={{ width: "1px", height: "1px", visibility: "hidden" }}
+        onCreated={({ scene, camera }) => {
+          sceneRef.current = scene;
+          cameraRef.current = camera;
+        }}
       >
         <XR>
           <Controllers />
@@ -290,26 +304,38 @@ const ShowPage = () => {
               title={selectedARComponent ?? ""}
             />
           )}
-          {models.map(({ position, component, id, title }) => (
-            // <Cube key={id} position={position} />
+          {models.map(({ position, component, id, title }, i) => (
             <WithXRPlane
-              key={id}
+              key={`${title}-${i}`}
               component={component}
               position={position}
               title={title}
             />
           ))}
+          {isARMode && (
+            <FloatingActionButton
+              selections={selections}
+              setSelection={setSelection}
+              isARMode={true}
+              setShouldShowReticle={setShouldShowReticle}
+              setSelectedARComponent={setSelectedARComponent}
+            />
+          )}
         </XR>
       </Canvas>
-      {isARMode && (
+
+      {/* {isARMode && (
         <Interface
           ref={ref}
           selections={selections}
           setSelection={setSelection}
           setShouldShowReticle={setShouldShowReticle}
           setSelectedARComponent={setSelectedARComponent}
+          camera={cameraRef.current}
+          scene={sceneRef.current}
         />
-      )}
+      )} */}
+
       {!isARMode && (
         // @ts-ignore: Unreachable code error
         <Box className={"h-full sm:flex overflow-y-auto "}>
@@ -396,6 +422,7 @@ const ShowPage = () => {
                           selections={selections}
                           setSelection={setSelection}
                           isARMode={false}
+                          fieldPosArr={fieldPositions}
                         />
                       ),
                       title: "Field",
@@ -449,17 +476,21 @@ const ShowPage = () => {
           </Box>
         </Box>
       )}
-      <ARButton
-        sessionInit={{
-          requiredFeatures: ["hit-test", "dom-overlay"],
-
-          domOverlay: !!overlayContent
-            ? {
-                root: overlayContent as HTMLElement,
-              }
-            : undefined,
-        }}
-      />
+      {
+        // <XRButton
+        <ARButton
+          sessionInit={{
+            requiredFeatures: ["hit-test"],
+            optionalFeatures: ["dom-overlay", "hand-tracking"],
+            domOverlay: !!overlayContent
+              ? {
+                  root: overlayContent as HTMLElement,
+                }
+              : undefined,
+          }}
+          // mode={"AR"}
+        />
+      }
     </>
   );
 };

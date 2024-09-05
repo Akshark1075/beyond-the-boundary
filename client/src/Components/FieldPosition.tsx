@@ -15,132 +15,15 @@ interface FieldPositionProps {
   selections: SelectedOption[];
   setSelection: (option: SelectedOption[]) => void;
   isARMode: boolean;
+  fieldPosArr: number[][];
 }
 
 const FieldPosition: React.FC<FieldPositionProps> = ({
   selections,
   setSelection,
   isARMode,
+  fieldPosArr,
 }) => {
-  const allPos = [
-    [0.0, 10.0, 1.0], //Keeper
-
-    [-1.0, 12.0, 1.0], //First Slip
-
-    [-1.5, 11.75, 1.0], //Second Slip
-
-    [-2.0, 11.5, 1.0], //Third Slip
-
-    [-2.5, 11.25, 1.0], //Fourth Slip
-
-    [-3.0, 11.0, 1.0], //Fifth Slip
-
-    [-3.5, 10.75, 1.0], //Sixth Slip
-
-    [-6.5, 10.75, 1.0], //Fly Slip
-
-    [-9, 10, 1.0], //Gully
-
-    [-12.5, 6, 1.0], //Point
-
-    [-12, 7.5, 1.0], //Backward Point
-
-    [-4, 4, 1.0], //Silly Point
-
-    [-13, 4.5, 1.0], //Forward Point
-
-    [-13.5, 0, 1.0], //Cover Point
-
-    [-13.5, -4, 1.0], //Cover
-
-    [-6, -2, 1.0], //Short Cover
-
-    [-13, -6, 1.0], //Extra Cover
-
-    [-5, -8, 1.0], //Mid off
-
-    [-5, -12, 1.0], //Deep Mid off
-
-    [-5, -6, 1.0], //Short Mid off
-
-    [-2.5, 1, 1.0], //Silly Mid off
-
-    [5, -8, 1.0], //Mid on
-
-    [5, -12, 1.0], //Deep Mid on
-
-    [5, -6, 1.0], //Short Mid on
-
-    [2.5, 1, 1.0], //Silly Mid on
-
-    [6, -2, 1.0], //Short Cover
-
-    [13.5, -4, 1.0], //Mid wicket
-
-    [4, 4, 1.0], //Short leg
-
-    [13.5, 4, 1.0], //Square leg
-
-    [13.5, 0, 1.0], //Forward Square leg
-
-    [13.5, -4, 1.0], //Backward Square leg
-
-    [3.0, 11.0, 1.0], //Leg slip
-
-    [9, 10, 1.0], //Leg Gully
-
-    [8, 12, 1.0], //Backward Short Leg
-
-    [12, 15, 1.0], //fine leg
-
-    [10.0, 13, 1.0], //Short fine leg
-
-    [14, 17, 1.0], //Deep fine leg
-
-    [12, 19, 1.0], //Long leg
-
-    [-12, 15, 1.0], //third man
-
-    [-10, 13, 1.0], //Short third man
-
-    [-14, 17, 1.0], //Deep third man
-
-    [-12, 19, 1.0], //Fine third man
-    [-16, 14, 1.0], //Square fine leg
-
-    [-20, 8.5, 1.0], //Deep Backward Point
-
-    [-22, 6, 1.0], //Deep Point
-
-    [-23, 0, 1.0], //Deep Cover Point
-
-    [-22, -6, 1.0], //Deep Cover
-
-    [-21, -10, 1.0], //Sweeper Cover
-
-    [-12, -20, 1.0], //Wide Long off
-
-    [-8, -22, 1.0], //Long off
-
-    [-4, -23, 1.0], //Straight Long offs
-
-    [0, -23, 1.0], //Straight Hit
-
-    [8, -22, 1.0], //Long on
-
-    [4, -23, 1.0], //Straight Long on
-
-    [21, -10, 1.0], //Deep Forward Mid wicket
-
-    [22, -6, 1.0], //Deep Mid wicket
-
-    [-23, 2, 1.0], //Deep Forward Square leg
-
-    [22, 6, 1.0], //Deep Square leg
-
-    [20, 8.5, 1.0], //Deep Backward Square leg
-  ];
-
   const mountRef = useRef<HTMLDivElement>(null);
   const { x: randomX, y: randomY } = getRandomCoordinates();
   const theme = useTheme();
@@ -150,23 +33,6 @@ const FieldPosition: React.FC<FieldPositionProps> = ({
   );
   const componentRef = React.useRef<HTMLDivElement>(null);
 
-  function getRandomSubarray(arr: number[][], subarrayLength: number) {
-    const indexesArr = [0];
-    while (indexesArr.length < subarrayLength) {
-      const rand = Math.floor(Math.random() * arr.length);
-      if (!indexesArr.includes(rand)) {
-        indexesArr.push(rand);
-      }
-    }
-    return indexesArr.map((i) => arr[i]).flat();
-  }
-
-  const randArray = useMemo(
-    () => getRandomSubarray(allPos, 10),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [allPos[0][0]]
-  );
-
   const {
     x = randomX,
     y = randomY,
@@ -174,7 +40,6 @@ const FieldPosition: React.FC<FieldPositionProps> = ({
     height = isMobile ? window.screen.width + 20 : 370,
   } = storedFieldPosition ?? {};
 
-  console.log(width, isMobile ? window.screen.width : 350, x);
   if (!storedFieldPosition && !isMobile) {
     const newItems = [
       ...selections,
@@ -258,109 +123,112 @@ const FieldPosition: React.FC<FieldPositionProps> = ({
   };
 
   useEffect(() => {
-    let renderer: THREE.WebGLRenderer | null = null;
+    if (!isARMode) {
+      let renderer: THREE.WebGLRenderer | null = null;
 
-    // Set up the scene, camera, and renderer
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000); // Aspect ratio is 1 for a square canvas
-    renderer = new THREE.WebGLRenderer();
-    renderer.setSize(
-      isMobile ? window.screen.width : width,
-      isMobile ? window.screen.width : height
-    );
-    mountRef.current?.appendChild(renderer.domElement);
-
-    // Set ground color
-    const groundColor = 0x00ff00;
-    scene.background = new THREE.Color(groundColor);
-
-    // Helper function to draw a circle
-    const drawCircle = (radius: number, color: number) => {
-      const geometry = new THREE.CircleGeometry(radius, 64);
-      const material = new THREE.MeshBasicMaterial({
-        color,
-        side: THREE.DoubleSide,
-        opacity: 0.2,
-        transparent: true,
-      });
-      const circle = new THREE.Mesh(geometry, material);
-      scene.add(circle);
-    };
-
-    // Helper function to draw the pitch
-    const drawPitch = () => {
-      const pitchWidth = 2;
-      const pitchHeight = 12;
-
-      const geometry = new THREE.PlaneGeometry(pitchWidth, pitchHeight);
-      const material = new THREE.MeshBasicMaterial({
-        color: 0x8b4513,
-        side: THREE.DoubleSide,
-      }); // Brown color
-      const pitch = new THREE.Mesh(geometry, material);
-      pitch.position.set(0, 0, 0.01); // Slightly offset to avoid z-fighting
-      scene.add(pitch);
-    };
-
-    const drawPoint = (pos: number[], color: string) => {
-      // Geometry
-      const dotGeometry = new THREE.BufferGeometry();
-
-      // Positions of points
-      const vertices = new Float32Array(pos);
-
-      // Set position attribute
-      dotGeometry.setAttribute(
-        "position",
-        new THREE.BufferAttribute(vertices, 3)
+      // Set up the scene, camera, and renderer
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000); // Aspect ratio is 1 for a square canvas
+      renderer = new THREE.WebGLRenderer();
+      renderer.setSize(
+        isMobile ? window.screen.width : width,
+        isMobile ? window.screen.width : height
       );
+      mountRef.current?.appendChild(renderer.domElement);
 
-      // Create a circular texture
-      const circleTexture = createCircleTexture(64, color);
+      // Set ground color
+      const groundColor = 0x00ff00;
+      scene.background = new THREE.Color(groundColor);
 
-      // Points material
-      const dotMaterial = new THREE.PointsMaterial({
-        size: 10,
-        sizeAttenuation: false,
-        map: circleTexture,
-        alphaTest: 0.5, // To discard the transparent parts of the texture
-        transparent: true, // Ensure the material is transparent
+      // Helper function to draw a circle
+      const drawCircle = (radius: number, color: number) => {
+        const geometry = new THREE.CircleGeometry(radius, 64);
+        const material = new THREE.MeshBasicMaterial({
+          color,
+          side: THREE.DoubleSide,
+          opacity: 0.2,
+          transparent: true,
+        });
+        const circle = new THREE.Mesh(geometry, material);
+        scene.add(circle);
+      };
+
+      // Helper function to draw the pitch
+      const drawPitch = () => {
+        const pitchWidth = 2;
+        const pitchHeight = 12;
+
+        const geometry = new THREE.PlaneGeometry(pitchWidth, pitchHeight);
+        const material = new THREE.MeshBasicMaterial({
+          color: 0x8b4513,
+          side: THREE.DoubleSide,
+        }); // Brown color
+        const pitch = new THREE.Mesh(geometry, material);
+        pitch.position.set(0, 0, 0.01); // Slightly offset to avoid z-fighting
+        scene.add(pitch);
+      };
+
+      const drawPoint = (pos: number[], color: string) => {
+        // Geometry
+        const dotGeometry = new THREE.BufferGeometry();
+
+        // Positions of points
+        const vertices = new Float32Array(pos);
+
+        // Set position attribute
+        dotGeometry.setAttribute(
+          "position",
+          new THREE.BufferAttribute(vertices, 3)
+        );
+
+        // Create a circular texture
+        const circleTexture = createCircleTexture(64, color);
+
+        // Points material
+        const dotMaterial = new THREE.PointsMaterial({
+          size: 10,
+          sizeAttenuation: false,
+          map: circleTexture,
+          alphaTest: 0.5, // To discard the transparent parts of the texture
+          transparent: true, // Ensure the material is transparent
+        });
+
+        // Points
+        const dot = new THREE.Points(dotGeometry, dotMaterial);
+        scene.add(dot);
+      };
+
+      // Draw the pitch, thirty-yard circle, and boundary
+      drawCircle(5, 0xffffff); // White circle for the pitch
+      drawCircle(15, 0xffff00); // Thirty-yard circle
+      drawCircle(25, 0xff0000); // Boundary
+
+      drawPitch(); // Draw the pitch rectangle
+      drawPoint([0, 5.5, 1, 0, -5.5, 1], "red");
+      drawPoint([0, -9, 1], "yellow");
+      fieldPosArr.map((p: number[], i: number) => {
+        drawPoint(fieldPosArr[i], "blue");
       });
+      camera.position.z = 40;
 
-      // Points
-      const dot = new THREE.Points(dotGeometry, dotMaterial);
-      scene.add(dot);
-    };
+      const animate = () => {
+        requestAnimationFrame(animate);
+        if (renderer) renderer.render(scene, camera);
+      };
 
-    // Draw the pitch, thirty-yard circle, and boundary
-    drawCircle(5, 0xffffff); // White circle for the pitch
-    drawCircle(15, 0xffff00); // Thirty-yard circle
-    drawCircle(25, 0xff0000); // Boundary
+      animate();
 
-    drawPitch(); // Draw the pitch rectangle
-    drawPoint([0, 5.5, 1, 0, -5.5, 1], "red");
-    drawPoint([0, -9, 1], "yellow");
-    drawPoint(randArray, "blue");
-
-    camera.position.z = 40;
-
-    const animate = () => {
-      requestAnimationFrame(animate);
-      if (renderer) renderer.render(scene, camera);
-    };
-
-    animate();
-
-    // Clean up on component unmount
-    return () => {
-      if (renderer) {
-        renderer.dispose();
-        renderer.forceContextLoss();
-        mountRef.current?.removeChild(renderer.domElement);
-        renderer = null;
-      }
-    };
-  }, [width, height, randArray]);
+      // Clean up on component unmount
+      return () => {
+        if (renderer) {
+          renderer.dispose();
+          renderer.forceContextLoss();
+          mountRef.current?.removeChild(renderer.domElement);
+          renderer = null;
+        }
+      };
+    }
+  }, [width, height, fieldPosArr]);
   const position = useContext(PositionContext);
   const Circle = ({
     radius,
@@ -382,18 +250,19 @@ const FieldPosition: React.FC<FieldPositionProps> = ({
   const Point = ({
     position,
     color,
+    radius,
   }: {
     position: THREE.Vector3 | undefined;
     color: string | undefined;
+    radius: number;
   }) => {
     return (
       <mesh position={position}>
-        <circleGeometry args={[0.1, 8]} />
+        <circleGeometry args={[radius, 8]} />
         <meshBasicMaterial color={color} />
       </mesh>
     );
   };
-  console.log(randArray, isARMode);
   return isARMode ? (
     <>
       <Circle
@@ -420,7 +289,7 @@ const FieldPosition: React.FC<FieldPositionProps> = ({
 
       {/* Circles and points */}
       <Circle
-        radius={3}
+        radius={4}
         color="white"
         position={
           position
@@ -441,55 +310,46 @@ const FieldPosition: React.FC<FieldPositionProps> = ({
       <Point
         position={
           position
-            ? new THREE.Vector3(
-                position.x + 0.25,
-                position.y + 0.75,
-                position.z + 1
-              )
+            ? new THREE.Vector3(position.x, position.y + 0.75, position.z + 1)
             : new THREE.Vector3(0.25, 0.75, 1)
         }
         color="red"
+        radius={0.1}
       />
       <Point
         position={
           position
-            ? new THREE.Vector3(
-                position.x + 0.25,
-                position.y - 0.75,
-                position.z + 1
-              )
+            ? new THREE.Vector3(position.x, position.y - 0.75, position.z + 1)
             : new THREE.Vector3(0.25, -0.75, 1)
         }
         color="red"
+        radius={0.1}
       />
       <Point
         position={
           position
-            ? new THREE.Vector3(
-                position.x + 0.25,
-                position.y - 1,
-                position.z + 1
-              )
+            ? new THREE.Vector3(position.x, position.y - 2, position.z + 1)
             : new THREE.Vector3(0.25, -1, 1)
         }
         color="yellow"
+        radius={0.2}
       />
 
-      {randArray.map((p, i) => {
-        if (i < randArray.length - 3 && i % 3 === 0) {
-          return (
-            <Point
-              position={
-                new THREE.Vector3(
-                  (p + 6) / 5,
-                  (randArray[i + 1] - 4) / 4,
-                  randArray[i + 2]
-                )
-              }
-              color="blue"
-            />
-          );
-        }
+      {fieldPosArr.map((p: number[], i: number) => {
+        return (
+          <Point
+            position={
+              new THREE.Vector3(
+                fieldPosArr[i][0] / 10,
+                (fieldPosArr[i][1] + 10) / 12,
+                fieldPosArr[i][2]
+              )
+            }
+            color="blue"
+            radius={0.1}
+            key={i}
+          />
+        );
       })}
     </>
   ) : isMobile ? (

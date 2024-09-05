@@ -159,11 +159,7 @@ const Video = ({
 
     return (
       <Plane args={[3, 2]}>
-        <meshStandardMaterial
-          side={DoubleSide}
-          map={texture}
-          toneMapped={false}
-        />
+        <meshBasicMaterial side={DoubleSide} map={texture} toneMapped={false} />
       </Plane>
     );
   };

@@ -338,11 +338,17 @@ const WagonWheelWrapper = ({
       </>
     );
   };
-  console.log(teamBatters);
+
   return isARMode ? (
-    <>
+    <mesh
+      position={
+        !!position
+          ? [position?.x + 10, position?.y, position.z + 50]
+          : [0, 0, 0]
+      }
+    >
       <DrawLines
-        count={teamBatters[0].ones}
+        count={teamBatters[0]?.ones ?? 0}
         length={2}
         color={0x800080}
         lineWidth={0.3}
@@ -357,7 +363,7 @@ const WagonWheelWrapper = ({
         // Position in AR space
       />
       <DrawLines
-        count={teamBatters[0].twos}
+        count={teamBatters[0]?.twos ?? 0}
         length={3}
         color={0x8b4513}
         lineWidth={0.3}
@@ -370,7 +376,7 @@ const WagonWheelWrapper = ({
         }
       />
       <DrawLines
-        count={teamBatters[0].threes}
+        count={teamBatters[0]?.threes ?? 0}
         length={6}
         color={0xffff00}
         lineWidth={0.3}
@@ -383,7 +389,7 @@ const WagonWheelWrapper = ({
         }
       />
       <DrawLines
-        count={teamBatters[0].fours}
+        count={teamBatters[0]?.fours ?? 0}
         length={8.5}
         color={0xffffff}
         lineWidth={0.3}
@@ -396,7 +402,7 @@ const WagonWheelWrapper = ({
         }
       />
       <DrawLines
-        count={teamBatters[0].sixes}
+        count={teamBatters[0]?.sixes ?? 0}
         length={9}
         color={0xff0000}
         lineWidth={0.3}
@@ -448,7 +454,7 @@ const WagonWheelWrapper = ({
             : new THREE.Vector3(0, 0, -1)
         }
       />
-    </>
+    </mesh>
   ) : isMobile ? (
     <div
       style={{
@@ -610,7 +616,9 @@ const WagonWheelWrapper = ({
                     onChange={handlePlayerChange}
                   >
                     {teamBatters.map((b) => (
-                      <MenuItem value={b.batName}>{b.batName}</MenuItem>
+                      <MenuItem value={b.batName} key={b.batName}>
+                        {b.batName}
+                      </MenuItem>
                     ))}
                   </Select>
                 </FormControl>

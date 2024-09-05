@@ -30,7 +30,6 @@ export default function Html({
   width,
   height,
   color = "transparent",
-  delay = 1000, // Default delay of 1 second
 }) {
   const { camera, size: viewSize, gl } = useThree();
 
@@ -47,7 +46,7 @@ export default function Html({
   const [image, setImage] = useState(
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
   );
-  const [textureSize, setTextureSize] = useState({ width, height });
+  // const [textureSize, setTextureSize] = useState({ width, height });
 
   const node = useMemo(() => {
     const node = document.createElement("div");
@@ -56,32 +55,32 @@ export default function Html({
   }, [children]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      container.appendChild(node);
-      domtoimage.toBlob(node, { bgcolor: color }).then((blob) => {
-        const { width: blobWidth, height: blobHeight } =
-          node.getBoundingClientRect();
-        setTextureSize({ width: blobWidth, height: blobHeight });
-        if (container.contains(node)) {
-          container.removeChild(node);
-        }
-        if (blob === null) return;
-        if (lastUrl.current !== null) {
-          URL.revokeObjectURL(lastUrl.current);
-        }
-        const url = URL.createObjectURL(blob);
-        lastUrl.current = url;
-        setImage(url);
-      });
-    }, delay);
+    // const timer = setTimeout(() => {
+    container.appendChild(node);
+    domtoimage.toBlob(node, { bgcolor: color }).then((blob) => {
+      // const { width: blobWidth, height: blobHeight } =
+      //   node.getBoundingClientRect();
+      // setTextureSize({ width: blobWidth, height: blobHeight });
+      if (container.contains(node)) {
+        container.removeChild(node);
+      }
+      if (blob === null) return;
+      if (lastUrl.current !== null) {
+        URL.revokeObjectURL(lastUrl.current);
+      }
+      const url = URL.createObjectURL(blob);
+      lastUrl.current = url;
+      setImage(url);
+    });
+    // }, delay);
 
     return () => {
-      clearTimeout(timer);
+      // clearTimeout(timer);
       if (container && container.contains(node)) {
         container.removeChild(node);
       }
     };
-  }, [node, viewSize, sceneSize, color, delay]);
+  }, [node, viewSize, sceneSize, color, children]);
 
   const texture = useTexture(image);
 

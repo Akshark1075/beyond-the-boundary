@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Matrix4, Mesh } from "three";
 import { Interactive, useHitTest, XRInteractionEvent } from "@react-three/xr";
 
@@ -36,6 +36,7 @@ const Reticle = ({
   const handleSelect = (e: XRInteractionEvent) => {
     placeModel(e, component, title);
   };
+
   return (
     <>
       <>

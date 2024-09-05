@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "XR App",
   "scripts": {
-    "start": "node server/server.js",
+    "start": "node server/src/index.js",
     "build": "npm run build --prefix client",
-    "server": "nodemon server/server.js",
+    "server": "nodemon server/src/index.js",
     "client": "npm start --prefix client",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "dev": "concurrently \"npm run build\" \"npm run server \""
   },
   "devDependencies": {
     "@types/react": "^18.3.3",

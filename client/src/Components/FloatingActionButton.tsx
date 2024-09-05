@@ -12,6 +12,14 @@ import Squad from "./Squad";
 import FallOfWickets from "./FallOfWickets";
 import MatchInfo from "./MatchInfo";
 import FieldPosition from "./FieldPosition";
+import { Html } from "@react-three/drei";
+import { Interactive } from "@react-three/xr";
+import * as THREE from "three";
+
+import { Text } from "@react-three/drei";
+import { useFrame, useThree } from "@react-three/fiber";
+import { BufferGeometry } from "three";
+import { fieldPositions } from "../utilities/getFieldPositions";
 
 interface FloatingActionButtonProps {
   selections: SelectedOption[];
@@ -35,7 +43,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   const [searchParams] = useSearchParams();
   const isLive = searchParams.get("isLive");
   const handleMenuItemClick = (component: string) => {
-    console.log(isARMode);
+    console.log(component);
     if (isARMode && !!setShouldShowReticle && !!setSelectedARComponent) {
       setShouldShowReticle(true);
       setSelectedARComponent(component);
@@ -156,6 +164,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
             selections={selections}
             setSelection={setSelection}
             isARMode={isARMode}
+            fieldPosArr={fieldPositions}
           />
         )}
       </>
@@ -265,36 +274,131 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   const filteredOptions = components.filter(
     (c) => !selections.find((s) => s.name === c.key && !isARMode)
   );
+
   return (
     <>
-      <div className="floatingButtonWrap">
-        <div className="floatingButtonInner">
-          <Button
-            className="floatingButton"
-            style={{ border: "5px solid #b2bedc", borderRadius: "50%" }}
-          >
-            <i
-              className="fa fa-plus icon-default"
-              style={{ color: "white" }}
-            ></i>
-          </Button>
-          <ul className="floatingMenu">
-            {filteredOptions.map((option) => (
-              <li key={option.key}>
-                <Button
-                  onClick={() => handleMenuItemClick(option.key)}
-                  className="floatingButtonItem"
-                >
-                  {option.title}
-                </Button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-      {!isARMode && renderComponent()}
+      {!isARMode ? (
+        <>
+          <div className="floatingButtonWrap">
+            <div className="floatingButtonInner">
+              <Button
+                className="floatingButton"
+                style={{ border: "5px solid #b2bedc", borderRadius: "50%" }}
+              >
+                <i
+                  className="fa fa-plus icon-default"
+                  style={{ color: "white" }}
+                ></i>
+              </Button>
+              <ul className="floatingMenu">
+                {filteredOptions.map((option) => (
+                  <li key={option.key}>
+                    <Button
+                      onClick={() => handleMenuItemClick(option.key)}
+                      className="floatingButtonItem"
+                    >
+                      {option.title}
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          {renderComponent()}
+        </>
+      ) : (
+        <ARFloatingActionButton
+          components={components}
+          handleMenuItemClick={handleMenuItemClick}
+        ></ARFloatingActionButton>
+      )}
     </>
   );
 };
+const ARFloatingActionButton = ({
+  components,
+  handleMenuItemClick,
+}: {
+  components: {
+    title: string;
+    key: string;
+  }[];
+  handleMenuItemClick: (component: string) => void;
+}) => {
+  const [open, setOpen] = useState(false);
+  const handleButtonClick = () => {
+    setOpen(!open);
+  };
+  const meshRef = useRef<THREE.Mesh<BufferGeometry>>(null);
+  const { camera } = useThree();
+  // Update the position of the mesh to always be in front of the camera
+  useFrame(({ camera }) => {
+    if (meshRef.current) {
+      meshRef.current.position.set(
+        camera.position.x,
+        camera.position.y - 1,
+        camera.position.z - 2
+      );
+    }
+  });
+  return (
+    <>
+      {" "}
+      <Interactive onSelect={handleButtonClick}>
+        <mesh
+          ref={meshRef}
+          onClick={() => handleButtonClick()} // Handle button click
+        >
+          <circleGeometry args={[0.15, 32]} />
+          <meshBasicMaterial color={"black"} opacity={0.9} />
+          <Text
+            fontSize={0.3} // Adjust font size as needed
+            color="linear-gradient(45deg, #fffaff, #303036)"
+            anchorX="center" // Center text horizontally
+            anchorY="middle" // Center text vertically
+          >
+            {open ? "X" : "+"}
+          </Text>
+        </mesh>
+      </Interactive>
+      {open &&
+        components.map((c, i) => (
+          // position={[-4, 1 - i * 0.5, 0.1]}
+          // <mesh position={[0, 1, 0]} key={i}>
+          //   <planeGeometry args={[1, 1]} />
+          //   <meshBasicMaterial color="#303036" />
 
+          //   {/* Render buttons as 3D text */}
+          // {
+          <Interactive
+            key={i}
+            onSelect={() => {
+              handleMenuItemClick(c.key); // Call the click handler with the component title
+              setOpen(!open);
+            }}
+          >
+            <Text
+              position={[
+                camera.position.x - 2,
+                camera.position.y + i,
+                camera.position.z - 10,
+              ]}
+              fontSize={1} // Adjust font size as needed
+              color="#fff"
+              anchorX="left" // Align text to the left
+              anchorY="middle" // Center text vertically
+              rotation-z={Math.PI}
+              rotation-x={Math.PI}
+              rotation-y={Math.PI}
+            >
+              {c.title}
+            </Text>
+          </Interactive>
+          //     }
+          //   </mesh>
+          // ))}
+        ))}
+    </>
+  );
+};
 export default FloatingActionButton;

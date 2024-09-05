@@ -70,13 +70,7 @@ const BattingScorecard = ({
     width = 350,
     height = 350,
   } = storedScorecard ?? {};
-
-  if (
-    selections.find((s) => s.name.includes("Batting Scorecard")) &&
-    !storedScorecard
-  ) {
-    return <></>;
-  } else if (!storedScorecard && !isMobile) {
+  if (!storedScorecard && !isMobile) {
     const newItems = [
       ...selections,
       {
@@ -144,6 +138,7 @@ const BattingScorecard = ({
         component={Paper}
         style={{
           boxShadow: "none",
+          background: "white",
           width: isMobile
             ? window.screen.width
             : width
@@ -161,7 +156,7 @@ const BattingScorecard = ({
         >
           <Box className="px-4 text-white">{`${row.batTeamDetails.batTeamName} Innings`}</Box>
           <Box className="flex px-4">
-            <Box className="text-white">
+            <Box className="text-white" style={{ color: "white" }}>
               {row.scoreDetails.runs +
                 "-" +
                 row.scoreDetails.wickets +
@@ -401,11 +396,12 @@ const BattingScorecard = ({
         width: window.screen.width,
         marginBottom: "1rem",
         overflowY: "scroll",
+        background: "white",
       }}
     >
       <AppBar
         position="static"
-        style={{ background: "#303036" }}
+        style={{ background: "#303036", color: "white" }}
         className="grow"
       >
         <Toolbar variant="dense" className="px-2 min-h-8">
@@ -553,10 +549,11 @@ const BowlingScorecard = ({
             backgroundColor: "#303036",
           }}
           className=" flex justify-between"
+          style={{ color: "white" }}
         >
           <Box className="px-4 text-white">{`${row.batTeamDetails.batTeamName} Innings`}</Box>
           <Box className="flex px-4">
-            <Box className="text-white">
+            <Box className="text-white" style={{ color: "white" }}>
               {row.scoreDetails.runs +
                 "-" +
                 row.scoreDetails.wickets +

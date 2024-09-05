@@ -43,35 +43,83 @@ const SpinningWheel: React.FC<SpinningWheelProps> = ({ components }) => {
     );
   };
 
+  // useEffect(() => {
+  //   document.addEventListener("click", handleVisibility);
+  //   document.addEventListener("mousedown", resetIdleTimer);
+  //   return () => {
+  //     document.removeEventListener("click", resetIdleTimer);
+  //     document.addEventListener("mousedown", resetIdleTimer);
+  //   };
+  // }, []);
+
+  // const handleMouseDown = (e: React.MouseEvent) => {
+  //   e.preventDefault();
+  //   const startY = e.clientY;
+  //   const startRotation = rotation;
+
+  //   const handleMouseMove = (e: MouseEvent) => {
+  //     const deltaY = e.clientY - startY;
+  //     const newRotation = startRotation + deltaY / 2;
+  //     setRotation(newRotation);
+  //     updateCurrentIndex(newRotation);
+  //   };
+
+  //   const handleMouseUp = () => {
+  //     document.removeEventListener("mousemove", handleMouseMove);
+  //     document.removeEventListener("mouseup", handleMouseUp);
+  //   };
+
+  //   document.addEventListener("mousemove", handleMouseMove);
+  //   document.addEventListener("mouseup", handleMouseUp);
+  // };
+
+  //uncomment below
   useEffect(() => {
     document.addEventListener("click", handleVisibility);
     document.addEventListener("mousedown", resetIdleTimer);
+    document.addEventListener("touchstart", resetIdleTimer); // Add touchstart event for mobile devices
     return () => {
-      document.removeEventListener("click", resetIdleTimer);
-      document.addEventListener("mousedown", resetIdleTimer);
+      document.removeEventListener("click", handleVisibility);
+      document.removeEventListener("mousedown", resetIdleTimer);
+      document.removeEventListener("touchstart", resetIdleTimer); // Clean up touchstart event
     };
   }, []);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    const startY = e.clientY;
+  const handleInteractionStart = (startEvent: MouseEvent | TouchEvent) => {
+    startEvent.preventDefault();
+
+    const isTouchEvent = startEvent.type === "touchstart";
+    const startY = isTouchEvent
+      ? (startEvent as TouchEvent).touches[0].clientY
+      : (startEvent as MouseEvent).clientY;
     const startRotation = rotation;
 
-    const handleMouseMove = (e: MouseEvent) => {
-      const deltaY = e.clientY - startY;
+    const handleInteractionMove = (moveEvent: MouseEvent | TouchEvent) => {
+      const moveY = isTouchEvent
+        ? (moveEvent as TouchEvent).touches[0].clientY
+        : (moveEvent as MouseEvent).clientY;
+      const deltaY = moveY - startY;
       const newRotation = startRotation + deltaY / 2;
       setRotation(newRotation);
       updateCurrentIndex(newRotation);
     };
 
-    const handleMouseUp = () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
+    const handleInteractionEnd = () => {
+      document.removeEventListener("mousemove", handleInteractionMove);
+      document.removeEventListener("mouseup", handleInteractionEnd);
+      document.removeEventListener("touchmove", handleInteractionMove); // Clean up touchmove event
+      document.removeEventListener("touchend", handleInteractionEnd); // Clean up touchend event
     };
 
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("mousemove", handleInteractionMove);
+    document.addEventListener("mouseup", handleInteractionEnd);
+    document.addEventListener("touchmove", handleInteractionMove); // Add touchmove event for mobile devices
+    document.addEventListener("touchend", handleInteractionEnd); // Add touchend event for mobile devices
   };
+  // @ts-ignore: Unreachable code error
+  const handleMouseDown = (event) => handleInteractionStart(event);
+  // @ts-ignore: Unreachable code error
+  const handleTouchStart = (event) => handleInteractionStart(event);
 
   const updateCurrentIndex = (newRotation: number) => {
     const adjustedRotation = ((newRotation % 360) + 360) % 360;
@@ -91,6 +139,7 @@ const SpinningWheel: React.FC<SpinningWheelProps> = ({ components }) => {
             <div
               id="wheel"
               onMouseDown={handleMouseDown}
+              onTouchStart={handleTouchStart}
               style={{ transform: `rotate(${rotation}deg)` }}
             >
               <div id="inner-wheel">
