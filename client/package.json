@@ -54,7 +54,6 @@
     "workbox-strategies": "^6.6.0",
     "workbox-streams": "^6.6.0"
   },
-  "proxy": "https://localhost:3000",
   "scripts": {
     "start": "HTTPS=true react-scripts start",
     "build": "react-scripts build",

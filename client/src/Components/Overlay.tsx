@@ -82,13 +82,13 @@ const Interface = forwardRef(
         }}
       >
         <div className="dom-container">
-          <FloatingActionButton
+          {/* <FloatingActionButton
             selections={props.selections}
             setSelection={props.setSelection}
             isARMode={true}
             setShouldShowReticle={props.setShouldShowReticle}
             setSelectedARComponent={props.setSelectedARComponent}
-          />
+          /> */}
         </div>
       </div>
     );

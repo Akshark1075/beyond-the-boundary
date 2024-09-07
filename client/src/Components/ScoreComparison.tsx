@@ -41,28 +41,21 @@ ChartJS.register(
   Legend
 );
 
-const fetchOvers = async (matchId: string): Promise<GetScorecard> => {
-  const res = await fetchWithRetry(
-    `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`
-  );
-  return res;
-};
-
 const Scorecomparison = ({
-  matchId,
+  data,
   selections,
   setSelection,
   isARMode,
+  isLoading,
+  isError,
 }: {
-  matchId: string;
   selections: SelectedOption[];
   setSelection: (option: SelectedOption[]) => void;
   isARMode: boolean;
+  data: GetScorecard | undefined;
+  isLoading: boolean;
+  isError: boolean;
 }) => {
-  const { isLoading, error, data } = useQuery<GetScorecard>({
-    queryKey: [`scoresData-${matchId}`],
-    queryFn: useCallback(() => fetchOvers(matchId), [matchId]),
-  });
   const { x: randomX, y: randomY } = getRandomCoordinates();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -168,7 +161,7 @@ const Scorecomparison = ({
     height = 350,
   } = storedScoreComparison ?? {};
 
-  if (!storedScoreComparison && !isMobile) {
+  if (!storedScoreComparison && !isMobile && !isARMode) {
     const newItems = [
       ...selections,
       {
@@ -221,7 +214,7 @@ const Scorecomparison = ({
   const handleDragStop = (e: DraggableEvent, d: { x: number; y: number }) => {
     setPosition(d.x, d.y);
   };
-  if ((isLoading || error) && isARMode) return <Box></Box>;
+  if ((isLoading || isError) && isARMode) return <Box></Box>;
 
   return isARMode ? (
     <ARLineGraph data={chartData.datasets} />
@@ -261,7 +254,7 @@ const Scorecomparison = ({
         ref={componentRef}
         className={isARMode ? "bg-white" : ""}
       >
-        {isLoading || error ? (
+        {isLoading || isError ? (
           <>
             <Skeleton height={"2rem"} />
             <Skeleton height={"2rem"} />
@@ -309,7 +302,7 @@ const Scorecomparison = ({
             }}
             ref={componentRef}
           >
-            {isLoading || error ? (
+            {isLoading || isError ? (
               <>
                 <Skeleton height={"2rem"} />
                 <Skeleton height={"2rem"} />

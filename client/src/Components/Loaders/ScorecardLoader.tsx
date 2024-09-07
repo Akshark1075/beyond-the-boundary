@@ -142,7 +142,7 @@ const ScoreCardLoader = ({
     >
       <div style={{ width: `${width}px` }}>
         <WithTitleBar
-          title="Score Comparison"
+          title="Scorecard Comparison"
           width={componentRef.current?.getBoundingClientRect().width ?? width}
           height={
             componentRef.current?.getBoundingClientRect().height ?? height

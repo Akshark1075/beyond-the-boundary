@@ -6,81 +6,78 @@ import domtoimage from "dom-to-image-more"; // Import dom-to-image-more
 import { renderToString } from "react-dom/server";
 
 // Prevents dom-to-image-more warnings
-HTMLCanvasElement.prototype.getContext = (function (origFn) {
-  return function (type, attribs) {
-    attribs = attribs || {};
-    attribs.preserveDrawingBuffer = true;
-    return origFn.call(this, type, attribs);
-  };
-})(HTMLCanvasElement.prototype.getContext);
+// HTMLCanvasElement.prototype.getContext = (function (origFn) {
+//   return function (type, attribs) {
+//     attribs = attribs || {};
+//     attribs.preserveDrawingBuffer = true;
+//     return origFn.call(this, type, attribs);
+//   };
+// })(HTMLCanvasElement.prototype.getContext);
 
-let container = document.querySelector("#htmlContainer");
-if (!container) {
-  const node = document.createElement("div");
-  node.setAttribute("id", "htmlContainer");
-  node.style.position = "fixed";
-  node.style.opacity = "0";
-  node.style.pointerEvents = "none";
-  document.body.appendChild(node);
-  container = node;
-}
+// let container = document.querySelector("#htmlContainer");
+// if (!container) {
+//   const node = document.createElement("div");
+//   node.setAttribute("id", "htmlContainer");
+//   node.style.position = "fixed";
+//   node.style.opacity = "0";
+//   node.style.pointerEvents = "none";
+//   document.body.appendChild(node);
+//   container = node;
+// }
 
 export default function Html({
   children,
   width,
   height,
   color = "transparent",
+  sceneSize,
+
+  image,
 }) {
   const { camera, size: viewSize, gl } = useThree();
 
-  const sceneSize = useMemo(() => {
-    const cam = camera;
-    const fov = (cam.fov * Math.PI) / 180; // convert vertical fov to radians
-    const height = 2 * Math.tan(fov / 2) * 5; // visible height
-    const width = height * (viewSize.width / viewSize.height);
-    return { width, height };
-  }, [camera, viewSize]);
+  // const sceneSize = useMemo(() => {
+  //   const cam = camera;
+  //   const fov = (cam.fov * Math.PI) / 180; // convert vertical fov to radians
+  //   const height = 2 * Math.tan(fov / 2) * 5; // visible height
+  //   const width = height * (viewSize.width / viewSize.height);
+  //   return { width, height };
+  // }, [camera, viewSize]);
 
-  const lastUrl = useRef(null);
+  // const lastUrl = useRef(null);
 
-  const [image, setImage] = useState(
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
-  );
+  // const [image, setImage] = useState(
+  //   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+  // );
   // const [textureSize, setTextureSize] = useState({ width, height });
 
-  const node = useMemo(() => {
-    const node = document.createElement("div");
-    node.innerHTML = renderToString(children);
-    return node;
-  }, [children]);
+  // useEffect(() => {
+  //   // const timer = setTimeout(() => {
+  //   container.appendChild(node);
+  //   domtoimage.toBlob(node, { bgcolor: color }).then((blob) => {
+  //     // const { width: blobWidth, height: blobHeight } =
+  //     //   node.getBoundingClientRect();
+  //     // setTextureSize({ width: blobWidth, height: blobHeight });
+  //     if (container.contains(node)) {
+  //       container.removeChild(node);
+  //     }
+  //     if (blob === null) return;
+  //     if (lastUrl.current !== null) {
+  //       URL.revokeObjectURL(lastUrl.current);
+  //     }
+  //     const url = URL.createObjectURL(blob);
+  //     lastUrl.current = url;
+  //     setImage(url);
+  //   });
+  //   // }, delay);
 
-  useEffect(() => {
-    // const timer = setTimeout(() => {
-    container.appendChild(node);
-    domtoimage.toBlob(node, { bgcolor: color }).then((blob) => {
-      // const { width: blobWidth, height: blobHeight } =
-      //   node.getBoundingClientRect();
-      // setTextureSize({ width: blobWidth, height: blobHeight });
-      if (container.contains(node)) {
-        container.removeChild(node);
-      }
-      if (blob === null) return;
-      if (lastUrl.current !== null) {
-        URL.revokeObjectURL(lastUrl.current);
-      }
-      const url = URL.createObjectURL(blob);
-      lastUrl.current = url;
-      setImage(url);
-    });
-    // }, delay);
-
-    return () => {
-      // clearTimeout(timer);
-      if (container && container.contains(node)) {
-        container.removeChild(node);
-      }
-    };
-  }, [node, viewSize, sceneSize, color, children]);
+  //   return () => {
+  //     // clearTimeout(timer);
+  //     if (container && container.contains(node)) {
+  //       container.removeChild(node);
+  //     }
+  //   };
+  // }, [node, viewSize, sceneSize, color, children]);
 
   const texture = useTexture(image);
 
@@ -110,9 +107,14 @@ export default function Html({
   }, [texture, size]);
 
   return (
+    <HTMLContent width={size.width} height={size.height} texture={texture} />
+  );
+}
+const HTMLContent = ({ width, height, texture }) => {
+  return (
     <mesh>
-      <planeGeometry args={[size.width, size.height]} />
+      <planeGeometry args={[width, height]} />
       <meshBasicMaterial map={texture} side={THREE.DoubleSide} transparent />
     </mesh>
   );
-}
+};

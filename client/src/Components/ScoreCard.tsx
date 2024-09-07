@@ -29,15 +29,16 @@ import { SelectedOption } from "../views/ShowPage";
 import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
 import getRandomCoordinates from "../utilities/getRandomCoordinates";
 import fetchWithRetry from "../api/fetch";
+
 export type ScoreCardType = "Batting" | "Bowling";
 
-const fetchScorecard = async (matchId: string): Promise<Response> => {
-  const res = await fetchWithRetry(
-    `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`
-  );
+// const fetchScorecard = async (matchId: string): Promise<Response> => {
+//   const res = await fetchWithRetry(
+//     `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`
+//   );
 
-  return res;
-};
+//   return res;
+// };
 
 const BattingScorecard = ({
   row,
@@ -63,14 +64,14 @@ const BattingScorecard = ({
   const storedScorecard = selections.find(
     (s) => s.name === `Batting Scorecard ${row.inningsId}`
   );
-
+  console.log("S");
   const {
     x = randomX,
     y = randomY,
     width = 350,
     height = 350,
   } = storedScorecard ?? {};
-  if (!storedScorecard && !isMobile) {
+  if (!storedScorecard && !isMobile && !isARMode) {
     const newItems = [
       ...selections,
       {
@@ -167,13 +168,15 @@ const BattingScorecard = ({
                 " Ov)"}
             </Box>
             <Box>
-              <IconButton
-                aria-label="expand row"
-                size="small"
-                onClick={() => setOpen(!open)}
-              >
-                {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-              </IconButton>
+              {!isARMode && (
+                <IconButton
+                  aria-label="expand row"
+                  size="small"
+                  onClick={() => setOpen(!open)}
+                >
+                  {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                </IconButton>
+              )}
             </Box>
           </Box>
         </Box>
@@ -389,7 +392,7 @@ const BattingScorecard = ({
       </TableContainer>
     );
   };
-
+  console.log(isARMode, "ar");
   return isMobile || isARMode ? (
     <div
       style={{
@@ -478,7 +481,7 @@ const BowlingScorecard = ({
     height = 350,
   } = storedScorecard ?? {};
 
-  if (!storedScorecard && !isMobile) {
+  if (!storedScorecard && !isMobile && !isARMode) {
     const newItems = [
       ...selections,
       {
@@ -564,13 +567,15 @@ const BowlingScorecard = ({
                 " Ov)"}
             </Box>
             <Box>
-              <IconButton
-                aria-label="expand row"
-                size="small"
-                onClick={() => setOpen(!open)}
-              >
-                {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-              </IconButton>
+              {!isARMode && (
+                <IconButton
+                  aria-label="expand row"
+                  size="small"
+                  onClick={() => setOpen(!open)}
+                >
+                  {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                </IconButton>
+              )}
             </Box>
           </Box>
         </Box>
@@ -822,7 +827,7 @@ const BowlingScorecard = ({
           </Typography>
         </Toolbar>
       </AppBar>
-      <BowlingScorecardComponent />
+      {/* <BowlingScorecardComponent /> */}
     </div>
   ) : (
     <Rnd
@@ -854,29 +859,34 @@ const BowlingScorecard = ({
 };
 
 export default function ScoreCardTable({
-  matchId,
   type,
-  isLive,
+
   selections,
   setSelection,
   isARMode,
+  data,
+  isLoading,
+  isError,
 }: {
-  matchId: string;
   type: ScoreCardType;
-  isLive: boolean;
+
   selections: SelectedOption[];
   setSelection: (option: SelectedOption[]) => void;
   isARMode: boolean;
+  data: GetScorecard | undefined;
+  isLoading: boolean;
+  isError: boolean;
 }) {
-  const { isLoading, isError, data } = useQuery<GetScorecard>({
-    queryKey: [`scoresData-${matchId}`],
-    queryFn: useCallback(
-      () => fetchScorecard(matchId).then((res) => res.json()),
-      [matchId]
-    ),
-    refetchInterval: isLive ? 30000 : undefined,
-  });
-  console.log(data, "sc");
+  // const { isLoading, isError, data } = useQuery<GetScorecard>({
+  //   queryKey: [`scoresData-${matchId}`],
+  //   queryFn: useCallback(
+  //     () => fetchScorecard(matchId).then((res) => res.json()),
+  //     [matchId]
+  //   ),
+  //   refetchInterval: isLive ? 30000 : undefined,
+  // });
+  // console.log(data, "sc");
+  console.log(type);
   if (isARMode) {
     if (data?.scoreCard) {
       if (type === "Batting") {

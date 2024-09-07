@@ -181,7 +181,7 @@ const WagonWheelWrapper = ({
     height = isMobile ? window.screen.width + 20 : 370,
   } = storedWagonWheel ?? {};
 
-  if (!storedWagonWheel && !isMobile) {
+  if (!storedWagonWheel && !isMobile && !isARMode) {
     const newItems = [
       ...selections,
       {

@@ -218,67 +218,44 @@ const SquadComponent = ({
 };
 const Squad = React.memo(
   ({
-    matchId,
     selections,
     setSelection,
     isARMode,
+    matchData,
+    isMatchDataLoading,
+    isMatchDataError,
+    isTeam1SquadDataLoading,
+    isTeam2SquadDataLoading,
+    team1SquadData,
+    team2SquadData,
   }: {
-    matchId: string;
     selections: SelectedOption[];
     setSelection: (option: SelectedOption[]) => void;
     isARMode: boolean;
+    matchData: GetInfo | undefined;
+    isMatchDataLoading: boolean;
+    isMatchDataError: boolean;
+    isTeam1SquadDataLoading: boolean;
+    isTeam2SquadDataLoading: boolean;
+    team1SquadData: GetSquad | undefined;
+    team2SquadData: GetSquad | undefined;
   }) => {
-    const fetchInfo = async (matchId: string): Promise<GetInfo> => {
-      const res = await fetchWithRetry(
-        `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}`
-      );
-      return res;
-    };
-    const fetchSquad = async (
-      matchId: string,
-      teamId: number | undefined
-    ): Promise<GetSquad> => {
-      const res = await fetchWithRetry(
-        `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/team/${teamId}`
-      );
+    // const fetchInfo = async (matchId: string): Promise<GetInfo> => {
+    //   const res = await fetchWithRetry(
+    //     `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}`
+    //   );
+    //   return res;
+    // };
 
-      return res;
-    };
-    const {
-      isLoading: isMatchDataLoading,
-      isError: isMatchDataError,
-      data: matchData,
-    } = useQuery<GetInfo>({
-      queryKey: ["infoData", matchId],
-      queryFn: useCallback(() => fetchInfo(matchId), [matchId]),
-    });
-    const team1Id = matchData?.matchInfo.team1.id;
-    const team2Id = matchData?.matchInfo.team2.id;
-    const {
-      isLoading: isTeam1SquadDataLoading,
-      isError: isTeam1SquadDataError,
-      data: team1SquadData,
-    } = useQuery<GetSquad>({
-      queryKey: [`squadData${team1Id}`, matchId],
-      queryFn: useCallback(
-        () => fetchSquad(matchId, team1Id),
-        [matchId, team1Id]
-      ),
-      enabled: !!matchId && !!team1Id,
-    });
+    // const {
+    //   isLoading: isMatchDataLoading,
+    //   isError: isMatchDataError,
+    //   data: matchData,
+    // } = useQuery<GetInfo>({
+    //   queryKey: ["infoData", matchId],
+    //   queryFn: useCallback(() => fetchInfo(matchId), [matchId]),
+    // });
 
-    const {
-      isLoading: isTeam2SquadDataLoading,
-      isError: isTeam2SquadDataError,
-      data: team2SquadData,
-    } = useQuery<GetSquad>({
-      queryKey: [`squadData${team2Id}`, matchId],
-      queryFn: useCallback(
-        () => fetchSquad(matchId, team2Id),
-        [matchId, team2Id]
-      ),
-      enabled: !!matchId && !!team2Id,
-    });
     const { x: randomX, y: randomY } = getRandomCoordinates();
     const componentRef = React.useRef<HTMLDivElement>(null);
 
@@ -291,7 +268,7 @@ const Squad = React.memo(
       width = 350,
       height = 500,
     } = storedSquad ?? {};
-    if (!storedSquad && !isMobile) {
+    if (!storedSquad && !isMobile && !isARMode) {
       const newItems = [
         ...selections,
         {

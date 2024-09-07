@@ -1,7 +1,7 @@
 import "../styles/ShowPage.css";
 import { DraggableEvent } from "react-draggable";
 import WithTitleBar from "./WithTitleBar";
-import React, { useCallback } from "react";
+import React, { Suspense, useCallback } from "react";
 import { Rnd, RndResizeCallback } from "react-rnd";
 import { SelectedOption } from "../views/ShowPage";
 import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
@@ -16,19 +16,21 @@ import { useQuery } from "@tanstack/react-query";
 import { GetInfo } from "../types/getInfo";
 import { VideoResource } from "../types/getVideo";
 import fetchWithRetry from "../api/fetch";
-import { Plane } from "@react-three/drei";
-import { useVideoTexture } from "@react-three/drei";
-import { DoubleSide } from "three";
+import { Plane, useTexture } from "@react-three/drei";
+
+import { DoubleSide, VideoTexture } from "three";
 const Video = ({
-  matchId,
   selections,
   setSelection,
   isARMode,
+  matchData,
+  texture,
 }: {
-  matchId: string;
   selections: SelectedOption[];
   setSelection: (option: SelectedOption[]) => void;
   isARMode: boolean;
+  matchData: GetInfo | undefined;
+  texture: VideoTexture | null;
 }) => {
   const componentRef = React.useRef<HTMLDivElement>(null);
 
@@ -54,21 +56,21 @@ const Video = ({
     }
   };
 
-  const fetchInfo = async (matchId: string): Promise<GetInfo> => {
-    const res = await fetchWithRetry(
-      `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}`
-    );
-    return res;
-  };
+  // const fetchInfo = async (matchId: string): Promise<GetInfo> => {
+  //   const res = await fetchWithRetry(
+  //     `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}`
+  //   );
+  //   return res;
+  // };
 
-  const {
-    isLoading: isMatchDataLoading,
-    isError: isMatchDataError,
-    data: matchData,
-  } = useQuery<GetInfo>({
-    queryKey: ["infoData", matchId],
-    queryFn: useCallback(() => fetchInfo(matchId), [matchId]),
-  });
+  // const {
+  //   isLoading: isMatchDataLoading,
+  //   isError: isMatchDataError,
+  //   data: matchData,
+  // } = useQuery<GetInfo>({
+  //   queryKey: ["infoData", matchId],
+  //   queryFn: useCallback(() => fetchInfo(matchId), [matchId]),
+  // });
   const {
     isLoading,
     isError,
@@ -155,17 +157,31 @@ const Video = ({
   // eslint-disable-next-line react/prop-types
   const VideoPlane = () => {
     // Use the correct path to the video file
-    const texture = useVideoTexture("/video.mp4"); // Path relative to the public directory
+    // const texture = useVideoTexture("/video.mp4"); // Path relative to the public directory
 
+    // function VideoMaterial({ url }: { url: string }) {
+    //   const texture = useVideoTexture(url);
+    //   return <meshBasicMaterial map={texture} toneMapped={false} />;
+    // }
+
+    function FallbackMaterial({ url }: { url: string }) {
+      const imgTexture = useTexture(url);
+      return <meshBasicMaterial map={imgTexture} toneMapped={false} />;
+    }
     return (
       <Plane args={[3, 2]}>
-        <meshBasicMaterial side={DoubleSide} map={texture} toneMapped={false} />
+        {/* <meshBasicMaterial map={texture} /> */}
+        {/* <meshBasicMaterial color={"white"} /> */}
+        <Suspense
+          fallback={<FallbackMaterial url="/icons/icon-1024x1024.png" />}
+        >
+          <meshBasicMaterial map={texture} toneMapped={false} />;
+          {/* <VideoMaterial url="/video.mp4" /> */}
+        </Suspense>
       </Plane>
     );
   };
-  if (isLoading || isError) {
-    return <></>;
-  }
+
   return isARMode ? (
     <VideoPlane />
   ) : isMobile ? (

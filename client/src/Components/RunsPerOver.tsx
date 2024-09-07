@@ -166,7 +166,7 @@ const RunsPerOver = React.memo(
       height = 350,
     } = storedRunsPerOver ?? {};
 
-    if (!storedRunsPerOver && !isMobile) {
+    if (!storedRunsPerOver && !isMobile && !isARMode) {
       const newItems = [
         ...selections,
         {

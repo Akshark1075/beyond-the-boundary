@@ -22,7 +22,6 @@ import { DraggableEvent } from "react-draggable";
 import WithTitleBar from "./WithTitleBar";
 
 import { useTheme } from "@mui/material/styles";
-import fetchWithRetry from "../api/fetch";
 const MatchInfoComponent = ({
   width,
   height,
@@ -385,32 +384,20 @@ const MatchInfoComponent = ({
 
 const MatchInfo = React.memo(
   ({
-    matchId,
     selections,
     setSelection,
     isARMode,
+    isLoading,
+    isError,
+    data,
   }: {
-    matchId: string;
     selections: SelectedOption[];
     setSelection: (option: SelectedOption[]) => void;
     isARMode: boolean;
+    isLoading: boolean;
+    isError: boolean;
+    data: GetInfo | undefined;
   }) => {
-    const fetchInfo = async (matchId: string): Promise<GetInfo> => {
-      const res = await fetchWithRetry(
-        `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}`
-      );
-      return res;
-    };
-
-    const {
-      isLoading: isMatchDataLoading,
-      isError: isMatchDataError,
-      data: matchData,
-    } = useQuery<GetInfo>({
-      queryKey: ["infoData", matchId],
-      queryFn: useCallback(() => fetchInfo(matchId), [matchId]),
-    });
-
     const { x: randomX, y: randomY } = getRandomCoordinates();
     const componentRef = React.useRef<HTMLDivElement>(null);
     const theme = useTheme();
@@ -423,7 +410,7 @@ const MatchInfo = React.memo(
       height = 350,
     } = storedInfo ?? {};
 
-    if (!storedInfo && !isMobile) {
+    if (!storedInfo && !isMobile && !isARMode) {
       const newItems = [
         ...selections,
         {
@@ -503,8 +490,8 @@ const MatchInfo = React.memo(
         <MatchInfoComponent
           width={window.screen.width}
           height={height}
-          isMatchDataLoading={isMatchDataLoading}
-          matchData={matchData}
+          isMatchDataLoading={isLoading}
+          matchData={data}
           isARMode={isARMode}
         />
       </div>
@@ -532,8 +519,8 @@ const MatchInfo = React.memo(
             <MatchInfoComponent
               width={width}
               height={height}
-              isMatchDataLoading={isMatchDataLoading}
-              matchData={matchData}
+              isMatchDataLoading={isLoading}
+              matchData={data}
               isARMode={isARMode}
             />
           </WithTitleBar>

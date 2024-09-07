@@ -11,32 +11,35 @@ import { SelectedOption } from "../views/ShowPage";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { AppBar, Skeleton, Toolbar, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import fetchWithRetry from "../api/fetch";
-const fetchScorecard = async (matchId: string): Promise<GetScorecard> => {
-  const res = await fetchWithRetry(
-    `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`
-  );
+// import fetchWithRetry from "../api/fetch";
+// const fetchScorecard = async (matchId: string): Promise<GetScorecard> => {
+//   const res = await fetchWithRetry(
+//     `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`
+//   );
 
-  return res;
-};
+//   return res;
+// };
 const FallOfWickets = ({
-  matchId,
   selections,
   setSelection,
-  isLive,
+  data,
+  isLoading,
+  isError,
   isARMode,
 }: {
-  matchId: string;
   selections: SelectedOption[];
   setSelection: (option: SelectedOption[]) => void;
-  isLive: boolean;
+
   isARMode: boolean;
+  isLoading: boolean;
+  isError: boolean;
+  data: GetScorecard | undefined;
 }) => {
-  const { isLoading, isError, data } = useQuery<GetScorecard>({
-    queryKey: [`scoresData-${matchId}`],
-    queryFn: useCallback(() => fetchScorecard(matchId), [matchId]),
-    refetchInterval: isLive ? 30000 : undefined,
-  });
+  // const { isLoading, isError, data } = useQuery<GetScorecard>({
+  //   queryKey: [`scoresData-${matchId}`],
+  //   queryFn: useCallback(() => fetchScorecard(matchId), [matchId]),
+  //   refetchInterval: isLive ? 30000 : undefined,
+  // });
   return (
     // <Fow
     //   row={data.scoreCard[data.scoreCard.length - 1]}

@@ -40,7 +40,7 @@ const FieldPosition: React.FC<FieldPositionProps> = ({
     height = isMobile ? window.screen.width + 20 : 370,
   } = storedFieldPosition ?? {};
 
-  if (!storedFieldPosition && !isMobile) {
+  if (!storedFieldPosition && !isMobile && !isARMode) {
     const newItems = [
       ...selections,
       {

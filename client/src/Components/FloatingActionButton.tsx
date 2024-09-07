@@ -20,6 +20,9 @@ import { Text } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { BufferGeometry } from "three";
 import { fieldPositions } from "../utilities/getFieldPositions";
+import { GetInfo } from "../types/getInfo";
+import { GetSquad } from "../types/getSquad";
+import { GetScorecard } from "../types/getScorecard";
 
 interface FloatingActionButtonProps {
   selections: SelectedOption[];
@@ -27,6 +30,17 @@ interface FloatingActionButtonProps {
   isARMode: boolean;
   setShouldShowReticle?: (shouldShowReticle: boolean) => void;
   setSelectedARComponent?: (component: string) => void;
+  matchData: GetInfo | undefined;
+  isMatchDataLoading: boolean;
+  isMatchDataError: boolean;
+  isTeam1SquadDataLoading: boolean;
+  isTeam2SquadDataLoading: boolean;
+  team1SquadData: GetSquad | undefined;
+  team2SquadData: GetSquad | undefined;
+  isScoresDataLoading: boolean;
+  isScoresDataError: boolean;
+  scoresData: GetScorecard | undefined;
+  videoTexture: THREE.VideoTexture | null;
 }
 
 const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
@@ -35,13 +49,22 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   isARMode,
   setShouldShowReticle,
   setSelectedARComponent,
+  matchData,
+  isMatchDataLoading,
+  isMatchDataError,
+  isTeam1SquadDataLoading,
+  isTeam2SquadDataLoading,
+  team1SquadData,
+  team2SquadData,
+  isScoresDataLoading,
+  isScoresDataError,
+  scoresData,
+  videoTexture,
 }) => {
   const [selectedComponent, setSelectedComponent] = useState<string | null>(
     null
   );
   const { matchId } = useParams();
-  const [searchParams] = useSearchParams();
-  const isLive = searchParams.get("isLive");
   const handleMenuItemClick = (component: string) => {
     console.log(component);
     if (isARMode && !!setShouldShowReticle && !!setSelectedARComponent) {
@@ -79,23 +102,25 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
       <>
         {(battingScorecard || selectedComponent === "Batting Scorecard") && (
           <ScoreCardTable
-            matchId={matchId ?? ""}
             type={"Batting"}
             selections={selections}
             setSelection={setSelection}
-            isLive={isLive === "y"}
             isARMode={isARMode}
+            data={scoresData}
+            isLoading={isScoresDataLoading}
+            isError={isScoresDataError}
           />
         )}
 
         {(bowlingScorecard || selectedComponent === "Bowling Scorecard") && (
           <ScoreCardTable
-            matchId={matchId ?? ""}
             type={"Bowling"}
             selections={selections}
             setSelection={setSelection}
-            isLive={isLive === "y"}
             isARMode={isARMode}
+            data={scoresData}
+            isLoading={isScoresDataLoading}
+            isError={isScoresDataError}
           />
         )}
 
@@ -110,10 +135,12 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
         {(scorecardComparison ||
           selectedComponent === "Scorecard comparison") && (
           <Scorecomparison
-            matchId={matchId ?? ""}
             selections={selections}
             setSelection={setSelection}
             isARMode={isARMode}
+            data={scoresData}
+            isLoading={isScoresDataLoading}
+            isError={isScoresDataError}
           />
         )}
         {(wagonWheel || selectedComponent === "Wagonwheel") && (
@@ -128,25 +155,33 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
           <Video
             selections={selections}
             setSelection={setSelection}
-            matchId={matchId ?? ""}
+            matchData={matchData}
             isARMode={isARMode}
+            texture={videoTexture}
           />
         )}
         {(squad || selectedComponent === "Squad") && (
           <Squad
             selections={selections}
             setSelection={setSelection}
-            matchId={matchId ?? ""}
             isARMode={isARMode}
+            matchData={matchData}
+            isMatchDataLoading={isMatchDataLoading}
+            isMatchDataError={isMatchDataError}
+            isTeam1SquadDataLoading={isTeam1SquadDataLoading}
+            isTeam2SquadDataLoading={isTeam2SquadDataLoading}
+            team1SquadData={team1SquadData}
+            team2SquadData={team2SquadData}
           />
         )}
         {(fallOfWickets || selectedComponent === "Fall of wickets") && (
           <FallOfWickets
             selections={selections}
             setSelection={setSelection}
-            matchId={matchId ?? ""}
-            isLive={isLive === "y"}
             isARMode={isARMode}
+            isLoading={isScoresDataLoading}
+            isError={isScoresDataError}
+            data={scoresData}
           />
         )}
 
@@ -154,8 +189,10 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
           <MatchInfo
             selections={selections}
             setSelection={setSelection}
-            matchId={matchId ?? ""}
             isARMode={isARMode}
+            isLoading={isMatchDataLoading}
+            isError={isMatchDataError}
+            data={matchData}
           />
         )}
 
@@ -254,11 +291,11 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
 
   const components = [
     { title: "Match Info", key: "Match Info" },
-    { title: "Video", key: "Video" },
+
     { title: "Batting Scorecard", key: "Batting Scorecard" },
     { title: "Bowling Scorecard", key: "Bowling Scorecard" },
     { title: "Runs Per Over", key: "Runs per over" },
-    { title: "Score Comparison", key: "Scorecard comparison" },
+    { title: "Scorecard Comparison", key: "Scorecard comparison" },
     {
       title: "Wagonwheel",
       key: "Wagonwheel",
@@ -269,6 +306,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
       key: "Fall of wickets",
     },
     { title: "Field Placements", key: "Field positions" },
+    { title: "Video", key: "Video" },
   ];
 
   const filteredOptions = components.filter(
@@ -329,6 +367,7 @@ const ARFloatingActionButton = ({
   const handleButtonClick = () => {
     setOpen(!open);
   };
+  const textRef = useRef<THREE.Mesh<BufferGeometry>>();
   const meshRef = useRef<THREE.Mesh<BufferGeometry>>(null);
   const { camera } = useThree();
   // Update the position of the mesh to always be in front of the camera
@@ -339,6 +378,17 @@ const ARFloatingActionButton = ({
         camera.position.y - 1,
         camera.position.z - 2
       );
+    }
+  });
+  const [hovered, setHovered] = useState(false);
+
+  // Animation effect
+  useFrame(() => {
+    if (hovered && textRef.current) {
+      // Example: Slightly scale the text when hovered
+      textRef.current.scale.set(1.1, 1.1, 1.1);
+    } else if (textRef.current) {
+      textRef.current.scale.set(1, 1, 1);
     }
   });
   return (
@@ -377,7 +427,7 @@ const ARFloatingActionButton = ({
               setOpen(!open);
             }}
           >
-            <Text
+            {/* <Text
               position={[
                 camera.position.x - 2,
                 camera.position.y + i,
@@ -392,7 +442,52 @@ const ARFloatingActionButton = ({
               rotation-y={Math.PI}
             >
               {c.title}
-            </Text>
+            </Text> */}
+
+            <>
+              {/* Background Rectangle */}
+              <mesh
+                position={[
+                  camera.position.x,
+                  camera.position.y + i,
+                  camera.position.z - 15,
+                ]}
+              >
+                <planeGeometry args={[10, 10]} /> {/* Background size */}
+                <meshStandardMaterial
+                  color={hovered ? "#444" : "#222"}
+                  transparent
+                  opacity={0.8}
+                />
+                {/* Text */}
+                <Text
+                  position={[camera.position.x, i / 5, 2]}
+                  ref={textRef}
+                  fontSize={0.3} // Adjust font size as needed
+                  color={hovered ? "#ff0" : "#fff"} // Change color on hover
+                  anchorX="center" // Center text horizontally
+                  anchorY="middle" // Center text vertically
+                  onPointerOver={() => setHovered(true)}
+                  onPointerOut={() => setHovered(false)}
+                >
+                  {c.title}
+                </Text>
+                {/* <mesh
+                  position={[
+                    camera.position.x,
+                    (i - 2) / 3,
+                    camera.position.z + 1,
+                  ]}
+                >
+                  <planeGeometry args={[8, 0.1]} /> {/* Background size */}
+                {/* <meshStandardMaterial
+                    color={"fff"}
+                    transparent
+                    opacity={0.8}
+                  />
+                </mesh> */}
+              </mesh>
+            </>
           </Interactive>
           //     }
           //   </mesh>
