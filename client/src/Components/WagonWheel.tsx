@@ -341,11 +341,7 @@ const WagonWheelWrapper = ({
 
   return isARMode ? (
     <mesh
-      position={
-        !!position
-          ? [position?.x + 10, position?.y, position.z + 50]
-          : [0, 0, 0]
-      }
+      position={!!position ? [position?.x, position?.y, position.z] : [0, 0, 0]}
     >
       <DrawLines
         count={teamBatters[0]?.ones ?? 0}

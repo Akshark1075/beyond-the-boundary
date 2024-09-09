@@ -13,7 +13,7 @@ import FallOfWickets from "./FallOfWickets";
 import MatchInfo from "./MatchInfo";
 import FieldPosition from "./FieldPosition";
 import { Html } from "@react-three/drei";
-import { Interactive } from "@react-three/xr";
+import { Interactive, useXR, XRInteractionEvent } from "@react-three/xr";
 import * as THREE from "three";
 
 import { Text } from "@react-three/drei";
@@ -367,39 +367,126 @@ const ARFloatingActionButton = ({
   const handleButtonClick = () => {
     setOpen(!open);
   };
-  const textRef = useRef<THREE.Mesh<BufferGeometry>>();
   const meshRef = useRef<THREE.Mesh<BufferGeometry>>(null);
+  const menuRef = useRef<THREE.Mesh<BufferGeometry>>(null);
   const { camera } = useThree();
   // Update the position of the mesh to always be in front of the camera
-  useFrame(({ camera }) => {
-    if (meshRef.current) {
-      meshRef.current.position.set(
-        camera.position.x,
-        camera.position.y - 1,
-        camera.position.z - 2
-      );
-    }
-  });
-  const [hovered, setHovered] = useState(false);
+  // useFrame(({ camera }) => {
+  //   if (meshRef.current) {
+  //     meshRef.current.position.set(
+  //       camera.position.x,
+  //       camera.position.y - 1,
+  //       camera.position.z - 2
+  //     );
+  //   }
+  // });
+  const [hovered, setHovered] = useState<number | null>(null);
+  const [pos, setPos] = useState<THREE.Vector3>(new THREE.Vector3(0, 0, -3));
 
-  // Animation effect
-  useFrame(() => {
-    if (hovered && textRef.current) {
-      // Example: Slightly scale the text when hovered
-      textRef.current.scale.set(1.1, 1.1, 1.1);
-    } else if (textRef.current) {
-      textRef.current.scale.set(1, 1, 1);
+  useEffect(() => {
+    if (meshRef.current) {
+      // Make the mesh look at the camera when it is first placed
+      meshRef.current.lookAt(camera.position);
     }
-  });
+  }, [camera.position, pos]);
+  // useEffect(() => {
+  //   if (open && meshRef.current && menuRef.current) {
+  //     // Get mesh's forward direction
+  //     const meshDirection = new THREE.Vector3();
+  //     meshRef.current.getWorldDirection(meshDirection);
+
+  //     // Offset distance to place the menu in front of the mesh
+  //     const offsetDistance = 5;
+
+  //     // Calculate new position for the menu
+  //     const newPosition = new THREE.Vector3(
+  //       meshRef.current.position.x + meshDirection.x * offsetDistance,
+  //       0, // Keep Y-level with the mesh
+  //       meshRef.current.position.z + meshDirection.z * offsetDistance
+  //     );
+
+  //     // Update menu's position
+  //     menuRef.current.position.copy(newPosition);
+
+  //     // Make sure menu faces the camera, but stay level at mesh's height
+  //     const menuLookAtPosition = new THREE.Vector3(
+  //       camera.position.x,
+  //       0, // Use mesh's Y position to avoid tilting
+  //       camera.position.z
+  //     );
+  //     menuRef.current.lookAt(menuLookAtPosition);
+  //   }
+  // }, [open, pos]);
+
+  // const { controllers } = useXR();
+  // const lastClickTimeRef = useRef<number | null>(null);
+  // const DOUBLE_CLICK_DELAY = 300; // Maximum time in ms for a double-click event
+
+  // useEffect(() => {
+  //   const rightController = controllers.find(
+  //     (c) => c.inputSource && c.inputSource.handedness === "right"
+  //   );
+
+  //   if (rightController && rightController.controller) {
+  //     const onControllerClick = () => {
+  //       const currentTime = Date.now();
+
+  //       if (
+  //         lastClickTimeRef.current &&
+  //         currentTime - lastClickTimeRef.current < DOUBLE_CLICK_DELAY
+  //       ) {
+  //         if (meshRef.current) {
+  //           // Get the current position and direction of the controller
+  //           const controllerPosition = rightController.controller.position;
+  //           const controllerDirection = new THREE.Vector3();
+
+  //           // Get the controller's forward direction (along the Z-axis)
+  //           rightController.controller.getWorldDirection(controllerDirection);
+
+  //           // Offset the position slightly backward in the direction the controller is pointing
+  //           const offset = 3; // Distance behind the controller
+  //           const newPosition = new THREE.Vector3(
+  //             controllerPosition.x - controllerDirection.x * offset,
+  //             0, // Keep Y at 0 (ground level)
+  //             controllerPosition.z - controllerDirection.z * offset
+  //           );
+
+  //           // Move the mesh to the adjusted position
+  //           meshRef.current.position.copy(newPosition);
+  //           setPos(newPosition); // If you're using this for other state tracking
+  //         }
+  //       }
+
+  //       lastClickTimeRef.current = currentTime;
+  //     };
+
+  //     // Add event listener for clicks
+  //     rightController.controller.addEventListener(
+  //       "selectstart",
+  //       onControllerClick
+  //     );
+
+  //     return () => {
+  //       // Clean up the event listener when the component is unmounted or the controller changes
+  //       rightController.controller.removeEventListener(
+  //         "selectstart",
+  //         onControllerClick
+  //       );
+  //     };
+  //   }
+  // }, [controllers, meshRef]);
+
   return (
     <>
       {" "}
-      <Interactive onSelect={handleButtonClick}>
-        <mesh
-          ref={meshRef}
-          onClick={() => handleButtonClick()} // Handle button click
-        >
-          <circleGeometry args={[0.15, 32]} />
+      <Interactive
+        onSelect={handleButtonClick}
+        // onSelectStart={handleDragStart}
+        // onSelectEnd={handleRelease}
+        // onMove={handleDrag}
+      >
+        <mesh ref={meshRef} position={pos}>
+          <circleGeometry args={[0.2, 32]} />
           <meshBasicMaterial color={"black"} opacity={0.9} />
           <Text
             fontSize={0.3} // Adjust font size as needed
@@ -411,88 +498,40 @@ const ARFloatingActionButton = ({
           </Text>
         </mesh>
       </Interactive>
-      {open &&
-        components.map((c, i) => (
-          // position={[-4, 1 - i * 0.5, 0.1]}
-          // <mesh position={[0, 1, 0]} key={i}>
-          //   <planeGeometry args={[1, 1]} />
-          //   <meshBasicMaterial color="#303036" />
-
-          //   {/* Render buttons as 3D text */}
-          // {
-          <Interactive
-            key={i}
-            onSelect={() => {
-              handleMenuItemClick(c.key); // Call the click handler with the component title
-              setOpen(!open);
-            }}
-          >
-            {/* <Text
-              position={[
-                camera.position.x - 2,
-                camera.position.y + i,
-                camera.position.z - 10,
-              ]}
-              fontSize={1} // Adjust font size as needed
-              color="#fff"
-              anchorX="left" // Align text to the left
-              anchorY="middle" // Center text vertically
-              rotation-z={Math.PI}
-              rotation-x={Math.PI}
-              rotation-y={Math.PI}
+      {open && (
+        <mesh
+          ref={menuRef}
+          position={
+            meshRef.current
+              ? [pos.x, pos.y + meshRef.current.scale.y + 1, pos.z - 5]
+              : pos
+          }
+        >
+          <planeGeometry args={[6, 6]} /> {/* Background size */}
+          <meshStandardMaterial color={"#222"} transparent opacity={1} />
+          {components.map((c, i) => (
+            <Interactive
+              key={i}
+              onHover={() => setHovered(i)}
+              onBlur={() => setHovered(null)}
+              onSelect={() => {
+                handleMenuItemClick(c.key); // Call the click handler with the component title
+                setOpen(!open);
+              }}
             >
-              {c.title}
-            </Text> */}
-
-            <>
-              {/* Background Rectangle */}
-              <mesh
-                position={[
-                  camera.position.x,
-                  camera.position.y + i,
-                  camera.position.z - 15,
-                ]}
+              <Text
+                position={[0, (i - 4.5) / 2, 1]}
+                fontSize={hovered && hovered === i ? 0.4 : 0.3} // Adjust font size as needed
+                color={hovered && hovered === i ? "#fff" : "#E50914"} // Change color on hover
+                anchorX="center" // Center text horizontally
+                anchorY="middle" // Center text vertically
               >
-                <planeGeometry args={[10, 10]} /> {/* Background size */}
-                <meshStandardMaterial
-                  color={hovered ? "#444" : "#222"}
-                  transparent
-                  opacity={0.8}
-                />
-                {/* Text */}
-                <Text
-                  position={[camera.position.x, i / 5, 2]}
-                  ref={textRef}
-                  fontSize={0.3} // Adjust font size as needed
-                  color={hovered ? "#ff0" : "#fff"} // Change color on hover
-                  anchorX="center" // Center text horizontally
-                  anchorY="middle" // Center text vertically
-                  onPointerOver={() => setHovered(true)}
-                  onPointerOut={() => setHovered(false)}
-                >
-                  {c.title}
-                </Text>
-                {/* <mesh
-                  position={[
-                    camera.position.x,
-                    (i - 2) / 3,
-                    camera.position.z + 1,
-                  ]}
-                >
-                  <planeGeometry args={[8, 0.1]} /> {/* Background size */}
-                {/* <meshStandardMaterial
-                    color={"fff"}
-                    transparent
-                    opacity={0.8}
-                  />
-                </mesh> */}
-              </mesh>
-            </>
-          </Interactive>
-          //     }
-          //   </mesh>
-          // ))}
-        ))}
+                {c.title}
+              </Text>
+            </Interactive>
+          ))}
+        </mesh>
+      )}
     </>
   );
 };

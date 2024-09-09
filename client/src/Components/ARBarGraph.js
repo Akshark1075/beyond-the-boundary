@@ -36,7 +36,6 @@ const ARBarGraph = ({ data, position = [0, 1, -2] }) => {
 
   return (
     <>
-      <ambientLight />
       {/* <Plane
         args={[1, 1]}
         position={[position.x, position.y - 0.5, position.z]}

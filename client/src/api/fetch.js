@@ -11,7 +11,7 @@ const apiKeys = [
   "fb825d76camshc89a23d3b25430ap1d884fjsn5e38a5b81ca1",
 ];
 const fetchWithRetry = async (url, options = {}) => {
-  let apiKey = apiKeys[7];
+  let apiKey = apiKeys[8];
   const newOptions = {
     ...options,
     headers: {
@@ -30,7 +30,7 @@ const fetchWithRetry = async (url, options = {}) => {
       throw new Error(`Request failed with status ${response.status}`);
     }
   } catch (error) {
-    apiKey = apiKeys[1];
+    apiKey = apiKeys[2];
     const response = await fetch(url, {
       ...newOptions,
       headers: { "x-rapidapi-key": apiKey },

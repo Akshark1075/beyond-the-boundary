@@ -58,7 +58,12 @@ export interface SelectedOption {
   width: number;
   height: number;
 }
-
+export interface Model {
+  position: THREE.Vector3 | undefined;
+  component: JSX.Element;
+  id: number;
+  title: string;
+}
 // @ts-ignore: Unreachable code error
 HTMLCanvasElement.prototype.getContext = (function (origFn) {
   return function (type, attribs) {
@@ -243,10 +248,10 @@ const ShowPage = () => {
       }
     }
   }, [isARMode]);
-  const [models, setModels] = useState<Array<{ [key: string]: any }>>([]);
+  const [models, setModels] = useState<Model[]>([]);
   const [shouldShowReticle, setShouldShowReticle] = useState(true);
   const [selectedARComponent, setSelectedARComponent] = useState<string | null>(
-    "Video"
+    "Wagonwheel"
   );
   const placeModel = (
     e: XRInteractionEvent,
@@ -268,6 +273,7 @@ const ShowPage = () => {
     video.crossOrigin = "anonymous";
     video.loop = true;
     video.muted = true;
+    video.controls = false;
     video.play();
 
     textureRef.current = new THREE.VideoTexture(video);
@@ -692,6 +698,7 @@ const ShowPage = () => {
               component={component}
               position={position}
               title={title}
+              setModels={setModels}
               image={
                 title === "Squad"
                   ? squadImage
