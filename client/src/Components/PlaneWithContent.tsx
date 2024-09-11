@@ -224,6 +224,7 @@ import { Interactive, useXR, XRInteractionEvent } from "@react-three/xr";
 import { useQuery } from "@tanstack/react-query";
 import { useDrag, useGesture } from "@use-gesture/react";
 import { Model } from "../views/ShowPage";
+import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
 
 export const PositionContext = createContext<Vector3 | undefined>(
   new THREE.Vector3(0, 0, 0)
@@ -234,12 +235,16 @@ const WithXRPlane = ({
   position,
   title,
   image,
+  models,
   setModels,
+  scale,
 }: {
   component: JSX.Element;
   position?: Vector3;
+  scale?: Vector3;
   title: string;
   image: string;
+  models: Model[];
   setModels: React.Dispatch<React.SetStateAction<Model[]>>;
 }) => {
   const { camera, size: viewSize } = useThree();
@@ -267,6 +272,16 @@ const WithXRPlane = ({
         )
       : new THREE.Vector3(0, 0, 0)
   );
+  const [meshScale, setMeshScale] = useState(
+    scale
+      ? new THREE.Vector3(
+          scale.x,
+          scale.y,
+
+          scale.z
+        )
+      : new THREE.Vector3(1, 1, 1)
+  );
   const bind = useDrag((state) => {
     const {
       offset: [x, y],
@@ -278,7 +293,7 @@ const WithXRPlane = ({
   useEffect(() => {
     if (meshRef.current) {
       // Make the mesh look at the camera when it is first placed
-      meshRef.current.lookAt(camera.position);
+      if (!!meshRef.current.lookAt) meshRef.current.lookAt(camera.position);
       updateControlMeshPositions();
     }
   }, [camera.position, pos]);
@@ -363,8 +378,34 @@ const WithXRPlane = ({
       const scaleX = meshRef.current.scale.x;
       const scaleY = meshRef.current.scale.y;
       const scaleZ = meshRef.current.scale.z;
-
+      setMeshScale((prevScale) => {
+        return new Vector3(
+          prevScale.x + 0.2,
+          prevScale.y + 0.2,
+          prevScale.z + 0.2
+        );
+      });
       meshRef.current.scale.set(scaleX + 0.2, scaleY + 0.2, scaleZ + 0.2);
+      const selectedModels = [...models];
+      const option = selectedModels.find((s) => s.title === title);
+      if (option) {
+        option.scale = new THREE.Vector3(
+          scaleX + 0.2,
+          scaleY + 0.2,
+          scaleZ + 0.2
+        );
+        saveArrayToLocalStorage(
+          "selectedAROptions",
+          selectedModels.map((m) => ({
+            position: m.position,
+            title: m.title,
+            id: m.id,
+            scale: m.scale,
+          }))
+        );
+        setModels(selectedModels);
+      }
+
       if (plusMeshRef.current) {
         plusMeshRef.current.position.set(
           meshRef.current.position.x + 1,
@@ -394,7 +435,31 @@ const WithXRPlane = ({
       const scaleX = meshRef.current.scale.x;
       const scaleY = meshRef.current.scale.y;
       const scaleZ = meshRef.current.scale.z;
+      setMeshScale(
+        (prevScale) =>
+          new Vector3(prevScale.x - 0.2, prevScale.y - 0.2, prevScale.z - 0.2)
+      );
       meshRef.current.scale.set(scaleX - 0.2, scaleY - 0.2, scaleZ - 0.2);
+      const selectedModels = [...models];
+      const option = selectedModels.find((s) => s.title === title);
+      if (option) {
+        option.scale = new THREE.Vector3(
+          scaleX - 0.2,
+          scaleY - 0.2,
+          scaleZ - 0.2
+        );
+        saveArrayToLocalStorage(
+          "selectedAROptions",
+          selectedModels.map((m) => ({
+            position: m.position,
+            title: m.title,
+            id: m.id,
+            scale: m.scale,
+          }))
+        );
+        setModels(selectedModels);
+      }
+
       if (plusMeshRef.current) {
         plusMeshRef.current.position.set(
           meshRef.current.position.x + 1,
@@ -419,9 +484,23 @@ const WithXRPlane = ({
     }
   };
   const handleClose = () => {
-    setModels((prevModels) =>
-      prevModels.filter((model) => model.component !== component)
-    );
+    setModels((prevModels) => {
+      saveArrayToLocalStorage(
+        "selectedAROptions",
+        prevModels
+          .filter((model) => model.component !== component)
+          .map((m) =>
+            Object.assign({
+              title: m.title,
+              id: m.id,
+              position: m.position,
+              scale: m.scale,
+            })
+          )
+      );
+
+      return prevModels.filter((model) => model.component !== component);
+    });
   };
   const isDraggingRef = useRef(false);
   const handleDragStart = (event: XRInteractionEvent) => {
@@ -446,8 +525,25 @@ const WithXRPlane = ({
 
   const handleRelease = (event: XRInteractionEvent) => {
     // Clean up event listeners when dragging ends
-    isDraggingRef.current = false;
-    setPos(event.intersections[0].point);
+    if (isDraggingRef.current) {
+      setPos(event.intersections[0].point);
+      const selectedModels = [...models];
+      const option = selectedModels.find((s) => s.title === title);
+      if (option) {
+        option.position = event.intersections[0].point;
+        saveArrayToLocalStorage(
+          "selectedAROptions",
+          selectedModels.map((m) => ({
+            position: m.position,
+            title: m.title,
+            id: m.id,
+            scale: m.scale,
+          }))
+        );
+        setModels(selectedModels);
+      }
+      isDraggingRef.current = false;
+    }
   };
 
   const { controllers } = useXR();
@@ -471,7 +567,7 @@ const WithXRPlane = ({
         // Move mesh along the Z-axis based on thumbstick Y movement
         const speedForward = thumbstickY * 0.1;
         if (meshRef.current) {
-          // meshRef.current.position.z -= speedForward; // Adjust mesh position
+          meshRef.current.position.z -= speedForward; // Adjust mesh position
           setPos(
             (prevPos) =>
               new THREE.Vector3(prevPos.x, prevPos.y, prevPos.z - speedForward)
@@ -506,7 +602,9 @@ const WithXRPlane = ({
             position={!!pos ? [pos.x, pos.y, pos.z] : [0, 1, -2]}
             ref={meshRef}
             scale={
-              title === `Runs per over` || title === `Scorecard comparison`
+              !!meshScale
+                ? meshScale
+                : title === `Runs per over` || title === `Scorecard comparison`
                 ? [0.5, 0.5, 0.5]
                 : title === `Field positions` || title === `Wagonwheel`
                 ? [0.1, 0.1, 0.1]

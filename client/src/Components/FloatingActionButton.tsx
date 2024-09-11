@@ -295,7 +295,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
     { title: "Batting Scorecard", key: "Batting Scorecard" },
     { title: "Bowling Scorecard", key: "Bowling Scorecard" },
     { title: "Runs Per Over", key: "Runs per over" },
-    { title: "Scorecard Comparison", key: "Scorecard comparison" },
+    { title: "Scorecard comparison", key: "Scorecard comparison" },
     {
       title: "Wagonwheel",
       key: "Wagonwheel",
@@ -305,7 +305,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
       title: "Fall Of Wickets",
       key: "Fall of wickets",
     },
-    { title: "Field Placements", key: "Field positions" },
+    { title: "Field positions", key: "Field positions" },
     { title: "Video", key: "Video" },
   ];
 

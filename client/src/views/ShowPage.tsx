@@ -63,6 +63,7 @@ export interface Model {
   component: JSX.Element;
   id: number;
   title: string;
+  scale: THREE.Vector3 | undefined;
 }
 // @ts-ignore: Unreachable code error
 HTMLCanvasElement.prototype.getContext = (function (origFn) {
@@ -91,7 +92,7 @@ const ShowPage = () => {
   const [isARMode, setIsARMode] = useState(false);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.Camera | null>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+
   const { matchId = "" } = useParams();
   const [searchParams] = useSearchParams();
   const isLive = searchParams.get("isLive");
@@ -162,34 +163,42 @@ const ShowPage = () => {
   });
   useEffect(() => {
     // Retrieve the array from local storage on component mount
-    // let storedItems = getArrayFromLocalStorage("selectedOptions");
-    // if (storedItems.length === 0) {
-    //   storedItems = [
-    //     {
-    //       name: "Video",
-    //       x: (window.innerWidth - 853) / 2,
-    //       y: (window.innerHeight - 480) / 2,
-    //       width: 853,
-    //       height: 480,
-    //     },
-    //     {
-    //       name: "Match Info",
-    //       x: 0,
-    //       y: 20,
-    //       width: 350,
-    //       height: 680,
-    //     },
-    //     {
-    //       name: "Squad",
-    //       x: window.innerWidth - 350,
-    //       y: 20,
-    //       width: 350,
-    //       height: 680,
-    //     },
-    //   ];
-    // }
-    // setSelection(storedItems);
-    // saveArrayToLocalStorage("selectedOptions", storedItems);
+    let storedItems = getArrayFromLocalStorage("selectedOptions");
+    let storedARItems: Model[] = getArrayFromLocalStorage("selectedAROptions");
+    if (storedItems.length === 0) {
+      storedItems = [
+        {
+          name: "Video",
+          x: (window.innerWidth - 853) / 2,
+          y: (window.innerHeight - 480) / 2,
+          width: 853,
+          height: 480,
+        },
+        {
+          name: "Match Info",
+          x: 0,
+          y: 20,
+          width: 350,
+          height: 680,
+        },
+        {
+          name: "Squad",
+          x: window.innerWidth - 350,
+          y: 20,
+          width: 350,
+          height: 680,
+        },
+      ];
+    }
+    setSelection(storedItems);
+    saveArrayToLocalStorage("selectedOptions", storedItems);
+    if (storedARItems.length > 0) {
+      setModels(
+        storedARItems.map((i) => {
+          return { ...i, component: getARComponent(i.title) };
+        })
+      );
+    }
   }, []);
 
   const {
@@ -251,19 +260,30 @@ const ShowPage = () => {
   const [models, setModels] = useState<Model[]>([]);
   const [shouldShowReticle, setShouldShowReticle] = useState(true);
   const [selectedARComponent, setSelectedARComponent] = useState<string | null>(
-    "Wagonwheel"
+    "Video"
   );
+
   const placeModel = (
     e: XRInteractionEvent,
     component: JSX.Element,
     title: string
   ) => {
     let position = e.intersection?.object.position.clone();
+    let scale = e.intersection?.object.scale.clone();
     let id = Date.now();
-    setModels((prevModels) => [
-      ...prevModels,
-      { position, component, id, title },
-    ]);
+
+    setModels((prevModels) => {
+      saveArrayToLocalStorage("selectedAROptions", [
+        ...prevModels.map((m) => ({
+          position: m.position,
+          title: m.title,
+          id: m.id,
+          scale: m.scale,
+        })),
+        { position, id, title, scale },
+      ]);
+      return [...prevModels, { position, component, id, title, scale }];
+    });
     setShouldShowReticle(false);
   };
   const textureRef = useRef<THREE.VideoTexture | null>(null);
@@ -285,7 +305,7 @@ const ShowPage = () => {
           <MatchInfo
             selections={selections}
             setSelection={setSelection}
-            isARMode={isARMode}
+            isARMode={true}
             data={matchData}
             isLoading={isMatchDataLoading}
             isError={isMatchDataError}
@@ -297,7 +317,7 @@ const ShowPage = () => {
             type="Batting"
             selections={selections}
             setSelection={setSelection}
-            isARMode={isARMode}
+            isARMode={true}
             data={scoresData}
             isLoading={isScoresDataLoading}
             isError={isScoresDataError}
@@ -309,7 +329,7 @@ const ShowPage = () => {
             type="Bowling"
             selections={selections}
             setSelection={setSelection}
-            isARMode={isARMode}
+            isARMode={true}
             data={scoresData}
             isLoading={isScoresDataLoading}
             isError={isScoresDataError}
@@ -320,7 +340,7 @@ const ShowPage = () => {
           <Scorecomparison
             selections={selections}
             setSelection={setSelection}
-            isARMode={isARMode}
+            isARMode={true}
             data={scoresData}
             isLoading={isScoresDataLoading}
             isError={isScoresDataError}
@@ -332,7 +352,7 @@ const ShowPage = () => {
             matchId={matchId ?? ""}
             selections={selections}
             setSelection={setSelection}
-            isARMode={isARMode}
+            isARMode={true}
           />
         );
       case "Video":
@@ -341,7 +361,7 @@ const ShowPage = () => {
             matchData={matchData}
             selections={selections}
             setSelection={setSelection}
-            isARMode={isARMode}
+            isARMode={true}
             texture={textureRef.current}
           />
         );
@@ -350,7 +370,7 @@ const ShowPage = () => {
           <Squad
             selections={selections}
             setSelection={setSelection}
-            isARMode={isARMode}
+            isARMode={true}
             matchData={matchData}
             isMatchDataLoading={isMatchDataLoading}
             isMatchDataError={isMatchDataError}
@@ -365,7 +385,7 @@ const ShowPage = () => {
           <FallOfWickets
             selections={selections}
             setSelection={setSelection}
-            isARMode={isARMode}
+            isARMode={true}
             isLoading={isScoresDataLoading}
             isError={isScoresDataError}
             data={scoresData}
@@ -377,7 +397,7 @@ const ShowPage = () => {
           <FieldPosition
             selections={selections}
             setSelection={setSelection}
-            isARMode={isARMode}
+            isARMode={true}
             fieldPosArr={fieldPositions}
           />
         );
@@ -387,7 +407,7 @@ const ShowPage = () => {
             matchId={matchId ?? ""}
             selections={selections}
             setSelection={setSelection}
-            isARMode={isARMode}
+            isARMode={true}
           />
         );
 
@@ -397,7 +417,7 @@ const ShowPage = () => {
             matchData={matchData}
             selections={selections}
             setSelection={setSelection}
-            isARMode={isARMode}
+            isARMode={true}
             texture={textureRef.current}
           />
         );
@@ -692,12 +712,14 @@ const ShowPage = () => {
             />
           )}
 
-          {models.map(({ position, component, id, title }, i) => (
+          {models.map(({ position, component, id, title, scale }, i) => (
             <WithXRPlane
-              key={`${title}-${i}`}
+              key={`${title}-${id}-${i}`}
               component={component}
               position={position}
+              scale={scale}
               title={title}
+              models={models}
               setModels={setModels}
               image={
                 title === "Squad"
@@ -710,7 +732,7 @@ const ShowPage = () => {
                   ? battingScorecardImage
                   : title === "Bowling Scorecard"
                   ? bowlingScorecardImage
-                  : ""
+                  : matchInfoImage
               }
             />
           ))}
