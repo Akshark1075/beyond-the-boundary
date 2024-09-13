@@ -90,6 +90,7 @@ const ShowPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [isARMode, setIsARMode] = useState(false);
+  const [models, setModels] = useState<Model[]>([]);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.Camera | null>(null);
 
@@ -161,10 +162,34 @@ const ShowPage = () => {
     enabled: !!matchId && !!team2Id,
     staleTime: 30000,
   });
+  const {
+    isLoading: isScoresDataLoading,
+    isError: isScoresDataError,
+    data: scoresData,
+    isSuccess: isScoresDataSuccess,
+  } = useQuery<GetScorecard>({
+    queryKey: [`scoresData-${matchId}`],
+    queryFn: useCallback(() => fetchScorecard(matchId), [matchId]),
+    refetchInterval: isLive === "y" ? 30000 : undefined,
+    // staleTime: 3000,
+  });
+
+  const memoizedmatchData = useMemo(() => matchData, [matchData]);
+  const memoizedTeam1SquadData = useMemo(
+    () => team1SquadData,
+    [team1SquadData]
+  );
+  const memoizedTeam2SquadData = useMemo(
+    () => team2SquadData,
+    [team2SquadData]
+  );
+  const memoizedScoresData = useMemo(() => scoresData, [scoresData]);
+
   useEffect(() => {
     // Retrieve the array from local storage on component mount
     let storedItems = getArrayFromLocalStorage("selectedOptions");
-    let storedARItems: Model[] = getArrayFromLocalStorage("selectedAROptions");
+    let storedARItems: Model[] = [];
+    storedARItems = getArrayFromLocalStorage("selectedAROptions");
     if (storedItems.length === 0) {
       storedItems = [
         {
@@ -192,26 +217,25 @@ const ShowPage = () => {
     }
     setSelection(storedItems);
     saveArrayToLocalStorage("selectedOptions", storedItems);
-    if (storedARItems.length > 0) {
+    if (storedARItems.length > 0 && isARMode) {
+      if (videoRef.current && storedARItems.find((i) => i.title === "Video"))
+        videoRef.current.muted = false;
       setModels(
         storedARItems.map((i) => {
-          return { ...i, component: getARComponent(i.title) };
+          return {
+            ...i,
+            position: new THREE.Vector3(
+              i.position?.x,
+              i.position?.y,
+              i.position?.z
+            ),
+            component: getARComponent(i.title),
+          };
         })
       );
     }
-  }, []);
+  }, [isARMode]);
 
-  const {
-    isLoading: isScoresDataLoading,
-    isError: isScoresDataError,
-    data: scoresData,
-    isSuccess: isScoresDataSuccess,
-  } = useQuery<GetScorecard>({
-    queryKey: [`scoresData-${matchId}`],
-    queryFn: useCallback(() => fetchScorecard(matchId), [matchId]),
-    refetchInterval: isLive === "y" ? 30000 : undefined,
-    // staleTime: 3000,
-  });
   // useQuery<GetScorecard>({
   //   queryKey: [`scoresData-${matchId}`],
   //   queryFn: useCallback(
@@ -224,6 +248,7 @@ const ShowPage = () => {
   // });
 
   const ref = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const [overlayContent, setOverlayContent] = useState<HTMLDivElement | null>(
     null
@@ -257,7 +282,7 @@ const ShowPage = () => {
       }
     }
   }, [isARMode]);
-  const [models, setModels] = useState<Model[]>([]);
+
   const [shouldShowReticle, setShouldShowReticle] = useState(true);
   const [selectedARComponent, setSelectedARComponent] = useState<string | null>(
     "Video"
@@ -268,10 +293,17 @@ const ShowPage = () => {
     component: JSX.Element,
     title: string
   ) => {
-    let position = e.intersection?.object.position.clone();
-    let scale = e.intersection?.object.scale.clone();
+    const position = e.intersection?.object.position.clone();
+    const scale =
+      title === `Runs per over` || title === `Scorecard comparison`
+        ? new THREE.Vector3(0.5, 0.5, 0.5)
+        : title === `Field positions` || title === `Wagonwheel`
+        ? new THREE.Vector3(0.1, 0.1, 0.1)
+        : new THREE.Vector3(1, 1, 1);
     let id = Date.now();
-
+    if (title === "Video" && videoRef.current) {
+      videoRef.current.muted = false;
+    }
     setModels((prevModels) => {
       saveArrayToLocalStorage("selectedAROptions", [
         ...prevModels.map((m) => ({
@@ -288,16 +320,20 @@ const ShowPage = () => {
   };
   const textureRef = useRef<THREE.VideoTexture | null>(null);
   useEffect(() => {
-    const video = document.createElement("video");
-    video.src = "/video.mp4";
-    video.crossOrigin = "anonymous";
-    video.loop = true;
-    video.muted = true;
-    video.controls = false;
-    video.play();
+    if (selectedARComponent === "Video") {
+      const video = document.createElement("video");
+      video.src = "/video.mp4";
+      video.crossOrigin = "anonymous";
+      video.loop = true;
+      video.muted = true;
+      video.autoplay = true;
+      video.controls = false;
+      video.play();
+      videoRef.current = video;
 
-    textureRef.current = new THREE.VideoTexture(video);
-  }, []);
+      textureRef.current = new THREE.VideoTexture(video);
+    }
+  }, [selectedARComponent]);
   const getARComponent = (componentName: string) => {
     switch (componentName) {
       case "Match Info":
@@ -444,9 +480,31 @@ const ShowPage = () => {
   const [bowlingScorecardImage, setBowlingScorecardImage] = useState(
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
   );
-  const matchInfoNode = useMemo(() => {
+  // const matchInfoNode = useMemo(() => {
+  //   const node = document.createElement("div");
+
+  //   node.innerHTML = renderToString(
+  //     <QueryClientProvider client={queryClient}>
+  //       <MatchInfo
+  //         selections={selections}
+  //         setSelection={setSelection}
+  //         isARMode={true}
+  //         data={matchData}
+  //         isLoading={isMatchDataLoading}
+  //         isError={isMatchDataError}
+  //       />
+  //     </QueryClientProvider>
+  //   );
+  //   return node;
+  // }, [isMatchDataSuccess, matchId]);
+
+  const matchInfoNodeRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    // Create the node
     const node = document.createElement("div");
 
+    // Render the content into the node
     node.innerHTML = renderToString(
       <QueryClientProvider client={queryClient}>
         <MatchInfo
@@ -459,15 +517,58 @@ const ShowPage = () => {
         />
       </QueryClientProvider>
     );
-    return node;
-  }, [isMatchDataSuccess, matchId]);
-  const squadNode = useMemo(() => {
+
+    // Store the node in the ref
+    matchInfoNodeRef.current = node;
+  }, [
+    isMatchDataSuccess,
+    matchId,
+    selections,
+    memoizedmatchData,
+    isMatchDataLoading,
+    isMatchDataError,
+    queryClient,
+    setSelection,
+  ]);
+
+  // const squadNode = useMemo(() => {
+  //   const node = document.createElement("div");
+
+  //   node.innerHTML = renderToString(
+  //     <QueryClientProvider client={queryClient}>
+  //       <Squad
+  //         // matchId={matchId ?? ""}
+  //         selections={selections}
+  //         setSelection={setSelection}
+  //         isARMode={true}
+  //         matchData={matchData}
+  //         isMatchDataLoading={isMatchDataLoading}
+  //         isMatchDataError={isMatchDataError}
+  //         isTeam1SquadDataLoading={isTeam1SquadDataLoading}
+  //         isTeam2SquadDataLoading={isTeam2SquadDataLoading}
+  //         team1SquadData={team1SquadData}
+  //         team2SquadData={team2SquadData}
+  //       />
+  //     </QueryClientProvider>
+  //   );
+  //   return node;
+  // }, [
+  //   isMatchDataSuccess,
+  //   isTeam1SquadDataSuccess,
+  //   isTeam2SquadDataSuccess,
+  //   matchId,
+  // ]);
+
+  const squadNodeRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    // Create the node
     const node = document.createElement("div");
 
+    // Render the content into the node
     node.innerHTML = renderToString(
       <QueryClientProvider client={queryClient}>
         <Squad
-          // matchId={matchId ?? ""}
           selections={selections}
           setSelection={setSelection}
           isARMode={true}
@@ -481,16 +582,50 @@ const ShowPage = () => {
         />
       </QueryClientProvider>
     );
-    return node;
+
+    // Store the node in the ref
+    squadNodeRef.current = node;
   }, [
     isMatchDataSuccess,
     isTeam1SquadDataSuccess,
     isTeam2SquadDataSuccess,
     matchId,
+    selections,
+    memoizedmatchData,
+    isMatchDataLoading,
+    isMatchDataError,
+    isTeam1SquadDataLoading,
+    isTeam2SquadDataLoading,
+    memoizedTeam1SquadData,
+    memoizedTeam2SquadData,
+    queryClient,
+    setSelection,
   ]);
-  const fowNode = useMemo(() => {
+
+  // const fowNode = useMemo(() => {
+  //   const node = document.createElement("div");
+
+  //   node.innerHTML = renderToString(
+  //     <QueryClientProvider client={queryClient}>
+  //       <FallOfWickets
+  //         selections={selections}
+  //         setSelection={setSelection}
+  //         isARMode={true}
+  //         isLoading={isScoresDataLoading}
+  //         isError={isScoresDataError}
+  //         data={scoresData}
+  //       />
+  //     </QueryClientProvider>
+  //   );
+  //   return node;
+  // }, [isScoresDataSuccess, matchId]);
+  const fowNodeRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    // Create the node
     const node = document.createElement("div");
 
+    // Render the content into the node
     node.innerHTML = renderToString(
       <QueryClientProvider client={queryClient}>
         <FallOfWickets
@@ -503,16 +638,51 @@ const ShowPage = () => {
         />
       </QueryClientProvider>
     );
-    return node;
-  }, [isScoresDataSuccess, matchId]);
 
-  const battingScorecardNode = useMemo(() => {
+    // Store the node in the ref
+    fowNodeRef.current = node;
+
+    // Optional cleanup
+  }, [
+    isScoresDataSuccess,
+    matchId,
+    selections,
+    isScoresDataLoading,
+    isScoresDataError,
+    memoizedScoresData,
+    queryClient,
+    setSelection,
+  ]);
+
+  // const battingScorecardNode = useMemo(() => {
+  //   const node = document.createElement("div");
+
+  //   node.innerHTML = renderToString(
+  //     <QueryClientProvider client={queryClient}>
+  //       <ScoreCardTable
+  //         type={"Batting"}
+  //         selections={selections}
+  //         setSelection={setSelection}
+  //         isARMode={true}
+  //         data={scoresData}
+  //         isLoading={isScoresDataLoading}
+  //         isError={isScoresDataError}
+  //       />
+  //     </QueryClientProvider>
+  //   );
+  //   return node;
+  // }, [isScoresDataSuccess, matchId]);
+  const battingScorecardNodeRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    // Create the node
     const node = document.createElement("div");
 
+    // Render the content into the node
     node.innerHTML = renderToString(
       <QueryClientProvider client={queryClient}>
         <ScoreCardTable
-          type={"Batting"}
+          type="Batting"
           selections={selections}
           setSelection={setSelection}
           isARMode={true}
@@ -522,16 +692,49 @@ const ShowPage = () => {
         />
       </QueryClientProvider>
     );
-    return node;
-  }, [isScoresDataSuccess, matchId]);
 
-  const bowlingScorecardNode = useMemo(() => {
+    // Store the node in the ref
+    battingScorecardNodeRef.current = node;
+  }, [
+    isScoresDataSuccess,
+    matchId,
+    selections,
+    memoizedScoresData,
+    isScoresDataLoading,
+    isScoresDataError,
+    queryClient,
+    setSelection,
+  ]);
+
+  // const bowlingScorecardNode = useMemo(() => {
+  //   const node = document.createElement("div");
+
+  //   node.innerHTML = renderToString(
+  //     <QueryClientProvider client={queryClient}>
+  //       <ScoreCardTable
+  //         type={"Bowling"}
+  //         selections={selections}
+  //         setSelection={setSelection}
+  //         isARMode={true}
+  //         data={scoresData}
+  //         isLoading={isScoresDataLoading}
+  //         isError={isScoresDataError}
+  //       />
+  //     </QueryClientProvider>
+  //   );
+  //   return node;
+  // }, [isScoresDataSuccess, matchId]);
+  const bowlingScorecardNodeRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    // Create the node
     const node = document.createElement("div");
 
+    // Render the content into the node
     node.innerHTML = renderToString(
       <QueryClientProvider client={queryClient}>
         <ScoreCardTable
-          type={"Bowling"}
+          type="Bowling"
           selections={selections}
           setSelection={setSelection}
           isARMode={true}
@@ -541,147 +744,173 @@ const ShowPage = () => {
         />
       </QueryClientProvider>
     );
-    return node;
-  }, [isScoresDataSuccess, matchId]);
+
+    // Store the node in the ref
+    bowlingScorecardNodeRef.current = node;
+
+    // Optional cleanup
+  }, [
+    isScoresDataSuccess,
+    matchId,
+    selections,
+    memoizedScoresData,
+    isScoresDataLoading,
+    isScoresDataError,
+    queryClient,
+    setSelection,
+  ]);
 
   useEffect(() => {
-    const node = matchInfoNode;
-    if (container) container.appendChild(node);
-    domtoimage
-      .toBlob(node, { bgcolor: "transparent" })
-      .then((blob: Blob | MediaSource | null) => {
+    const node = matchInfoNodeRef.current;
+    if (node) {
+      if (container) container.appendChild(node);
+      domtoimage
+        .toBlob(node, { bgcolor: "transparent" })
+        .then((blob: Blob | MediaSource | null) => {
+          if (container && container.contains(node)) {
+            container.removeChild(node);
+          }
+          if (blob === null) return;
+          if (lastUrl1.current !== null) {
+            URL.revokeObjectURL(lastUrl1.current);
+          }
+          const url = URL.createObjectURL(blob);
+          // @ts-ignore: Unreachable code error
+          lastUrl1.current = url;
+          setMatchInfoImage(url);
+        });
+
+      return () => {
+        // clearTimeout(timer);
         if (container && container.contains(node)) {
           container.removeChild(node);
         }
-        if (blob === null) return;
-        if (lastUrl1.current !== null) {
-          URL.revokeObjectURL(lastUrl1.current);
-        }
-        const url = URL.createObjectURL(blob);
-        // @ts-ignore: Unreachable code error
-        lastUrl1.current = url;
-        setMatchInfoImage(url);
-      });
-
-    return () => {
-      // clearTimeout(timer);
-      if (container && container.contains(node)) {
-        container.removeChild(node);
-      }
-    };
-  }, [isMatchDataSuccess, matchId]);
+      };
+    }
+  }, [isMatchDataSuccess, matchId, memoizedmatchData]);
   useEffect(() => {
-    const node = squadNode;
-    if (container) container.appendChild(node);
-    domtoimage
-      .toBlob(node, { bgcolor: "transparent" })
-      .then((blob: Blob | MediaSource | null) => {
+    const node = squadNodeRef.current;
+    if (node) {
+      if (container) container.appendChild(node);
+      domtoimage
+        .toBlob(node, { bgcolor: "transparent" })
+        .then((blob: Blob | MediaSource | null) => {
+          if (container && container.contains(node)) {
+            container.removeChild(node);
+          }
+          if (blob === null) return;
+          if (lastUrl2.current !== null) {
+            URL.revokeObjectURL(lastUrl2.current);
+          }
+          const url = URL.createObjectURL(blob);
+          // @ts-ignore: Unreachable code error
+          lastUrl2.current = url;
+          setSquadImage(url);
+        });
+
+      return () => {
+        // clearTimeout(timer);
         if (container && container.contains(node)) {
           container.removeChild(node);
         }
-        if (blob === null) return;
-        if (lastUrl2.current !== null) {
-          URL.revokeObjectURL(lastUrl2.current);
-        }
-        const url = URL.createObjectURL(blob);
-        // @ts-ignore: Unreachable code error
-        lastUrl2.current = url;
-        setSquadImage(url);
-      });
-
-    return () => {
-      // clearTimeout(timer);
-      if (container && container.contains(node)) {
-        container.removeChild(node);
-      }
-    };
+      };
+    }
   }, [
     isMatchDataSuccess,
     isTeam1SquadDataSuccess,
     isTeam2SquadDataSuccess,
     matchId,
+    memoizedmatchData,
+    memoizedTeam1SquadData,
+    memoizedTeam2SquadData,
   ]);
 
   useEffect(() => {
-    const node = fowNode;
-    if (container) container.appendChild(node);
-    domtoimage
-      .toBlob(node, { bgcolor: "transparent" })
-      .then((blob: Blob | MediaSource | null) => {
+    const node = fowNodeRef.current;
+    if (node) {
+      if (container) container.appendChild(node);
+      domtoimage
+        .toBlob(node, { bgcolor: "transparent" })
+        .then((blob: Blob | MediaSource | null) => {
+          if (container && container.contains(node)) {
+            container.removeChild(node);
+          }
+          if (blob === null) return;
+          if (lastUrl3.current !== null) {
+            URL.revokeObjectURL(lastUrl3.current);
+          }
+          const url = URL.createObjectURL(blob);
+          // @ts-ignore: Unreachable code error
+          lastUrl3.current = url;
+          setFowImage(url);
+        });
+
+      return () => {
+        // clearTimeout(timer);
         if (container && container.contains(node)) {
           container.removeChild(node);
         }
-        if (blob === null) return;
-        if (lastUrl3.current !== null) {
-          URL.revokeObjectURL(lastUrl3.current);
-        }
-        const url = URL.createObjectURL(blob);
-        // @ts-ignore: Unreachable code error
-        lastUrl3.current = url;
-        setFowImage(url);
-      });
-
-    return () => {
-      // clearTimeout(timer);
-      if (container && container.contains(node)) {
-        container.removeChild(node);
-      }
-    };
-  }, [isScoresDataSuccess, matchId]);
+      };
+    }
+  }, [isScoresDataSuccess, matchId, memoizedScoresData]);
 
   useEffect(() => {
-    const node = battingScorecardNode;
-    if (container) container.appendChild(node);
-    domtoimage
-      .toBlob(node, { bgcolor: "transparent" })
-      .then((blob: Blob | MediaSource | null) => {
+    const node = battingScorecardNodeRef.current;
+    if (node) {
+      if (container) container.appendChild(node);
+      domtoimage
+        .toBlob(node, { bgcolor: "transparent" })
+        .then((blob: Blob | MediaSource | null) => {
+          if (container && container.contains(node)) {
+            container.removeChild(node);
+          }
+          if (blob === null) return;
+          if (lastUrl4.current !== null) {
+            URL.revokeObjectURL(lastUrl4.current);
+          }
+          const url = URL.createObjectURL(blob);
+          // @ts-ignore: Unreachable code error
+          lastUrl4.current = url;
+          setBattingScorecardImage(url);
+        });
+
+      return () => {
+        // clearTimeout(timer);
         if (container && container.contains(node)) {
           container.removeChild(node);
         }
-        if (blob === null) return;
-        if (lastUrl4.current !== null) {
-          URL.revokeObjectURL(lastUrl4.current);
-        }
-        const url = URL.createObjectURL(blob);
-        // @ts-ignore: Unreachable code error
-        lastUrl4.current = url;
-        setBattingScorecardImage(url);
-      });
-
-    return () => {
-      // clearTimeout(timer);
-      if (container && container.contains(node)) {
-        container.removeChild(node);
-      }
-    };
-  }, [isScoresDataSuccess, matchId]);
+      };
+    }
+  }, [isScoresDataSuccess, matchId, memoizedScoresData]);
 
   useEffect(() => {
-    const node = bowlingScorecardNode;
-    if (container) container.appendChild(node);
-    domtoimage
-      .toBlob(node, { bgcolor: "transparent" })
-      .then((blob: Blob | MediaSource | null) => {
+    const node = bowlingScorecardNodeRef.current;
+    if (node) {
+      if (container) container.appendChild(node);
+      domtoimage
+        .toBlob(node, { bgcolor: "transparent" })
+        .then((blob: Blob | MediaSource | null) => {
+          if (container && container.contains(node)) {
+            container.removeChild(node);
+          }
+          if (blob === null) return;
+          if (lastUrl5.current !== null) {
+            URL.revokeObjectURL(lastUrl5.current);
+          }
+          const url = URL.createObjectURL(blob);
+          // @ts-ignore: Unreachable code error
+          lastUrl5.current = url;
+          setBowlingScorecardImage(url);
+        });
+
+      return () => {
+        // clearTimeout(timer);
         if (container && container.contains(node)) {
           container.removeChild(node);
         }
-        if (blob === null) return;
-        if (lastUrl5.current !== null) {
-          URL.revokeObjectURL(lastUrl5.current);
-        }
-        const url = URL.createObjectURL(blob);
-        // @ts-ignore: Unreachable code error
-        lastUrl5.current = url;
-        setBowlingScorecardImage(url);
-      });
-
-    return () => {
-      // clearTimeout(timer);
-      if (container && container.contains(node)) {
-        container.removeChild(node);
-      }
-    };
-  }, [isScoresDataSuccess, matchId]);
+      };
+    }
+  }, [isScoresDataSuccess, matchId, memoizedScoresData]);
 
   return (
     <>
@@ -734,6 +963,7 @@ const ShowPage = () => {
                   ? bowlingScorecardImage
                   : matchInfoImage
               }
+              videoRef={videoRef}
             />
           ))}
           {isARMode && (
@@ -936,8 +1166,7 @@ const ShowPage = () => {
           </Box>
         </Box>
       )}
-      {
-        // <XRButton
+      {!isMobile && (
         <ARButton
           sessionInit={{
             requiredFeatures: ["hit-test"],
@@ -948,9 +1177,8 @@ const ShowPage = () => {
                 }
               : undefined,
           }}
-          // mode={"AR"}
         />
-      }
+      )}
     </>
   );
 };

@@ -64,7 +64,7 @@ const MatchInfoComponent = ({
                       sx={{
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-
+                        textAlign: "center",
                         fontWeight: "800",
                       }}
                     >
@@ -77,7 +77,7 @@ const MatchInfoComponent = ({
                       sx={{
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-
+                        textAlign: "center",
                         fontWeight: "800",
                       }}
                     >
@@ -92,7 +92,7 @@ const MatchInfoComponent = ({
                       sx={{
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-
+                        textAlign: "center",
                         fontWeight: "800",
                       }}
                     >
@@ -105,7 +105,7 @@ const MatchInfoComponent = ({
                       sx={{
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-
+                        textAlign: "center",
                         fontWeight: "800",
                       }}
                     >
@@ -125,7 +125,7 @@ const MatchInfoComponent = ({
                       sx={{
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-
+                        textAlign: "center",
                         fontWeight: "800",
                       }}
                     >
@@ -138,7 +138,7 @@ const MatchInfoComponent = ({
                       sx={{
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-
+                        textAlign: "center",
                         fontWeight: "800",
                       }}
                     >
@@ -153,7 +153,7 @@ const MatchInfoComponent = ({
                       sx={{
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-
+                        textAlign: "center",
                         fontWeight: "800",
                       }}
                     >
@@ -166,7 +166,7 @@ const MatchInfoComponent = ({
                       sx={{
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-
+                        textAlign: "center",
                         fontWeight: "800",
                       }}
                     >
@@ -183,7 +183,7 @@ const MatchInfoComponent = ({
                       sx={{
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-
+                        textAlign: "center",
                         fontWeight: "800",
                       }}
                     >
@@ -196,7 +196,7 @@ const MatchInfoComponent = ({
                       sx={{
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-
+                        textAlign: "center",
                         fontWeight: "800",
                       }}
                     >
@@ -216,7 +216,7 @@ const MatchInfoComponent = ({
                       sx={{
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-
+                        textAlign: "center",
                         fontWeight: "800",
                       }}
                     >
@@ -229,7 +229,7 @@ const MatchInfoComponent = ({
                       sx={{
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-
+                        textAlign: "center",
                         fontWeight: "800",
                       }}
                     >
@@ -248,7 +248,7 @@ const MatchInfoComponent = ({
                       sx={{
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-
+                        textAlign: "center",
                         fontWeight: "800",
                       }}
                     >
@@ -261,7 +261,7 @@ const MatchInfoComponent = ({
                       sx={{
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-
+                        textAlign: "center",
                         fontWeight: "800",
                       }}
                     >
@@ -278,7 +278,7 @@ const MatchInfoComponent = ({
                       sx={{
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-
+                        textAlign: "center",
                         fontWeight: "800",
                       }}
                     >
@@ -291,7 +291,7 @@ const MatchInfoComponent = ({
                       sx={{
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-
+                        textAlign: "center",
                         fontWeight: "800",
                       }}
                     >
@@ -308,7 +308,7 @@ const MatchInfoComponent = ({
                       sx={{
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-
+                        textAlign: "center",
                         fontWeight: "800",
                       }}
                     >
@@ -323,7 +323,7 @@ const MatchInfoComponent = ({
                       sx={{
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-
+                        textAlign: "center",
                         fontWeight: "800",
                       }}
                     >
@@ -344,7 +344,7 @@ const MatchInfoComponent = ({
                       sx={{
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-
+                        textAlign: "center",
                         fontWeight: "800",
                       }}
                     >
@@ -359,7 +359,7 @@ const MatchInfoComponent = ({
                       sx={{
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-
+                        textAlign: "center",
                         fontWeight: "800",
                       }}
                     >

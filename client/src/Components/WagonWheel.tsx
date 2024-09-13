@@ -1,4 +1,10 @@
-import React, { useCallback, useContext, useEffect, useRef } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import * as THREE from "three";
 import WithTitleBar from "./WithTitleBar";
 import { DraggableEvent } from "react-draggable";
@@ -25,6 +31,7 @@ import { GetScorecard } from "../types/getScorecard";
 import { useQuery } from "@tanstack/react-query";
 import fetchWithRetry from "../api/fetch";
 import { PositionContext } from "./PlaneWithContent";
+import { Text } from "@react-three/drei";
 
 interface WagonWheelProps {
   scores: {
@@ -158,16 +165,18 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ scores, width, height }) => {
   return <div ref={mountRef} />;
 };
 
-const WagonWheelWrapper = ({
+const WagWheel = ({
   matchId,
   selections,
   setSelection,
   isARMode,
+  arPos,
 }: {
   matchId: string;
   selections: SelectedOption[];
   setSelection: (option: SelectedOption[]) => void;
   isARMode: boolean;
+  arPos?: THREE.Vector3;
 }) => {
   const { x: randomX, y: randomY } = getRandomCoordinates();
   const storedWagonWheel = selections.find((s) => s.name === `Wagonwheel`);
@@ -242,7 +251,7 @@ const WagonWheelWrapper = ({
   };
   const [team, setTeam] = React.useState(0);
   const [player, setPlayer] = React.useState("");
-  const { isLoading, error, data } = useQuery<GetScorecard>({
+  const { isLoading, error, data, isSuccess } = useQuery<GetScorecard>({
     queryKey: [`scoresData-${matchId}`],
     queryFn: useCallback(() => fetchOvers(matchId), [matchId]),
   });
@@ -260,7 +269,45 @@ const WagonWheelWrapper = ({
   const teamBatters = Object.values(
     data?.scoreCard[team]?.batTeamDetails.batsmenData ?? {}
   );
-  const position = useContext(PositionContext);
+  const randomOnesAngles = useMemo(() => {
+    if (!teamBatters || teamBatters?.length === 0) return [];
+    return Array.from(
+      { length: teamBatters[0]?.ones },
+      () => Math.random() * Math.PI * 2
+    );
+  }, [isSuccess]);
+
+  const randomTwosAngles = useMemo(() => {
+    if (!teamBatters || teamBatters?.length === 0) return [];
+    return Array.from(
+      { length: teamBatters[0]?.twos },
+      () => Math.random() * Math.PI * 2
+    );
+  }, [isSuccess]);
+
+  const randomThreesAngles = useMemo(() => {
+    if (!teamBatters || teamBatters?.length === 0) return [];
+    return Array.from(
+      { length: teamBatters[0]?.threes },
+      () => Math.random() * Math.PI * 2
+    );
+  }, [isSuccess]);
+
+  const randomFoursAngles = useMemo(() => {
+    if (!teamBatters || teamBatters?.length === 0) return [];
+    return Array.from(
+      { length: teamBatters[0]?.fours },
+      () => Math.random() * Math.PI * 2
+    );
+  }, [isSuccess]);
+
+  const randomSixesAngles = useMemo(() => {
+    if (!teamBatters || teamBatters?.length === 0) return [];
+    return Array.from(
+      { length: teamBatters[0]?.sixers },
+      () => Math.random() * Math.PI * 2
+    );
+  }, [isSuccess]);
   const Circle = ({
     radius,
     color,
@@ -278,179 +325,204 @@ const WagonWheelWrapper = ({
     );
   };
 
+  // const DrawLines = ({
+  //   count,
+  //   length,
+  //   color,
+  //   lineWidth,
+  //   angleOffset,
+  //   angleRange,
+  //   position,
+  // }: {
+  //   count: number;
+  //   length: number;
+  //   color: number;
+  //   lineWidth: number;
+  //   angleOffset: number;
+  //   angleRange: number;
+  //   position?: THREE.Vector3;
+  // }) => {
+  //   // Memoize the lines so they are only recalculated when the dependencies change
+  //   const lines = useMemo(() => {
+  //     const generatedLines = [];
+  //     for (let i = 0; i < count; i++) {
+  //       const angle = angleOffset + Math.random() * angleRange; // Memoized random angle
+  //       const x = length * Math.cos(angle);
+  //       const y = length * Math.sin(angle);
+
+  //       const points = position
+  //         ? [
+  //             new THREE.Vector3(position.x, position.y, position.z + 0.2),
+  //             new THREE.Vector3(position.x + x, position.y + y, position.z),
+  //           ]
+  //         : [];
+
+  //       const tubeGeometry = new THREE.TubeGeometry(
+  //         new THREE.CatmullRomCurve3(points),
+  //         512, // Path segments
+  //         0.04, // Thickness
+  //         8, // Roundness of Tube
+  //         false // Closed
+  //       );
+
+  //       const material = new THREE.LineBasicMaterial({
+  //         color,
+  //         linewidth: lineWidth,
+  //       });
+
+  //       const line = new THREE.Line(tubeGeometry, material);
+  //       generatedLines.push(line);
+  //     }
+  //     return generatedLines;
+  //   }, [count, length, color, lineWidth, angleOffset, angleRange, position]); // Dependencies
+
+  //   return (
+  //     <>
+  //       {lines.map((line, index) => (
+  //         <primitive key={index} object={line} />
+  //       ))}
+  //     </>
+  //   );
+  // };
+
   const DrawLines = ({
-    count,
     length,
     color,
-    lineWidth,
-    angleOffset,
-    angleRange,
+    meshType, // Add a meshType to define the shape
     position,
+    angles,
   }: {
-    count: number;
     length: number;
     color: number;
-    lineWidth: number;
-    angleOffset: number;
-    angleRange: number;
-    position: THREE.Vector3;
+    meshType?: string; // You can pass the type of mesh (box, sphere, etc.)
+    position?: THREE.Vector3;
+    angles: number[];
   }) => {
-    const drawLines = () => {
-      const lines = [];
-      for (let i = 0; i < count; i++) {
-        const angle = angleOffset + Math.random() * angleRange;
+    // Memoize the meshes so they are only recalculated when the dependencies change
+    const meshes = useMemo(() => {
+      const generatedMeshes = [];
+
+      for (let i = 0; i < angles.length; i++) {
+        const angle = angles[i] * Math.PI * 2; // Random angle
         const x = length * Math.cos(angle);
         const y = length * Math.sin(angle);
 
-        const points = [
-          position
-            ? new THREE.Vector3(position.x, position.y, position.z + 0.2)
-            : new THREE.Vector3(0, 1, 0.2),
-          position
-            ? new THREE.Vector3(position.x + x, position.y + y, position.z)
-            : new THREE.Vector3(x, y, 0),
-        ];
+        // Choose geometry based on meshType
+        let geometry;
+        if (meshType === "box") {
+          geometry = new THREE.BoxGeometry(1, 1, 1); // Example for box
+        } else if (meshType === "sphere") {
+          geometry = new THREE.SphereGeometry(0.5, 16, 16); // Example for sphere
+        } else {
+          // Default to tube geometry
+          const points = [
+            new THREE.Vector3(0, 1, 0), // Start at origin
+            new THREE.Vector3(x, y, 0), // End at calculated position
+          ];
+          geometry = new THREE.TubeGeometry(
+            new THREE.CatmullRomCurve3(points),
+            512,
+            0.04,
+            8,
+            false
+          );
+        }
 
-        // const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        var tubeGeometry = new THREE.TubeGeometry(
-          new THREE.CatmullRomCurve3(points),
-          512, // path segments
-          0.04, // THICKNESS
-          8, //Roundness of Tube
-          false //closed
-        );
-        const material = new THREE.LineBasicMaterial({
+        const material = new THREE.MeshBasicMaterial({
           color,
-
-          linewidth: lineWidth,
         });
-        const line = new THREE.Line(tubeGeometry, material);
-        lines.push(line);
+
+        // Create the mesh
+        const mesh = new THREE.Mesh(geometry, material);
+        generatedMeshes.push(mesh);
       }
-      return lines;
-    };
+
+      return generatedMeshes;
+    }, [angles, length, color, meshType]); // Position is no longer a dependency
 
     return (
-      <>
-        {drawLines().map((line, index) => (
-          <primitive key={index} object={line} />
+      <group position={position || new THREE.Vector3(0, 0, 0)}>
+        {" "}
+        {/* Apply group position here */}
+        {meshes.map((mesh, index) => (
+          <primitive key={index} object={mesh} />
         ))}
-      </>
+      </group>
     );
   };
 
+  // const wagonWheelRef = useRef(position);
+  // useEffect(() => {
+  //   wagonWheelRef.current = position;
+  // }, [position]);
   return isARMode ? (
-    <mesh
-      position={!!position ? [position?.x, position?.y, position.z] : [0, 0, 0]}
-    >
+    <>
+      <mesh>
+        <planeGeometry args={[20, 20]} />
+        <meshBasicMaterial transparent={true} color={"none"} opacity={0} />
+      </mesh>
+      {/* <Text
+        position={arPos ? [arPos.x, arPos.y + 9, arPos.z] : undefined}
+        fontSize={0.5}
+        color="white"
+        fontWeight="bold"
+      >
+        WagonWheel
+      </Text> */}
+
       <DrawLines
-        count={teamBatters[0]?.ones ?? 0}
         length={2}
         color={0x800080}
-        lineWidth={0.3}
-        angleOffset={0}
-        angleRange={Math.PI * 2}
-        position={
-          position
-            ? new THREE.Vector3(position.x, position.y, position.z - 1.5)
-            : new THREE.Vector3(0, 0, -1.5)
-        }
-
-        // Position in AR space
+        angles={randomOnesAngles}
+        position={arPos}
       />
       <DrawLines
-        count={teamBatters[0]?.twos ?? 0}
+        angles={randomTwosAngles}
         length={3}
         color={0x8b4513}
-        lineWidth={0.3}
-        angleOffset={0}
-        angleRange={Math.PI * 2}
-        position={
-          position
-            ? new THREE.Vector3(position.x, position.y, position.z - 1.5)
-            : new THREE.Vector3(0, 0, -1.5)
-        }
+        position={new THREE.Vector3(arPos?.x, arPos?.y, arPos?.z)}
       />
       <DrawLines
-        count={teamBatters[0]?.threes ?? 0}
         length={6}
         color={0xffff00}
-        lineWidth={0.3}
-        angleOffset={0}
-        angleRange={Math.PI * 2}
-        position={
-          position
-            ? new THREE.Vector3(position.x, position.y, position.z - 1.5)
-            : new THREE.Vector3(0, 0, -1.5)
-        }
+        angles={randomThreesAngles}
+        position={new THREE.Vector3(arPos?.x, arPos?.y, arPos?.z)}
       />
       <DrawLines
-        count={teamBatters[0]?.fours ?? 0}
-        length={8.5}
+        length={8}
         color={0xffffff}
-        lineWidth={0.3}
-        angleOffset={0}
-        angleRange={Math.PI * 2}
-        position={
-          position
-            ? new THREE.Vector3(position.x, position.y, position.z - 1.5)
-            : new THREE.Vector3(0, 0, -1.5)
-        }
+        angles={randomFoursAngles}
+        position={new THREE.Vector3(arPos?.x, arPos?.y, arPos?.z)}
       />
       <DrawLines
-        count={teamBatters[0]?.sixes ?? 0}
         length={9}
         color={0xff0000}
-        lineWidth={0.3}
-        angleOffset={0}
-        angleRange={Math.PI * 2}
-        position={
-          position
-            ? new THREE.Vector3(position.x, position.y, position.z - 1.5)
-            : new THREE.Vector3(0, 0, -1.5)
-        }
+        angles={randomSixesAngles}
+        position={new THREE.Vector3(arPos?.x, arPos?.y, arPos?.z)}
       />
       <Circle
         radius={8}
         color="green"
         position={
-          position
-            ? new THREE.Vector3(position.x, position.y, position.z - 0.5)
-            : new THREE.Vector3(0, 0, -0.5)
+          arPos ? new THREE.Vector3(arPos.x, arPos.y, arPos.z + 0.2) : undefined
         }
       />
 
       {/* Pitch in the center */}
-      <mesh
-        position={
-          position
-            ? new THREE.Vector3(position.x, position.y, position.z - 0.1)
-            : new THREE.Vector3(0, 0, 0.1)
-        }
-      >
-        <boxGeometry args={[0.5, 2, -0.01]} />
+      <mesh position={new THREE.Vector3(arPos?.x, arPos?.y, arPos?.z)}>
+        <planeGeometry args={[0.5, 2]} />
         <meshBasicMaterial color="saddlebrown" />
       </mesh>
       <Circle
         radius={3}
         color="white"
         position={
-          position
-            ? new THREE.Vector3(position.x, position.y, position.z - 1.1)
-            : new THREE.Vector3(0, 0, -1.1)
+          arPos ? new THREE.Vector3(arPos.x, arPos.y, arPos.z - 0.1) : undefined
         }
       />
 
-      <Circle
-        radius={9}
-        color="red"
-        position={
-          position
-            ? new THREE.Vector3(position.x, position.y, position.z - 1)
-            : new THREE.Vector3(0, 0, -1)
-        }
-      />
-    </mesh>
+      {/* <Circle radius={9} color="red" position={new THREE.Vector3(0, 0, 0)} /> */}
+    </>
   ) : isMobile ? (
     <div
       style={{
@@ -647,6 +719,28 @@ const WagonWheelWrapper = ({
         </WithTitleBar>
       </div>
     </Rnd>
+  );
+};
+const WagonWheelWrapper = ({
+  matchId,
+  selections,
+  setSelection,
+  isARMode,
+}: {
+  matchId: string;
+  selections: SelectedOption[];
+  setSelection: (option: SelectedOption[]) => void;
+  isARMode: boolean;
+}) => {
+  const arPos = useContext(PositionContext);
+  return (
+    <WagWheel
+      matchId={matchId}
+      selections={selections}
+      setSelection={setSelection}
+      isARMode={isARMode}
+      arPos={arPos}
+    />
   );
 };
 export default WagonWheelWrapper;

@@ -87,6 +87,7 @@ const SpinningWheel: React.FC<SpinningWheelProps> = ({ components }) => {
 
   const handleInteractionStart = (startEvent: MouseEvent | TouchEvent) => {
     startEvent.preventDefault();
+    startEvent.stopPropagation();
 
     const isTouchEvent = startEvent.type === "touchstart";
     const startY = isTouchEvent

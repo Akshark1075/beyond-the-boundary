@@ -392,7 +392,6 @@ const BattingScorecard = ({
       </TableContainer>
     );
   };
-  console.log(isARMode, "ar");
   return isMobile || isARMode ? (
     <div
       style={{
@@ -815,7 +814,7 @@ const BowlingScorecard = ({
     >
       <AppBar
         position="static"
-        style={{ background: "#303036" }}
+        style={{ background: "#303036", color: "white" }}
         className="grow"
       >
         <Toolbar variant="dense" className="px-2 min-h-8">
@@ -827,7 +826,7 @@ const BowlingScorecard = ({
           </Typography>
         </Toolbar>
       </AppBar>
-      {/* <BowlingScorecardComponent /> */}
+      <BowlingScorecardComponent />
     </div>
   ) : (
     <Rnd
@@ -840,7 +839,10 @@ const BowlingScorecard = ({
       bounds="window"
       key={row.bowlTeamDetails.bowlTeamName}
     >
-      <div ref={componentRef} style={{ overflow: "scroll" }}>
+      <div
+        ref={componentRef}
+        style={{ width: width, height: height, overflow: "auto" }}
+      >
         <WithTitleBar
           title={`Bowling Scorecard ${row.inningsId}`}
           width={componentRef.current?.getBoundingClientRect().width ?? width}

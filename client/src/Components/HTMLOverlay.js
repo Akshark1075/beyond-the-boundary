@@ -111,10 +111,44 @@ export default function Html({
   );
 }
 const HTMLContent = ({ width, height, texture }) => {
+  const darkenShader = {
+    uniforms: {
+      map: { value: texture },
+      darkenAmount: { value: 1.3 }, // Adjust this value to change how dark the texture is
+    },
+    vertexShader: `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform sampler2D map;
+      uniform float darkenAmount;
+      varying vec2 vUv;
+      void main() {
+        vec4 color = texture2D(map, vUv);
+        color.rgb *= darkenAmount; // Darken the texture
+        gl_FragColor = color;
+      }
+    `,
+  };
   return (
     <mesh>
       <planeGeometry args={[width, height]} />
-      <meshBasicMaterial map={texture} side={THREE.DoubleSide} transparent />
+      {/* <meshBasicMaterial
+        map={texture}
+        side={THREE.DoubleSide}
+        transparent
+        color={"white"}
+      /> */}
+      <shaderMaterial
+        attach="material"
+        args={[darkenShader]}
+        side={THREE.DoubleSide}
+        transparent
+      />
     </mesh>
   );
 };

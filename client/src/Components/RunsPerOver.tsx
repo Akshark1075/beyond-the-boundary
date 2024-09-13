@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useMemo } from "react";
+import { useCallback, useContext, useMemo } from "react";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -31,6 +31,7 @@ import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
 import fetchWithRetry from "../api/fetch";
 import ARBarGraph from "./ARBarGraph";
 import { Box } from "@react-three/drei";
+import { PositionContext } from "./PlaneWithContent";
 
 ChartJS.register(
   CategoryScale,
@@ -62,6 +63,8 @@ const RunsPerOver = React.memo(
     setSelection: (option: SelectedOption[]) => void;
     isARMode: boolean;
   }) => {
+    const arPos = useContext(PositionContext);
+
     const { isLoading, error, data } = useQuery<GetScorecard>({
       queryKey: [`scoresData-${matchId}`],
       queryFn: useCallback(() => fetchOvers(matchId), [matchId]),
@@ -223,7 +226,7 @@ const RunsPerOver = React.memo(
     if ((isLoading || error) && isARMode) return <Box></Box>;
 
     return isARMode ? (
-      <ARBarGraph data={chartData.datasets[0].data} />
+      <ARBarGraph data={chartData.datasets[0].data} position={arPos} />
     ) : isMobile ? (
       <Card
         style={{

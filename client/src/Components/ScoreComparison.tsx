@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useCallback } from "react";
+import { useCallback, useContext, useEffect, useRef } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -30,6 +30,7 @@ import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
 import fetchWithRetry from "../api/fetch";
 import ARLineGraph from "./ARLineGraph";
 import { Box } from "@react-three/drei";
+import { PositionContext } from "./PlaneWithContent";
 
 ChartJS.register(
   CategoryScale,
@@ -56,6 +57,7 @@ const Scorecomparison = ({
   isLoading: boolean;
   isError: boolean;
 }) => {
+  const arPos = useContext(PositionContext);
   const { x: randomX, y: randomY } = getRandomCoordinates();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -89,6 +91,29 @@ const Scorecomparison = ({
       return score;
     });
   }
+
+  const team1ScoreRef = useRef(
+    generateRandomArray(
+      Math.floor(data?.scoreCard[0]?.scoreDetails?.overs ?? 0),
+      data?.scoreCard[0]?.scoreDetails?.runs ?? 0
+    )
+  );
+  const team2ScoreRef = useRef(
+    generateRandomArray(
+      Math.floor(data?.scoreCard[1]?.scoreDetails?.overs ?? 0),
+      data?.scoreCard[1]?.scoreDetails?.runs ?? 0
+    )
+  );
+  useEffect(() => {
+    team1ScoreRef.current = generateRandomArray(
+      Math.floor(data?.scoreCard[0]?.scoreDetails?.overs ?? 0),
+      data?.scoreCard[0]?.scoreDetails?.runs ?? 0
+    );
+    team2ScoreRef.current = generateRandomArray(
+      Math.floor(data?.scoreCard[1]?.scoreDetails?.overs ?? 0),
+      data?.scoreCard[1]?.scoreDetails?.runs ?? 0
+    );
+  }, [data]);
   const chartData = {
     labels: Array.from(
       {
@@ -103,19 +128,13 @@ const Scorecomparison = ({
     datasets: [
       {
         label: data?.scoreCard[0]?.batTeamDetails.batTeamName ?? "Team 1",
-        data: generateRandomArray(
-          Math.floor(data?.scoreCard[0]?.scoreDetails?.overs ?? 0),
-          data?.scoreCard[0]?.scoreDetails?.runs ?? 0
-        ), // Y-axis data
+        data: team1ScoreRef.current, // Y-axis data
         borderColor: "rgba(75, 192, 192, 1)",
         backgroundColor: "rgba(75, 192, 192, 0.2)",
       },
       {
         label: data?.scoreCard[1]?.batTeamDetails.batTeamName ?? "Team 2",
-        data: generateRandomArray(
-          Math.floor(data?.scoreCard[1]?.scoreDetails?.overs ?? 0),
-          data?.scoreCard[1]?.scoreDetails?.runs ?? 0
-        ), // Y-axis data
+        data: team2ScoreRef.current, // Y-axis data
         borderColor: "rgba(255, 192, 192, 1)",
         backgroundColor: "rgba(255, 192, 192, 0.2)",
       },
@@ -217,7 +236,10 @@ const Scorecomparison = ({
   if ((isLoading || isError) && isARMode) return <Box></Box>;
 
   return isARMode ? (
-    <ARLineGraph data={chartData.datasets} />
+    <ARLineGraph
+      data={chartData.datasets}
+      position={[arPos?.x, arPos?.y, arPos?.z]}
+    />
   ) : isMobile ? (
     <div
       style={{

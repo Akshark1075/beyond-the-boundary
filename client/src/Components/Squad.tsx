@@ -61,7 +61,7 @@ const SquadComponent = ({
                   sx={{
                     overflow: "hidden",
                     textOverflow: "ellipsis",
-
+                    textAlign: "center",
                     fontWeight: "900",
                   }}
                 >
@@ -74,7 +74,7 @@ const SquadComponent = ({
                   sx={{
                     overflow: "hidden",
                     textOverflow: "ellipsis",
-
+                    textAlign: "center",
                     fontWeight: "900",
                   }}
                 >
@@ -162,7 +162,7 @@ const SquadComponent = ({
                             sx={{
                               overflow: "hidden",
                               textOverflow: "ellipsis",
-
+                              textAlign: "center",
                               fontWeight: "800",
                             }}
                           >
@@ -174,6 +174,7 @@ const SquadComponent = ({
                             sx={{
                               overflow: "hidden",
                               textOverflow: "ellipsis",
+                              textAlign: "center",
                             }}
                           >
                             {team1SquadData?.players["playing XI"][i].role ??
@@ -188,7 +189,7 @@ const SquadComponent = ({
                             sx={{
                               overflow: "hidden",
                               textOverflow: "ellipsis",
-
+                              textAlign: "center",
                               fontWeight: "800",
                             }}
                           >
@@ -199,6 +200,7 @@ const SquadComponent = ({
                             sx={{
                               overflow: "hidden",
                               textOverflow: "ellipsis",
+                              textAlign: "center",
                             }}
                           >
                             {team2SquadData?.players["playing XI"][i].role ??

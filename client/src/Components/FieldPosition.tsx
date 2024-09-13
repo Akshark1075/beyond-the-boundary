@@ -10,19 +10,22 @@ import { AppBar, Toolbar, Typography, useMediaQuery } from "@mui/material";
 
 import { useTheme } from "@mui/material/styles";
 import { PositionContext } from "./PlaneWithContent";
+import { BufferGeometry, Mesh } from "three";
 
 interface FieldPositionProps {
   selections: SelectedOption[];
   setSelection: (option: SelectedOption[]) => void;
   isARMode: boolean;
   fieldPosArr: number[][];
+  arPos?: THREE.Vector3;
 }
 
-const FieldPosition: React.FC<FieldPositionProps> = ({
+const FieldPos: React.FC<FieldPositionProps> = ({
   selections,
   setSelection,
   isARMode,
   fieldPosArr,
+  arPos,
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
   const { x: randomX, y: randomY } = getRandomCoordinates();
@@ -229,13 +232,13 @@ const FieldPosition: React.FC<FieldPositionProps> = ({
       };
     }
   }, [width, height, fieldPosArr]);
-  const position = useContext(PositionContext);
+
   const Circle = ({
     radius,
     color,
     position,
   }: {
-    position: THREE.Vector3 | undefined;
+    position?: THREE.Vector3 | undefined;
     radius: number;
     color: string | undefined;
   }) => {
@@ -263,27 +266,26 @@ const FieldPosition: React.FC<FieldPositionProps> = ({
       </mesh>
     );
   };
+  const meshRef = useRef<Mesh<BufferGeometry>>(null);
+  // useEffect(() => {
+  //   fieldPositionRef.current = arPos;
+  // }, [arPos]);
+
   return isARMode ? (
     <>
+      <mesh ref={meshRef} renderOrder={1}>
+        <planeGeometry args={[20, 20]} />
+        <meshBasicMaterial transparent={true} color={"white"} opacity={0} />
+      </mesh>
       <Circle
         radius={8}
         color="green"
-        position={
-          position
-            ? new THREE.Vector3(position.x, position.y, position.z - 0.5)
-            : new THREE.Vector3(0, 0, -0.5)
-        }
+        position={new THREE.Vector3(arPos?.x, arPos?.y, arPos?.z)}
       />
 
       {/* Pitch in the center */}
-      <mesh
-        position={
-          position
-            ? new THREE.Vector3(position.x, position.y, position.z + 0.1)
-            : new THREE.Vector3(0, 0, 0.1)
-        }
-      >
-        <boxGeometry args={[0.5, 2, -0.01]} />
+      <mesh position={new THREE.Vector3(arPos?.x, arPos?.y, arPos?.z)}>
+        <planeGeometry args={[0.5, 2]} />
         <meshBasicMaterial color="saddlebrown" />
       </mesh>
 
@@ -292,44 +294,46 @@ const FieldPosition: React.FC<FieldPositionProps> = ({
         radius={4}
         color="white"
         position={
-          position
-            ? new THREE.Vector3(position.x, position.y, position.z - 1.1)
-            : new THREE.Vector3(0, 0, -1.1)
+          arPos ? new THREE.Vector3(arPos.x, arPos.y, arPos.z - 0.1) : undefined
         }
       />
 
-      <Circle
+      {/* <Circle
         radius={9}
         color="red"
         position={
-          position
-            ? new THREE.Vector3(position.x, position.y, position.z - 1)
-            : new THREE.Vector3(0, 0, -1)
+          ar   ? new THREE.Vector3(
+                arPos.x,
+                arPos.y,
+                arPos.z - 0.2
+              )
+            : undefined
         }
-      />
+      /> */}
+
       <Point
         position={
-          position
-            ? new THREE.Vector3(position.x, position.y + 0.75, position.z + 1)
-            : new THREE.Vector3(0.25, 0.75, 1)
-        }
-        color="red"
-        radius={0.1}
-      />
-      <Point
-        position={
-          position
-            ? new THREE.Vector3(position.x, position.y - 0.75, position.z + 1)
-            : new THREE.Vector3(0.25, -0.75, 1)
+          arPos
+            ? new THREE.Vector3(arPos?.x, arPos?.y + 0.75, arPos?.z)
+            : undefined
         }
         color="red"
         radius={0.1}
       />
       <Point
         position={
-          position
-            ? new THREE.Vector3(position.x, position.y - 2, position.z + 1)
-            : new THREE.Vector3(0.25, -1, 1)
+          arPos
+            ? new THREE.Vector3(arPos?.x, arPos?.y - 0.75, arPos?.z)
+            : undefined
+        }
+        color="red"
+        radius={0.1}
+      />
+      <Point
+        position={
+          arPos
+            ? new THREE.Vector3(arPos?.x, arPos?.y - 2, arPos?.z)
+            : undefined
         }
         color="yellow"
         radius={0.2}
@@ -339,11 +343,17 @@ const FieldPosition: React.FC<FieldPositionProps> = ({
         return (
           <Point
             position={
-              new THREE.Vector3(
-                fieldPosArr[i][0] / 10,
-                (fieldPosArr[i][1] + 10) / 12,
-                fieldPosArr[i][2]
-              )
+              arPos
+                ? new THREE.Vector3(
+                    arPos.x + fieldPosArr[i][0] / 10,
+                    arPos.y + (fieldPosArr[i][1] + 10) / 12,
+                    arPos.z + fieldPosArr[i][2]
+                  )
+                : new THREE.Vector3(
+                    fieldPosArr[i][0] / 10,
+                    (fieldPosArr[i][1] + 10) / 12,
+                    fieldPosArr[i][2]
+                  )
             }
             color="blue"
             radius={0.1}
@@ -401,4 +411,16 @@ const FieldPosition: React.FC<FieldPositionProps> = ({
   );
 };
 
+const FieldPosition: React.FC<FieldPositionProps> = (props) => {
+  const arPos = useContext(PositionContext);
+  return (
+    <FieldPos
+      selections={props.selections}
+      setSelection={props.setSelection}
+      isARMode={props.isARMode}
+      fieldPosArr={props.fieldPosArr}
+      arPos={arPos}
+    />
+  );
+};
 export default FieldPosition;
