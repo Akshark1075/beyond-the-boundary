@@ -91,13 +91,13 @@
   "screenshots": [
     {
       "src": "screenshots/screenshot-wide.png",
-      "sizes": "1280x800",
+      "sizes": "1280x633",
       "form-factor": "wide",
       "type": "image/png"
     },
     {
       "src": "screenshots/screenshot-narrow.png",
-      "sizes": "360x650",
+      "sizes": "360x609",
       "form-factor": "narrow",
       "type": "image/png"
     }
