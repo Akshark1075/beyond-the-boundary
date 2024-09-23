@@ -3,7 +3,6 @@ import {
   deleteFromLocalStorage,
   getArrayFromLocalStorage,
 } from "./localStorageUtils";
-import { SelectedOption } from "../views/ShowPage";
 
 describe("Local Storage Utils", () => {
   beforeEach(() => {

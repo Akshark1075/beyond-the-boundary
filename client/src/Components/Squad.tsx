@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import {
   Table,
   TableBody,
@@ -15,7 +15,6 @@ import {
   AppBar,
 } from "@mui/material";
 import Typography from "@mui/joy/Typography";
-import { useQuery } from "@tanstack/react-query";
 import { GetInfo } from "../types/getInfo";
 import { GetSquad } from "../types/getSquad";
 import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
@@ -24,7 +23,6 @@ import getRandomCoordinates from "../utilities/getRandomCoordinates";
 import { Rnd, RndResizeCallback } from "react-rnd";
 import { DraggableEvent } from "react-draggable";
 import WithTitleBar from "./WithTitleBar";
-import fetchWithRetry from "../api/fetch";
 const SquadComponent = ({
   width,
   height,

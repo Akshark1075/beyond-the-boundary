@@ -1,6 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
 import { GetScorecard, ScoreCard } from "../types/getScorecard";
-import { useCallback } from "react";
 import { Rnd, RndResizeCallback } from "react-rnd";
 import WithTitleBar from "./WithTitleBar";
 import { DraggableEvent } from "react-draggable";
@@ -11,14 +9,7 @@ import { SelectedOption } from "../views/ShowPage";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { AppBar, Skeleton, Toolbar, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-// import fetchWithRetry from "../api/fetch";
-// const fetchScorecard = async (matchId: string): Promise<GetScorecard> => {
-//   const res = await fetchWithRetry(
-//     `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`
-//   );
 
-//   return res;
-// };
 const FallOfWickets = ({
   selections,
   setSelection,
@@ -35,21 +26,7 @@ const FallOfWickets = ({
   isError: boolean;
   data: GetScorecard | undefined;
 }) => {
-  // const { isLoading, isError, data } = useQuery<GetScorecard>({
-  //   queryKey: [`scoresData-${matchId}`],
-  //   queryFn: useCallback(() => fetchScorecard(matchId), [matchId]),
-  //   refetchInterval: isLive ? 30000 : undefined,
-  // });
   return (
-    // <Fow
-    //   row={data.scoreCard[data.scoreCard.length - 1]}
-    //   isLoading={isLoading}
-    //   isError={isError}
-    //   selections={selections}
-    //   setSelection={setSelection}
-    //   key={data.scoreCard[data?.scoreCard.length - 1].inningsId}
-    //   isARMode={isARMode}
-    // />
     <>
       {data?.scoreCard.map((row, i) => {
         return (

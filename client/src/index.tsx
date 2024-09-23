@@ -18,7 +18,7 @@ root.render(
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <App />
-        <Stats showPanel={0} />
+        {process.env.NODE_ENV === "development" && <Stats showPanel={0} />}
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </BrowserRouter>

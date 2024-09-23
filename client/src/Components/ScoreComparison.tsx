@@ -1,5 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
-import { useCallback, useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -27,7 +26,6 @@ import { DraggableEvent } from "react-draggable";
 import { SelectedOption } from "../views/ShowPage";
 import getRandomCoordinates from "../utilities/getRandomCoordinates";
 import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
-import fetchWithRetry from "../api/fetch";
 import ARLineGraph from "./ARLineGraph";
 import { Box } from "@react-three/drei";
 import { PositionContext } from "./PlaneWithContent";

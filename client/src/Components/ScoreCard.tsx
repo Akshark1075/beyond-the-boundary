@@ -7,7 +7,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { GetScorecard, ScoreCard } from "../types/getScorecard";
-import { useCallback, useRef } from "react";
+import { useRef } from "react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Collapse from "@mui/material/Collapse";
@@ -20,25 +20,14 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import ScoreCardLoader from "./Loaders/ScorecardLoader";
 import { DraggableEvent } from "react-draggable";
 import WithTitleBar from "./WithTitleBar";
-import { useQuery } from "@tanstack/react-query";
 import { Rnd, RndResizeCallback } from "react-rnd";
 import { SelectedOption } from "../views/ShowPage";
 import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
 import getRandomCoordinates from "../utilities/getRandomCoordinates";
-import fetchWithRetry from "../api/fetch";
 
 export type ScoreCardType = "Batting" | "Bowling";
-
-// const fetchScorecard = async (matchId: string): Promise<Response> => {
-//   const res = await fetchWithRetry(
-//     `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`
-//   );
-
-//   return res;
-// };
 
 const BattingScorecard = ({
   row,
@@ -64,7 +53,6 @@ const BattingScorecard = ({
   const storedScorecard = selections.find(
     (s) => s.name === `Batting Scorecard ${row.inningsId}`
   );
-  console.log("S");
   const {
     x = randomX,
     y = randomY,
@@ -879,16 +867,6 @@ export default function ScoreCardTable({
   isLoading: boolean;
   isError: boolean;
 }) {
-  // const { isLoading, isError, data } = useQuery<GetScorecard>({
-  //   queryKey: [`scoresData-${matchId}`],
-  //   queryFn: useCallback(
-  //     () => fetchScorecard(matchId).then((res) => res.json()),
-  //     [matchId]
-  //   ),
-  //   refetchInterval: isLive ? 30000 : undefined,
-  // });
-  // console.log(data, "sc");
-  console.log(type);
   if (isARMode) {
     if (data?.scoreCard) {
       if (type === "Batting") {

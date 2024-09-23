@@ -40,7 +40,7 @@ export default function DrawerAppBar(props: Props) {
     (
       // @ts-ignore: Unreachable code error
       <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
-        <img src={logo} className="p-4" />
+        <img src={logo} className="p-4" alt="logo" />
         <List>
           {navItems.map((item) => (
             <ListItem key={item.title} disablePadding>

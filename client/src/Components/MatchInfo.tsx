@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import {
   Table,
   TableBody,
@@ -12,7 +12,6 @@ import {
   Toolbar,
 } from "@mui/material";
 import Typography from "@mui/joy/Typography";
-import { useQuery } from "@tanstack/react-query";
 import { GetInfo } from "../types/getInfo";
 import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
 import { SelectedOption } from "../views/ShowPage";

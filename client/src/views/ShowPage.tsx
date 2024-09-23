@@ -33,8 +33,7 @@ import {
   XRInteractionEvent,
   ARButton,
 } from "@react-three/xr";
-import { Canvas, useThree } from "@react-three/fiber";
-import Interface from "../Components/Overlay";
+import { Canvas } from "@react-three/fiber";
 import { Reticle } from "../Components/Reticle";
 import { OrbitControls } from "@react-three/drei";
 import WithXRPlane from "../Components/PlaneWithContent";
@@ -46,7 +45,7 @@ import * as THREE from "three";
 import { fieldPositions } from "../utilities/getFieldPositions";
 import { renderToString } from "react-dom/server";
 // @ts-ignore: Unreachable code error
-import domtoimage from "dom-to-image-more"; // Import dom-to-image-more
+import domtoimage from "dom-to-image-more";
 import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "../api/queryClient";
 import { GetInfo } from "../types/getInfo";
@@ -235,17 +234,6 @@ const ShowPage = () => {
     }
   }, [isARMode]);
 
-  // useQuery<GetScorecard>({
-  //   queryKey: [`scoresData-${matchId}`],
-  //   queryFn: useCallback(
-  //     () => fetchScorecard(matchId ?? "").then((res) => res.json()),
-  //     [matchId]
-  //   ),
-  //   enabled: !!matchId,
-  //   // refetchInterval: isLive ? 30000 : undefined,
-  //   staleTime: 30000,
-  // });
-
   const ref = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
@@ -258,14 +246,6 @@ const ShowPage = () => {
       setOverlayContent(ref.current);
     }
   }, []);
-  // let interfaceRef = useCallback(
-  //   (node: React.SetStateAction<HTMLDivElement | null>) => {
-  //     if (node !== null) {
-  //       setOverlayContent(node);
-  //     }
-  //   },
-  //   []
-  // );
 
   useEffect(() => {
     const canvas = document.getElementById("canvas");
@@ -479,31 +459,12 @@ const ShowPage = () => {
   const [bowlingScorecardImage, setBowlingScorecardImage] = useState(
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
   );
-  // const matchInfoNode = useMemo(() => {
-  //   const node = document.createElement("div");
-
-  //   node.innerHTML = renderToString(
-  //     <QueryClientProvider client={queryClient}>
-  //       <MatchInfo
-  //         selections={selections}
-  //         setSelection={setSelection}
-  //         isARMode={true}
-  //         data={matchData}
-  //         isLoading={isMatchDataLoading}
-  //         isError={isMatchDataError}
-  //       />
-  //     </QueryClientProvider>
-  //   );
-  //   return node;
-  // }, [isMatchDataSuccess, matchId]);
 
   const matchInfoNodeRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    // Create the node
     const node = document.createElement("div");
 
-    // Render the content into the node
     node.innerHTML = renderToString(
       <QueryClientProvider client={queryClient}>
         <MatchInfo
@@ -517,7 +478,6 @@ const ShowPage = () => {
       </QueryClientProvider>
     );
 
-    // Store the node in the ref
     matchInfoNodeRef.current = node;
   }, [
     isMatchDataSuccess,
@@ -530,41 +490,11 @@ const ShowPage = () => {
     setSelection,
   ]);
 
-  // const squadNode = useMemo(() => {
-  //   const node = document.createElement("div");
-
-  //   node.innerHTML = renderToString(
-  //     <QueryClientProvider client={queryClient}>
-  //       <Squad
-  //         // matchId={matchId ?? ""}
-  //         selections={selections}
-  //         setSelection={setSelection}
-  //         isARMode={true}
-  //         matchData={matchData}
-  //         isMatchDataLoading={isMatchDataLoading}
-  //         isMatchDataError={isMatchDataError}
-  //         isTeam1SquadDataLoading={isTeam1SquadDataLoading}
-  //         isTeam2SquadDataLoading={isTeam2SquadDataLoading}
-  //         team1SquadData={team1SquadData}
-  //         team2SquadData={team2SquadData}
-  //       />
-  //     </QueryClientProvider>
-  //   );
-  //   return node;
-  // }, [
-  //   isMatchDataSuccess,
-  //   isTeam1SquadDataSuccess,
-  //   isTeam2SquadDataSuccess,
-  //   matchId,
-  // ]);
-
   const squadNodeRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    // Create the node
     const node = document.createElement("div");
 
-    // Render the content into the node
     node.innerHTML = renderToString(
       <QueryClientProvider client={queryClient}>
         <Squad
@@ -582,7 +512,6 @@ const ShowPage = () => {
       </QueryClientProvider>
     );
 
-    // Store the node in the ref
     squadNodeRef.current = node;
   }, [
     isMatchDataSuccess,
@@ -601,30 +530,11 @@ const ShowPage = () => {
     setSelection,
   ]);
 
-  // const fowNode = useMemo(() => {
-  //   const node = document.createElement("div");
-
-  //   node.innerHTML = renderToString(
-  //     <QueryClientProvider client={queryClient}>
-  //       <FallOfWickets
-  //         selections={selections}
-  //         setSelection={setSelection}
-  //         isARMode={true}
-  //         isLoading={isScoresDataLoading}
-  //         isError={isScoresDataError}
-  //         data={scoresData}
-  //       />
-  //     </QueryClientProvider>
-  //   );
-  //   return node;
-  // }, [isScoresDataSuccess, matchId]);
   const fowNodeRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    // Create the node
     const node = document.createElement("div");
 
-    // Render the content into the node
     node.innerHTML = renderToString(
       <QueryClientProvider client={queryClient}>
         <FallOfWickets
@@ -638,10 +548,7 @@ const ShowPage = () => {
       </QueryClientProvider>
     );
 
-    // Store the node in the ref
     fowNodeRef.current = node;
-
-    // Optional cleanup
   }, [
     isScoresDataSuccess,
     matchId,
@@ -653,31 +560,11 @@ const ShowPage = () => {
     setSelection,
   ]);
 
-  // const battingScorecardNode = useMemo(() => {
-  //   const node = document.createElement("div");
-
-  //   node.innerHTML = renderToString(
-  //     <QueryClientProvider client={queryClient}>
-  //       <ScoreCardTable
-  //         type={"Batting"}
-  //         selections={selections}
-  //         setSelection={setSelection}
-  //         isARMode={true}
-  //         data={scoresData}
-  //         isLoading={isScoresDataLoading}
-  //         isError={isScoresDataError}
-  //       />
-  //     </QueryClientProvider>
-  //   );
-  //   return node;
-  // }, [isScoresDataSuccess, matchId]);
   const battingScorecardNodeRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    // Create the node
     const node = document.createElement("div");
 
-    // Render the content into the node
     node.innerHTML = renderToString(
       <QueryClientProvider client={queryClient}>
         <ScoreCardTable
@@ -692,7 +579,6 @@ const ShowPage = () => {
       </QueryClientProvider>
     );
 
-    // Store the node in the ref
     battingScorecardNodeRef.current = node;
   }, [
     isScoresDataSuccess,
@@ -705,31 +591,11 @@ const ShowPage = () => {
     setSelection,
   ]);
 
-  // const bowlingScorecardNode = useMemo(() => {
-  //   const node = document.createElement("div");
-
-  //   node.innerHTML = renderToString(
-  //     <QueryClientProvider client={queryClient}>
-  //       <ScoreCardTable
-  //         type={"Bowling"}
-  //         selections={selections}
-  //         setSelection={setSelection}
-  //         isARMode={true}
-  //         data={scoresData}
-  //         isLoading={isScoresDataLoading}
-  //         isError={isScoresDataError}
-  //       />
-  //     </QueryClientProvider>
-  //   );
-  //   return node;
-  // }, [isScoresDataSuccess, matchId]);
   const bowlingScorecardNodeRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    // Create the node
     const node = document.createElement("div");
 
-    // Render the content into the node
     node.innerHTML = renderToString(
       <QueryClientProvider client={queryClient}>
         <ScoreCardTable
@@ -744,10 +610,7 @@ const ShowPage = () => {
       </QueryClientProvider>
     );
 
-    // Store the node in the ref
     bowlingScorecardNodeRef.current = node;
-
-    // Optional cleanup
   }, [
     isScoresDataSuccess,
     matchId,
@@ -780,7 +643,6 @@ const ShowPage = () => {
         });
 
       return () => {
-        // clearTimeout(timer);
         if (container && container.contains(node)) {
           container.removeChild(node);
         }
@@ -988,18 +850,6 @@ const ShowPage = () => {
         </XR>
       </Canvas>
 
-      {/* {isARMode && (
-        <Interface
-          ref={ref}
-          selections={selections}
-          setSelection={setSelection}
-          setShouldShowReticle={setShouldShowReticle}
-          setSelectedARComponent={setSelectedARComponent}
-          camera={cameraRef.current}
-          scene={sceneRef.current}
-        />
-      )} */}
-
       {!isARMode && (
         // @ts-ignore: Unreachable code error
         <Box className={"h-full sm:flex overflow-y-auto "}>
@@ -1169,7 +1019,7 @@ const ShowPage = () => {
         <ARButton
           sessionInit={{
             requiredFeatures: ["hit-test"],
-            optionalFeatures: ["dom-overlay", "hand-tracking"],
+            optionalFeatures: ["hand-tracking"],
             domOverlay: !!overlayContent
               ? {
                   root: overlayContent as HTMLElement,

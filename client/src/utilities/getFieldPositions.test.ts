@@ -10,7 +10,6 @@ it("should have subarrays of size 3 (x, y, z coordinates)", () => {
   });
 });
 it("should map the random positions into 3-coordinate arrays", () => {
-  // Check if each entry is a valid position [x, y, z]
   fieldPositions.forEach((pos) => {
     expect(pos.length).toBe(3);
     pos.forEach((coord) => {

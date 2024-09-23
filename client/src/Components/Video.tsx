@@ -15,10 +15,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { GetInfo } from "../types/getInfo";
 import { VideoResource } from "../types/getVideo";
-import fetchWithRetry from "../api/fetch";
 import { Plane, useTexture } from "@react-three/drei";
-
-import { DoubleSide, VideoTexture } from "three";
+import { VideoTexture } from "three";
 const Video = ({
   selections,
   setSelection,
@@ -56,26 +54,7 @@ const Video = ({
     }
   };
 
-  // const fetchInfo = async (matchId: string): Promise<GetInfo> => {
-  //   const res = await fetchWithRetry(
-  //     `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}`
-  //   );
-  //   return res;
-  // };
-
-  // const {
-  //   isLoading: isMatchDataLoading,
-  //   isError: isMatchDataError,
-  //   data: matchData,
-  // } = useQuery<GetInfo>({
-  //   queryKey: ["infoData", matchId],
-  //   queryFn: useCallback(() => fetchInfo(matchId), [matchId]),
-  // });
-  const {
-    isLoading,
-    isError,
-    data: videoUrl,
-  } = useQuery<VideoResource>({
+  const { data: videoUrl } = useQuery<VideoResource>({
     queryKey: ["videoData"],
     enabled: !!matchData,
     queryFn: useCallback(
@@ -156,27 +135,16 @@ const Video = ({
 
   // eslint-disable-next-line react/prop-types
   const VideoPlane = () => {
-    // Use the correct path to the video file
-    // const texture = useVideoTexture("/video.mp4"); // Path relative to the public directory
-
-    // function VideoMaterial({ url }: { url: string }) {
-    //   const texture = useVideoTexture(url);
-    //   return <meshBasicMaterial map={texture} toneMapped={false} />;
-    // }
-
     function FallbackMaterial({ url }: { url: string }) {
       const imgTexture = useTexture(url);
       return <meshBasicMaterial map={imgTexture} toneMapped={false} />;
     }
     return (
       <Plane args={[3, 2]}>
-        {/* <meshBasicMaterial map={texture} /> */}
-        {/* <meshBasicMaterial color={"white"} /> */}
         <Suspense
           fallback={<FallbackMaterial url="/icons/icon-1024x1024.png" />}
         >
           <meshBasicMaterial map={texture} toneMapped={false} />;
-          {/* <VideoMaterial url="/video.mp4" /> */}
         </Suspense>
       </Plane>
     );

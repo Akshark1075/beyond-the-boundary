@@ -31,7 +31,6 @@ import { GetScorecard } from "../types/getScorecard";
 import { useQuery } from "@tanstack/react-query";
 import fetchWithRetry from "../api/fetch";
 import { PositionContext } from "./PlaneWithContent";
-import { Text } from "@react-three/drei";
 
 interface WagonWheelProps {
   scores: {
@@ -92,9 +91,9 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ scores, width, height }) => {
       const material = new THREE.MeshBasicMaterial({
         color: 0x8b4513,
         side: THREE.DoubleSide,
-      }); // Brown color
+      });
       const pitch = new THREE.Mesh(geometry, material);
-      pitch.position.set(0, 0, 0.01); // Slightly offset to avoid z-fighting
+      pitch.position.set(0, 0, 0.01);
       scene.add(pitch);
     };
 
@@ -114,13 +113,12 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ scores, width, height }) => {
 
         const points = [new THREE.Vector3(0, 6, 0), new THREE.Vector3(x, y, 0)];
 
-        // const geometry = new THREE.BufferGeometry().setFromPoints(points);
         var tubeGeometry = new THREE.TubeGeometry(
           new THREE.CatmullRomCurve3(points),
-          512, // path segments
-          0.1, // THICKNESS
-          8, //Roundness of Tube
-          false //closed
+          512,
+          0.1,
+          8,
+          false
         );
         const material = new THREE.LineBasicMaterial({
           color,
@@ -132,7 +130,6 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ scores, width, height }) => {
       }
     };
 
-    // Draw the pitch, thirty-yard circle, and boundary
     drawCircle(5, 0xffffff); // White circle for the pitch
     drawCircle(15, 0xffff00, 2); // Thirty-yard circle
     drawCircle(25, 0xff0000, 2); // Boundary
@@ -156,7 +153,6 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ scores, width, height }) => {
 
     animate();
 
-    // Clean up on component unmount
     return () => {
       mountRef.current?.removeChild(renderer.domElement);
     };
@@ -325,99 +321,37 @@ const WagWheel = ({
     );
   };
 
-  // const DrawLines = ({
-  //   count,
-  //   length,
-  //   color,
-  //   lineWidth,
-  //   angleOffset,
-  //   angleRange,
-  //   position,
-  // }: {
-  //   count: number;
-  //   length: number;
-  //   color: number;
-  //   lineWidth: number;
-  //   angleOffset: number;
-  //   angleRange: number;
-  //   position?: THREE.Vector3;
-  // }) => {
-  //   // Memoize the lines so they are only recalculated when the dependencies change
-  //   const lines = useMemo(() => {
-  //     const generatedLines = [];
-  //     for (let i = 0; i < count; i++) {
-  //       const angle = angleOffset + Math.random() * angleRange; // Memoized random angle
-  //       const x = length * Math.cos(angle);
-  //       const y = length * Math.sin(angle);
-
-  //       const points = position
-  //         ? [
-  //             new THREE.Vector3(position.x, position.y, position.z + 0.2),
-  //             new THREE.Vector3(position.x + x, position.y + y, position.z),
-  //           ]
-  //         : [];
-
-  //       const tubeGeometry = new THREE.TubeGeometry(
-  //         new THREE.CatmullRomCurve3(points),
-  //         512, // Path segments
-  //         0.04, // Thickness
-  //         8, // Roundness of Tube
-  //         false // Closed
-  //       );
-
-  //       const material = new THREE.LineBasicMaterial({
-  //         color,
-  //         linewidth: lineWidth,
-  //       });
-
-  //       const line = new THREE.Line(tubeGeometry, material);
-  //       generatedLines.push(line);
-  //     }
-  //     return generatedLines;
-  //   }, [count, length, color, lineWidth, angleOffset, angleRange, position]); // Dependencies
-
-  //   return (
-  //     <>
-  //       {lines.map((line, index) => (
-  //         <primitive key={index} object={line} />
-  //       ))}
-  //     </>
-  //   );
-  // };
-
   const DrawLines = ({
     length,
     color,
-    meshType, // Add a meshType to define the shape
+    meshType,
     position,
     angles,
   }: {
     length: number;
     color: number;
-    meshType?: string; // You can pass the type of mesh (box, sphere, etc.)
+    meshType?: string;
     position?: THREE.Vector3;
     angles: number[];
   }) => {
-    // Memoize the meshes so they are only recalculated when the dependencies change
     const meshes = useMemo(() => {
       const generatedMeshes = [];
 
       for (let i = 0; i < angles.length; i++) {
-        const angle = angles[i] * Math.PI * 2; // Random angle
+        const angle = angles[i] * Math.PI * 2;
         const x = length * Math.cos(angle);
         const y = length * Math.sin(angle);
 
-        // Choose geometry based on meshType
         let geometry;
         if (meshType === "box") {
-          geometry = new THREE.BoxGeometry(1, 1, 1); // Example for box
+          geometry = new THREE.BoxGeometry(1, 1, 1);
         } else if (meshType === "sphere") {
-          geometry = new THREE.SphereGeometry(0.5, 16, 16); // Example for sphere
+          geometry = new THREE.SphereGeometry(0.5, 16, 16);
         } else {
           // Default to tube geometry
           const points = [
-            new THREE.Vector3(0, 1, 0), // Start at origin
-            new THREE.Vector3(x, y, 0), // End at calculated position
+            new THREE.Vector3(0, 1, 0),
+            new THREE.Vector3(x, y, 0),
           ];
           geometry = new THREE.TubeGeometry(
             new THREE.CatmullRomCurve3(points),
@@ -442,8 +376,6 @@ const WagWheel = ({
 
     return (
       <group position={position || new THREE.Vector3(0, 0, 0)}>
-        {" "}
-        {/* Apply group position here */}
         {meshes.map((mesh, index) => (
           <primitive key={index} object={mesh} />
         ))}
@@ -451,24 +383,12 @@ const WagWheel = ({
     );
   };
 
-  // const wagonWheelRef = useRef(position);
-  // useEffect(() => {
-  //   wagonWheelRef.current = position;
-  // }, [position]);
   return isARMode ? (
     <>
       <mesh>
         <planeGeometry args={[20, 20]} />
         <meshBasicMaterial transparent={true} color={"none"} opacity={0} />
       </mesh>
-      {/* <Text
-        position={arPos ? [arPos.x, arPos.y + 9, arPos.z] : undefined}
-        fontSize={0.5}
-        color="white"
-        fontWeight="bold"
-      >
-        WagonWheel
-      </Text> */}
 
       <DrawLines
         length={2}
@@ -520,8 +440,6 @@ const WagWheel = ({
           arPos ? new THREE.Vector3(arPos.x, arPos.y, arPos.z - 0.1) : undefined
         }
       />
-
-      {/* <Circle radius={9} color="red" position={new THREE.Vector3(0, 0, 0)} /> */}
     </>
   ) : isMobile ? (
     <div

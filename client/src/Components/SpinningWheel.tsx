@@ -43,37 +43,6 @@ const SpinningWheel: React.FC<SpinningWheelProps> = ({ components }) => {
     );
   };
 
-  // useEffect(() => {
-  //   document.addEventListener("click", handleVisibility);
-  //   document.addEventListener("mousedown", resetIdleTimer);
-  //   return () => {
-  //     document.removeEventListener("click", resetIdleTimer);
-  //     document.addEventListener("mousedown", resetIdleTimer);
-  //   };
-  // }, []);
-
-  // const handleMouseDown = (e: React.MouseEvent) => {
-  //   e.preventDefault();
-  //   const startY = e.clientY;
-  //   const startRotation = rotation;
-
-  //   const handleMouseMove = (e: MouseEvent) => {
-  //     const deltaY = e.clientY - startY;
-  //     const newRotation = startRotation + deltaY / 2;
-  //     setRotation(newRotation);
-  //     updateCurrentIndex(newRotation);
-  //   };
-
-  //   const handleMouseUp = () => {
-  //     document.removeEventListener("mousemove", handleMouseMove);
-  //     document.removeEventListener("mouseup", handleMouseUp);
-  //   };
-
-  //   document.addEventListener("mousemove", handleMouseMove);
-  //   document.addEventListener("mouseup", handleMouseUp);
-  // };
-
-  //uncomment below
   useEffect(() => {
     document.addEventListener("click", handleVisibility);
     document.addEventListener("mousedown", resetIdleTimer);

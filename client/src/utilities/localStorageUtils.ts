@@ -1,6 +1,5 @@
 import { SelectedOption } from "../views/ShowPage";
 
-// localStorageUtils.ts
 export const saveArrayToLocalStorage = (key: string, array: any[]) => {
   localStorage.setItem(key, JSON.stringify(array));
 };

@@ -8,7 +8,8 @@ describe("getTimeAgo", () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers(); // Restore real timers after each test
+    // Restore real timers after each test
+    jest.useRealTimers();
   });
 
   it('should return "just now" for a timestamp equal to the current time', () => {

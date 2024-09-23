@@ -370,129 +370,28 @@ const ARFloatingActionButton = ({
   const meshRef = useRef<THREE.Mesh<BufferGeometry>>(null);
   const menuRef = useRef<THREE.Mesh<BufferGeometry>>(null);
   const { camera } = useThree();
-  // Update the position of the mesh to always be in front of the camera
-  // useFrame(({ camera }) => {
-  //   if (meshRef.current) {
-  //     meshRef.current.position.set(
-  //       camera.position.x,
-  //       camera.position.y - 1,
-  //       camera.position.z - 2
-  //     );
-  //   }
-  // });
+
   const [hovered, setHovered] = useState<number | null>(null);
   const [pos, setPos] = useState<THREE.Vector3>(new THREE.Vector3(0, 0, -3));
 
   useEffect(() => {
     if (meshRef.current) {
-      // Make the mesh look at the camera when it is first placed
       meshRef.current.lookAt(camera.position);
     }
   }, [camera.position, pos]);
-  // useEffect(() => {
-  //   if (open && meshRef.current && menuRef.current) {
-  //     // Get mesh's forward direction
-  //     const meshDirection = new THREE.Vector3();
-  //     meshRef.current.getWorldDirection(meshDirection);
-
-  //     // Offset distance to place the menu in front of the mesh
-  //     const offsetDistance = 5;
-
-  //     // Calculate new position for the menu
-  //     const newPosition = new THREE.Vector3(
-  //       meshRef.current.position.x + meshDirection.x * offsetDistance,
-  //       0, // Keep Y-level with the mesh
-  //       meshRef.current.position.z + meshDirection.z * offsetDistance
-  //     );
-
-  //     // Update menu's position
-  //     menuRef.current.position.copy(newPosition);
-
-  //     // Make sure menu faces the camera, but stay level at mesh's height
-  //     const menuLookAtPosition = new THREE.Vector3(
-  //       camera.position.x,
-  //       0, // Use mesh's Y position to avoid tilting
-  //       camera.position.z
-  //     );
-  //     menuRef.current.lookAt(menuLookAtPosition);
-  //   }
-  // }, [open, pos]);
-
-  // const { controllers } = useXR();
-  // const lastClickTimeRef = useRef<number | null>(null);
-  // const DOUBLE_CLICK_DELAY = 300; // Maximum time in ms for a double-click event
-
-  // useEffect(() => {
-  //   const rightController = controllers.find(
-  //     (c) => c.inputSource && c.inputSource.handedness === "right"
-  //   );
-
-  //   if (rightController && rightController.controller) {
-  //     const onControllerClick = () => {
-  //       const currentTime = Date.now();
-
-  //       if (
-  //         lastClickTimeRef.current &&
-  //         currentTime - lastClickTimeRef.current < DOUBLE_CLICK_DELAY
-  //       ) {
-  //         if (meshRef.current) {
-  //           // Get the current position and direction of the controller
-  //           const controllerPosition = rightController.controller.position;
-  //           const controllerDirection = new THREE.Vector3();
-
-  //           // Get the controller's forward direction (along the Z-axis)
-  //           rightController.controller.getWorldDirection(controllerDirection);
-
-  //           // Offset the position slightly backward in the direction the controller is pointing
-  //           const offset = 3; // Distance behind the controller
-  //           const newPosition = new THREE.Vector3(
-  //             controllerPosition.x - controllerDirection.x * offset,
-  //             0, // Keep Y at 0 (ground level)
-  //             controllerPosition.z - controllerDirection.z * offset
-  //           );
-
-  //           // Move the mesh to the adjusted position
-  //           meshRef.current.position.copy(newPosition);
-  //           setPos(newPosition); // If you're using this for other state tracking
-  //         }
-  //       }
-
-  //       lastClickTimeRef.current = currentTime;
-  //     };
-
-  //     // Add event listener for clicks
-  //     rightController.controller.addEventListener(
-  //       "selectstart",
-  //       onControllerClick
-  //     );
-
-  //     return () => {
-  //       // Clean up the event listener when the component is unmounted or the controller changes
-  //       rightController.controller.removeEventListener(
-  //         "selectstart",
-  //         onControllerClick
-  //       );
-  //     };
-  //   }
-  // }, [controllers, meshRef]);
 
   return (
     <>
       {" "}
-      <Interactive
-        onSelect={handleButtonClick}
-        // onSelectStart={handleDragStart}
-        // onSelectEnd={handleRelease}
-        // onMove={handleDrag}
-      >
+      <Interactive onSelect={handleButtonClick}>
         <mesh ref={meshRef} position={pos}>
           <circleGeometry args={[0.2, 32]} />
           <meshBasicMaterial color={"black"} opacity={0.9} />
           <Text
-            fontSize={0.3} // Adjust font size as needed
+            fontSize={0.3}
             color="linear-gradient(45deg, #fffaff, #303036)"
-            anchorX="center" // Center text horizontally
-            anchorY="middle" // Center text vertically
+            anchorX="center"
+            anchorY="middle"
           >
             {open ? "X" : "+"}
           </Text>
@@ -507,7 +406,7 @@ const ARFloatingActionButton = ({
               : pos
           }
         >
-          <planeGeometry args={[6, 6]} /> {/* Background size */}
+          <planeGeometry args={[6, 6]} />
           <meshStandardMaterial color={"#222"} transparent opacity={1} />
           {components.map((c, i) => (
             <Interactive
@@ -515,16 +414,16 @@ const ARFloatingActionButton = ({
               onHover={() => setHovered(i)}
               onBlur={() => setHovered(null)}
               onSelect={() => {
-                handleMenuItemClick(c.key); // Call the click handler with the component title
+                handleMenuItemClick(c.key);
                 setOpen(!open);
               }}
             >
               <Text
                 position={[0, (i - 4.5) / 2, 1]}
-                fontSize={hovered && hovered === i ? 0.4 : 0.3} // Adjust font size as needed
-                color={hovered && hovered === i ? "#fff" : "#E50914"} // Change color on hover
-                anchorX="center" // Center text horizontally
-                anchorY="middle" // Center text vertically
+                fontSize={hovered && hovered === i ? 0.4 : 0.3}
+                color={hovered && hovered === i ? "#fff" : "#E50914"}
+                anchorX="center"
+                anchorY="middle"
               >
                 {c.title}
               </Text>

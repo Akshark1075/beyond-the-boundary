@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useRef } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import * as THREE from "three";
 import WithTitleBar from "./WithTitleBar";
 import { Rnd, RndResizeCallback } from "react-rnd";
@@ -267,9 +267,6 @@ const FieldPos: React.FC<FieldPositionProps> = ({
     );
   };
   const meshRef = useRef<Mesh<BufferGeometry>>(null);
-  // useEffect(() => {
-  //   fieldPositionRef.current = arPos;
-  // }, [arPos]);
 
   return isARMode ? (
     <>
@@ -297,19 +294,6 @@ const FieldPos: React.FC<FieldPositionProps> = ({
           arPos ? new THREE.Vector3(arPos.x, arPos.y, arPos.z - 0.1) : undefined
         }
       />
-
-      {/* <Circle
-        radius={9}
-        color="red"
-        position={
-          ar   ? new THREE.Vector3(
-                arPos.x,
-                arPos.y,
-                arPos.z - 0.2
-              )
-            : undefined
-        }
-      /> */}
 
       <Point
         position={
