@@ -171,7 +171,6 @@ const ShowPage = () => {
     queryKey: [`scoresData-${matchId}`],
     queryFn: useCallback(() => fetchScorecard(matchId), [matchId]),
     refetchInterval: isLive === "y" ? 30000 : undefined,
-    // staleTime: 3000,
   });
 
   const memoizedmatchData = useMemo(() => matchData, [matchData]);
