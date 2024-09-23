@@ -92,13 +92,13 @@
     {
       "src": "screenshots/screenshot-wide.png",
       "sizes": "1280x633",
-      "form-factor": "wide",
+      "form_factor": "wide",
       "type": "image/png"
     },
     {
       "src": "screenshots/screenshot-narrow.png",
       "sizes": "360x609",
-      "form-factor": "narrow",
+      "form_factor": "narrow",
       "type": "image/png"
     }
   ],
