@@ -17,7 +17,6 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
     "@types/node": "^17.0.45",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
@@ -57,8 +56,8 @@
   "scripts": {
     "start": "HTTPS=true react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "test": "jest --watchAll"
   },
   "eslintConfig": {
     "extends": [
@@ -80,9 +79,13 @@
   },
   "devDependencies": {
     "@types/hammerjs": "^2.0.45",
+    "@types/jest": "^29.5.13",
     "@types/react-resizable": "^3.0.8",
     "@types/react-rnd": "^8.0.0",
     "fork-ts-checker-webpack-plugin": "^9.0.2",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "ts-jest": "^29.2.5",
     "webpack": "^5.92.1",
     "webpack-cli": "^5.1.4"
   }

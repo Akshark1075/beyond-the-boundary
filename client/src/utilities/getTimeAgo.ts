@@ -1,7 +1,7 @@
-function getTimeAgo(timestamp) {
+function getTimeAgo(timestamp: string | number | undefined): string {
   const now = new Date();
   const past = new Date(Number(timestamp)); // Convert timestamp to a number and create a Date object
-  const secondsAgo = Math.floor((now - past) / 1000);
+  const secondsAgo = Math.floor((now.getTime() - past.getTime()) / 1000);
 
   const intervals = {
     year: 31536000,
