@@ -11,7 +11,7 @@ import ListItemText from "@mui/material/ListItemText";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Button from "@mui/material/Button";
-import logo from "../assets/logo1.png";
+import logo from "../assets/logo.webp";
 import { useMediaQuery, useTheme } from "@mui/material";
 import { Link } from "react-router-dom";
 

@@ -6,114 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <meta name="description" content="Immersive cricketing experience" />
-    <link rel="apple-touch-icon" href="./logo192.png" />
+
     <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
     <link rel="manifest" href="/manifest.json" />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="29x29"
-      href="%PUBLIC_URL%/icons/icon-29x29.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="40x40"
-      href="%PUBLIC_URL%/icons/icon-40x40.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="48x48"
-      href="%PUBLIC_URL%/icons/icon-48x48.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="57x57"
-      href="%PUBLIC_URL%/icons/icon-57x57.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="58x58"
-      href="%PUBLIC_URL%/icons/icon-58x58.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="60x60"
-      href="%PUBLIC_URL%/icons/icon-60x60.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="72x72"
-      href="%PUBLIC_URL%/icons/icon-72x72.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="80x80"
-      href="%PUBLIC_URL%/icons/icon-80x80.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="87x87"
-      href="%PUBLIC_URL%/icons/icon-87x87.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="96x96"
-      href="%PUBLIC_URL%/icons/icon-96x96.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="114x114"
-      href="%PUBLIC_URL%/icons/icon-114x114.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="120x120"
-      href="%PUBLIC_URL%/icons/icon-120x120.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="144x144"
-      href="%PUBLIC_URL%/icons/icon-144x144.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="180x180"
-      href="%PUBLIC_URL%/icons/icon-180x180.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="192x192"
-      href="%PUBLIC_URL%/icons/icon-192x192.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="512x512"
-      href="%PUBLIC_URL%/icons/icon-512x512.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="1024x1024"
-      href="%PUBLIC_URL%/icons/icon-1024x1024.png"
-    />
+
     <title>Beyond the Boundary</title>
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
@@ -148,5 +47,26 @@
     <!-- <a href="https://www.vecteezy.com/free-vector/cricket-logo"
       >Cricket Logo Vectors by Vecteezy</a
     > -->
+    <script>
+      // Dynamically load larger icons to avoid render blocking
+      const iconSizes = [
+        { size: "48x48", href: "%PUBLIC_URL%/icons/icon-48x48.webp" },
+        { size: "72x72", href: "%PUBLIC_URL%/icons/icon-72x72.webp" },
+        { size: "96x96", href: "%PUBLIC_URL%/icons/icon-96x96.webp" },
+        { size: "144x144", href: "%PUBLIC_URL%/icons/icon-144x144.webp" },
+        { size: "192x192", href: "%PUBLIC_URL%/icons/icon-192x192.webp" },
+        { size: "512x512", href: "%PUBLIC_URL%/icons/icon-512x512.webp" },
+        { size: "1024x1024", href: "%PUBLIC_URL%/icons/icon-1024x1024.webp" },
+      ];
+
+      iconSizes.forEach((icon) => {
+        const link = document.createElement("link");
+        link.rel = "icon";
+        link.type = "image/webp";
+        link.sizes = icon.size;
+        link.href = icon.href;
+        document.head.appendChild(link);
+      });
+    </script>
   </body>
 </html>

@@ -31,6 +31,6 @@ const getTrophyImage = (seriesName: string) => {
     seriesName.toLocaleLowerCase().includes("worldcup")
   )
     return "iccLogo.png";
-  return "defaultLogo.jpeg";
+  return "defaultLogo.webp";
 };
 export default getTrophyImage;

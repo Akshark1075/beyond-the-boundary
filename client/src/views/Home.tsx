@@ -1,6 +1,6 @@
 import Box from "@mui/material/Box";
 import DrawerAppBar from "../Components/Navbar";
-import homecover from "../assets/homecover.jpg";
+import homecover from "../assets/homecover.webp";
 import { Typography } from "@mui/material";
 import MatchCard from "../Components/MatchCard";
 const Home = () => {

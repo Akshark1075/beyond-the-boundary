@@ -52,7 +52,7 @@ describe("getTrophyImage", () => {
     expect(getTrophyImage("ICC World Cup")).toBe("iccLogo.png");
   });
 
-  it("should return defaultLogo.jpeg for unknown series", () => {
-    expect(getTrophyImage("Unknown Series")).toBe("defaultLogo.jpeg");
+  it("should return defaultLogo.webp for unknown series", () => {
+    expect(getTrophyImage("Unknown Series")).toBe("defaultLogo.webp");
   });
 });
