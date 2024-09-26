@@ -56,7 +56,7 @@ const Video = ({
 
   const { data: videoUrl } = useQuery<VideoResource>({
     queryKey: ["videoData"],
-    enabled: !!matchData,
+    enabled: !!matchData && !isARMode,
     queryFn: useCallback(
       () =>
         fetchTopYouTubeResult(

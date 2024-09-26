@@ -372,46 +372,65 @@ const WithXRPlane = ({
             {title}
           </Text>
           )
-          <mesh
-            position={pos}
-            ref={meshRef}
-            scale={
-              !!meshScale
-                ? meshScale
-                : title === `Runs per over` || title === `Scorecard comparison`
-                ? [0.5, 0.5, 0.5]
-                : title === `Field positions` || title === `Wagonwheel`
-                ? [0.1, 0.1, 0.1]
-                : [1, 1, 1]
-            }
-            {...(bind() as any)}
-          >
-            {title === `Runs per over` ||
-            title === `Scorecard comparison` ||
-            title === `Field positions` ||
-            title === `Video` ||
-            title === `Wagonwheel` ? (
-              component
-            ) : (
-              <>
-                {title === "Batting Scorecard" ||
-                  (title === "Bowling Scorecard" && (
-                    <mesh>
-                      <planeGeometry args={[width, height]} />
-                      <meshBasicMaterial color={"white"} />
-                    </mesh>
-                  ))}
-                <Html
-                  width={width}
-                  height={height}
-                  image={image}
-                  sceneSize={sceneSize}
-                >
-                  {component}
-                </Html>
-              </>
-            )}
-          </mesh>
+          {title === `Runs per over` ||
+          title === `Scorecard comparison` ||
+          title === `Field positions` ||
+          title === `Wagonwheel` ? (
+            <group
+              position={pos}
+              ref={meshRef}
+              scale={
+                !!meshScale
+                  ? meshScale
+                  : title === `Field positions` || title === `Wagonwheel`
+                  ? [0.1, 0.1, 0.1]
+                  : title === `Runs per over` ||
+                    title === `Scorecard comparison`
+                  ? [0.5, 0.5, 0.5]
+                  : [1, 1, 1]
+              }
+              {...(bind() as any)}
+            >
+              {component}
+            </group>
+          ) : (
+            <mesh
+              position={pos}
+              ref={meshRef}
+              scale={
+                !!meshScale
+                  ? meshScale
+                  : title === `Field positions` || title === `Wagonwheel`
+                  ? [0.1, 0.1, 0.1]
+                  : [1, 1, 1]
+              }
+              {...(bind() as any)}
+            >
+              {title === `Field positions` ||
+              title === `Video` ||
+              title === `Wagonwheel` ? (
+                component
+              ) : (
+                <>
+                  {title === "Batting Scorecard" ||
+                    (title === "Bowling Scorecard" && (
+                      <mesh>
+                        <planeGeometry args={[width, height]} />
+                        <meshBasicMaterial color={"white"} />
+                      </mesh>
+                    ))}
+                  <Html
+                    width={width}
+                    height={height}
+                    image={image}
+                    sceneSize={sceneSize}
+                  >
+                    {component}
+                  </Html>
+                </>
+              )}
+            </mesh>
+          )}
         </Interactive>
 
         <Interactive onSelect={handleScaleDown}>

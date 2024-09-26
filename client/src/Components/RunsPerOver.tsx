@@ -226,7 +226,10 @@ const RunsPerOver = React.memo(
     if ((isLoading || error) && isARMode) return <Box></Box>;
 
     return isARMode ? (
-      <ARBarGraph data={chartData.datasets[0].data} position={arPos} />
+      <ARBarGraph
+        data={data ? chartData.datasets[0].data : undefined}
+        position={arPos}
+      />
     ) : isMobile ? (
       <Card
         style={{

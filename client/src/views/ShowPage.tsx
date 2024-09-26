@@ -50,8 +50,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "../api/queryClient";
 import { GetInfo } from "../types/getInfo";
 import { GetSquad } from "../types/getSquad";
-import { createRoot } from "react-dom/client";
-import { flushSync } from "react-dom";
+import { renderToString } from "react-dom/server";
+
 export interface SelectedOption {
   name: string;
   x: number;
@@ -238,16 +238,6 @@ const ShowPage = () => {
 
   const ref = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-
-  const [overlayContent, setOverlayContent] = useState<HTMLDivElement | null>(
-    null
-  );
-
-  useEffect(() => {
-    if (ref.current !== null) {
-      setOverlayContent(ref.current);
-    }
-  }, []);
 
   useEffect(() => {
     const canvas = document.getElementById("canvas");
@@ -466,21 +456,19 @@ const ShowPage = () => {
 
   useEffect(() => {
     const node = document.createElement("div");
-    const root = createRoot(node);
-    flushSync(() => {
-      root.render(
-        <QueryClientProvider client={queryClient}>
-          <MatchInfo
-            selections={selections}
-            setSelection={setSelection}
-            isARMode={true}
-            data={matchData}
-            isLoading={isMatchDataLoading}
-            isError={isMatchDataError}
-          />
-        </QueryClientProvider>
-      );
-    });
+
+    node.innerHTML = renderToString(
+      <QueryClientProvider client={queryClient}>
+        <MatchInfo
+          selections={selections}
+          setSelection={setSelection}
+          isARMode={true}
+          data={matchData}
+          isLoading={isMatchDataLoading}
+          isError={isMatchDataError}
+        />
+      </QueryClientProvider>
+    );
 
     matchInfoNodeRef.current = node;
   }, [
@@ -498,25 +486,22 @@ const ShowPage = () => {
 
   useEffect(() => {
     const node = document.createElement("div");
-    const root = createRoot(node);
-    flushSync(() => {
-      root.render(
-        <QueryClientProvider client={queryClient}>
-          <Squad
-            selections={selections}
-            setSelection={setSelection}
-            isARMode={true}
-            matchData={matchData}
-            isMatchDataLoading={isMatchDataLoading}
-            isMatchDataError={isMatchDataError}
-            isTeam1SquadDataLoading={isTeam1SquadDataLoading}
-            isTeam2SquadDataLoading={isTeam2SquadDataLoading}
-            team1SquadData={team1SquadData}
-            team2SquadData={team2SquadData}
-          />
-        </QueryClientProvider>
-      );
-    });
+    node.innerHTML = renderToString(
+      <QueryClientProvider client={queryClient}>
+        <Squad
+          selections={selections}
+          setSelection={setSelection}
+          isARMode={true}
+          matchData={matchData}
+          isMatchDataLoading={isMatchDataLoading}
+          isMatchDataError={isMatchDataError}
+          isTeam1SquadDataLoading={isTeam1SquadDataLoading}
+          isTeam2SquadDataLoading={isTeam2SquadDataLoading}
+          team1SquadData={team1SquadData}
+          team2SquadData={team2SquadData}
+        />
+      </QueryClientProvider>
+    );
 
     squadNodeRef.current = node;
   }, [
@@ -540,21 +525,18 @@ const ShowPage = () => {
 
   useEffect(() => {
     const node = document.createElement("div");
-    const root = createRoot(node);
-    flushSync(() => {
-      root.render(
-        <QueryClientProvider client={queryClient}>
-          <FallOfWickets
-            selections={selections}
-            setSelection={setSelection}
-            isARMode={true}
-            isLoading={isScoresDataLoading}
-            isError={isScoresDataError}
-            data={scoresData}
-          />
-        </QueryClientProvider>
-      );
-    });
+    node.innerHTML = renderToString(
+      <QueryClientProvider client={queryClient}>
+        <FallOfWickets
+          selections={selections}
+          setSelection={setSelection}
+          isARMode={true}
+          isLoading={isScoresDataLoading}
+          isError={isScoresDataError}
+          data={scoresData}
+        />
+      </QueryClientProvider>
+    );
 
     fowNodeRef.current = node;
   }, [
@@ -572,22 +554,19 @@ const ShowPage = () => {
 
   useEffect(() => {
     const node = document.createElement("div");
-    const root = createRoot(node);
-    flushSync(() => {
-      root.render(
-        <QueryClientProvider client={queryClient}>
-          <ScoreCardTable
-            type="Batting"
-            selections={selections}
-            setSelection={setSelection}
-            isARMode={true}
-            data={scoresData}
-            isLoading={isScoresDataLoading}
-            isError={isScoresDataError}
-          />
-        </QueryClientProvider>
-      );
-    });
+    node.innerHTML = renderToString(
+      <QueryClientProvider client={queryClient}>
+        <ScoreCardTable
+          type="Batting"
+          selections={selections}
+          setSelection={setSelection}
+          isARMode={true}
+          data={scoresData}
+          isLoading={isScoresDataLoading}
+          isError={isScoresDataError}
+        />
+      </QueryClientProvider>
+    );
 
     battingScorecardNodeRef.current = node;
   }, [
@@ -605,22 +584,19 @@ const ShowPage = () => {
 
   useEffect(() => {
     const node = document.createElement("div");
-    const root = createRoot(node);
-    flushSync(() => {
-      root.render(
-        <QueryClientProvider client={queryClient}>
-          <ScoreCardTable
-            type="Bowling"
-            selections={selections}
-            setSelection={setSelection}
-            isARMode={true}
-            data={scoresData}
-            isLoading={isScoresDataLoading}
-            isError={isScoresDataError}
-          />
-        </QueryClientProvider>
-      );
-    });
+    node.innerHTML = renderToString(
+      <QueryClientProvider client={queryClient}>
+        <ScoreCardTable
+          type="Bowling"
+          selections={selections}
+          setSelection={setSelection}
+          isARMode={true}
+          data={scoresData}
+          isLoading={isScoresDataLoading}
+          isError={isScoresDataError}
+        />
+      </QueryClientProvider>
+    );
 
     bowlingScorecardNodeRef.current = node;
   }, [
@@ -636,6 +612,7 @@ const ShowPage = () => {
 
   useEffect(() => {
     const node = matchInfoNodeRef.current;
+
     if (node) {
       if (container) container.appendChild(node);
       domtoimage
@@ -660,7 +637,7 @@ const ShowPage = () => {
         }
       };
     }
-  }, [isMatchDataSuccess, matchId, memoizedmatchData]);
+  }, [isMatchDataSuccess, matchId, matchData]);
   useEffect(() => {
     const node = squadNodeRef.current;
     if (node) {
@@ -1032,11 +1009,6 @@ const ShowPage = () => {
           sessionInit={{
             requiredFeatures: ["hit-test"],
             optionalFeatures: ["hand-tracking"],
-            domOverlay: !!overlayContent
-              ? {
-                  root: overlayContent as HTMLElement,
-                }
-              : undefined,
           }}
         />
       )}
