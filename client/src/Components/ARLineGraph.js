@@ -20,18 +20,22 @@ const CustomLine = ({ points, color, position }) => {
 };
 
 const ARLineGraph = ({ data, position }) => {
-  const maxRuns = Math.max(...data.map((team) => Math.max(...team.data)));
-  const minRuns = Math.min(...data.map((team) => Math.min(...team.data)));
-  const oversCount = data[0].data.length;
+  const maxRuns = data
+    ? Math.max(...data.map((team) => Math.max(...team.data)))
+    : 0;
+  const minRuns = data
+    ? Math.min(...data.map((team) => Math.min(...team.data)))
+    : 0;
+  const oversCount = data ? data[0].data.length : 0;
 
-  return (
+  return data ? (
     <>
       <mesh>
         <planeGeometry args={[4, 4]} />
         <meshBasicMaterial transparent={true} color={"white"} opacity={0} />
       </mesh>
       <mesh>
-        {data.map((team, teamIndex) => {
+        {data?.map((team, teamIndex) => {
           const points = team.data.map((value, index) => {
             const x = (index / (oversCount - 1)) * 2 - 1; // Scale to [-1, 1]
             const y = ((value - minRuns) / (maxRuns - minRuns)) * 2; // Scale to [0, 2]
@@ -101,6 +105,8 @@ const ARLineGraph = ({ data, position }) => {
         })}
       </mesh>
     </>
+  ) : (
+    <Text position={position}>Loading</Text>
   );
 };
 

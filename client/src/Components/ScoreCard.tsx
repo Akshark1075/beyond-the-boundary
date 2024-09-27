@@ -531,7 +531,18 @@ const BowlingScorecard = ({
     height?: number;
   }) => {
     return (
-      <TableContainer component={Paper} style={{ boxShadow: "none" }}>
+      <TableContainer
+        component={Paper}
+        style={{
+          boxShadow: "none",
+          background: "white",
+          width: isMobile
+            ? window.screen.width
+            : width
+            ? `${width}px`
+            : "350px",
+        }}
+      >
         <Box
           // @ts-ignore: Unreachable code error
           sx={{
@@ -568,7 +579,11 @@ const BowlingScorecard = ({
         </Box>
         <Table
           sx={{
-            width: width ? `${width}px` : window.screen.width,
+            width: isMobile
+              ? window.screen.width
+              : width
+              ? `${width}px`
+              : "350px",
             tableLayout: "fixed",
           }}
           size="small"

@@ -372,7 +372,7 @@ const ARFloatingActionButton = ({
   const { camera } = useThree();
 
   const [hovered, setHovered] = useState<number | null>(null);
-  const [pos, setPos] = useState<THREE.Vector3>(new THREE.Vector3(0, 0, -3));
+  const [pos, setPos] = useState<THREE.Vector3>(new THREE.Vector3(0, 0.3, -3));
 
   useEffect(() => {
     if (meshRef.current) {
@@ -397,6 +397,15 @@ const ARFloatingActionButton = ({
           </Text>
         </mesh>
       </Interactive>
+      <Text
+        fontSize={0.3}
+        position={[pos.x, pos.y - 0.4, pos.z]}
+        color="#E50914"
+        anchorX="center"
+        anchorY="middle"
+      >
+        {"Menu"}
+      </Text>
       {open && (
         <mesh
           ref={menuRef}

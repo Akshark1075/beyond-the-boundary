@@ -256,7 +256,7 @@ const ShowPage = () => {
 
   const [shouldShowReticle, setShouldShowReticle] = useState(true);
   const [selectedARComponent, setSelectedARComponent] = useState<string | null>(
-    "Video"
+    "Runs per over"
   );
 
   const placeModel = (
