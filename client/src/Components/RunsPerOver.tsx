@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useContext, useMemo } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -28,10 +28,10 @@ import { DraggableEvent } from "react-draggable";
 import { SelectedOption } from "../views/ShowPage";
 import getRandomCoordinates from "../utilities/getRandomCoordinates";
 import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
-import fetchWithRetry from "../api/fetch";
 import ARBarGraph from "./ARBarGraph";
 import { Box } from "@react-three/drei";
 import { PositionContext } from "./PlaneWithContent";
+import getUpdatedZIndex from "../utilities/getUpdatedZIndex";
 
 ChartJS.register(
   CategoryScale,
@@ -43,32 +43,28 @@ ChartJS.register(
   Legend
 );
 
-const fetchOvers = async (matchId: string): Promise<GetScorecard> => {
-  const res = await fetchWithRetry(
-    `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`
-  );
-  return res;
-};
-
 const RunsPerOver = React.memo(
   ({
     matchId,
     selections,
     setSelection,
     isARMode,
+    data,
+    isLoading,
+    isError,
   }: {
     matchId: string;
 
     selections: SelectedOption[];
     setSelection: (option: SelectedOption[]) => void;
     isARMode: boolean;
+    data: GetScorecard | undefined;
+    isLoading: boolean;
+    isError: boolean;
   }) => {
     const arPos = useContext(PositionContext);
+    const [isDragging, setIsDragging] = useState(false);
 
-    const { isLoading, error, data } = useQuery<GetScorecard>({
-      queryKey: [`scoresData-${matchId}`],
-      queryFn: useCallback(() => fetchOvers(matchId), [matchId]),
-    });
     const { x: randomX, y: randomY } = getRandomCoordinates();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -167,6 +163,7 @@ const RunsPerOver = React.memo(
       y = randomY,
       width = 350,
       height = 350,
+      zIndex = 1,
     } = storedRunsPerOver ?? {};
 
     if (!storedRunsPerOver && !isMobile && !isARMode) {
@@ -178,6 +175,7 @@ const RunsPerOver = React.memo(
           y: y,
           width: width,
           height: height,
+          zIndex: 1,
         },
       ];
       setSelection(newItems);
@@ -190,6 +188,7 @@ const RunsPerOver = React.memo(
       if (option && !isMobile) {
         option.x = x;
         option.y = y;
+        option.zIndex = getUpdatedZIndex(selections, option.name);
         setSelection(newSelections);
         saveArrayToLocalStorage("selectedOptions", newSelections);
       }
@@ -201,6 +200,7 @@ const RunsPerOver = React.memo(
       if (option && !isMobile) {
         option.width = w;
         option.height = h;
+        option.zIndex = getUpdatedZIndex(selections, option.name);
         setSelection(newSelections);
         saveArrayToLocalStorage("selectedOptions", newSelections);
       }
@@ -218,12 +218,21 @@ const RunsPerOver = React.memo(
         setSize(newWidth, newHeight);
       }
     };
-
+    const handleDragStart = (e: DraggableEvent) => {
+      setIsDragging(true);
+    };
     const handleDragStop = (e: DraggableEvent, d: { x: number; y: number }) => {
+      setIsDragging(false);
       setPosition(d.x, d.y);
     };
+    const handleResizeStart = (e: DraggableEvent) => {
+      setIsDragging(true);
+    };
+    const handleResizeStop = (e: DraggableEvent) => {
+      setIsDragging(false);
+    };
 
-    if ((isLoading || error) && isARMode) return <Box></Box>;
+    if ((isLoading || isError) && isARMode) return <Box></Box>;
 
     return isARMode ? (
       <ARBarGraph
@@ -262,7 +271,7 @@ const RunsPerOver = React.memo(
             overflow: "auto",
           }}
         >
-          {isLoading || error ? (
+          {isLoading || isError ? (
             <>
               <Skeleton height={"2rem"} />
               <Skeleton height={"2rem"} />
@@ -283,10 +292,24 @@ const RunsPerOver = React.memo(
         size={{ width: width, height: height }}
         position={{ x: x ?? randomX, y: y ?? randomY }}
         onResize={handleResize}
+        onResizeStart={handleResizeStart}
+        onResizeStop={handleResizeStop}
+        onDragStart={handleDragStart}
         onDragStop={handleDragStop}
         minWidth={350}
         minHeight={350}
         bounds="window"
+        style={{ zIndex: isDragging ? 999999 : zIndex }}
+        enableResizing={{
+          top: true,
+          right: true,
+          bottom: true,
+          left: true,
+          bottomLeft: true,
+          bottomRight: true,
+          topLeft: true,
+          topRight: true,
+        }}
       >
         <div>
           <WithTitleBar
@@ -309,7 +332,7 @@ const RunsPerOver = React.memo(
                 overflow: "auto",
               }}
             >
-              {isLoading || error ? (
+              {isLoading || isError ? (
                 <>
                   <Skeleton height={"2rem"} />
                   <Skeleton height={"2rem"} />

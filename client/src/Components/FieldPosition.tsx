@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import WithTitleBar from "./WithTitleBar";
 import { Rnd, RndResizeCallback } from "react-rnd";
@@ -11,6 +11,7 @@ import { AppBar, Toolbar, Typography, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { PositionContext } from "./PlaneWithContent";
 import { BufferGeometry, Mesh } from "three";
+import getUpdatedZIndex from "../utilities/getUpdatedZIndex";
 
 interface FieldPositionProps {
   selections: SelectedOption[];
@@ -27,6 +28,7 @@ const FieldPos: React.FC<FieldPositionProps> = ({
   fieldPosArr,
   arPos,
 }) => {
+  const [isDragging, setIsDragging] = useState(false);
   const mountRef = useRef<HTMLDivElement>(null);
   const { x: randomX, y: randomY } = getRandomCoordinates();
   const theme = useTheme();
@@ -41,6 +43,7 @@ const FieldPos: React.FC<FieldPositionProps> = ({
     y = randomY,
     width = isMobile ? window.screen.width : 350,
     height = isMobile ? window.screen.width + 20 : 370,
+    zIndex = 1,
   } = storedFieldPosition ?? {};
 
   if (!storedFieldPosition && !isMobile && !isARMode) {
@@ -52,6 +55,7 @@ const FieldPos: React.FC<FieldPositionProps> = ({
         y: y,
         width: width,
         height: height,
+        zIndex: 1,
       },
     ];
     setSelection(newItems);
@@ -64,6 +68,7 @@ const FieldPos: React.FC<FieldPositionProps> = ({
     if (option && !isMobile) {
       option.x = x;
       option.y = y;
+      option.zIndex = getUpdatedZIndex(selections, option.name);
       setSelection(newSelections);
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
@@ -75,6 +80,7 @@ const FieldPos: React.FC<FieldPositionProps> = ({
     if (option && !isMobile) {
       option.width = w;
       option.height = h;
+      option.zIndex = getUpdatedZIndex(selections, option.name);
       setSelection(newSelections);
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
@@ -94,8 +100,18 @@ const FieldPos: React.FC<FieldPositionProps> = ({
     }
   };
 
+  const handleDragStart = (e: DraggableEvent) => {
+    setIsDragging(true);
+  };
   const handleDragStop = (e: DraggableEvent, d: { x: number; y: number }) => {
+    setIsDragging(false);
     setPosition(d.x, d.y);
+  };
+  const handleResizeStart = (e: DraggableEvent) => {
+    setIsDragging(true);
+  };
+  const handleResizeStop = (e: DraggableEvent) => {
+    setIsDragging(false);
   };
 
   const createCircleTexture = (size: number, color: string) => {
@@ -372,10 +388,14 @@ const FieldPos: React.FC<FieldPositionProps> = ({
       size={{ width: width, height: height }}
       position={{ x: x ?? randomX, y: y ?? randomY }}
       onResize={handleResize}
+      onResizeStart={handleResizeStart}
+      onResizeStop={handleResizeStop}
+      onDragStart={handleDragStart}
       onDragStop={handleDragStop}
       minWidth={350}
       minHeight={350}
       bounds="window"
+      style={{ zIndex: isDragging ? 999999 : zIndex }}
     >
       <div style={{ width: `${width}px` }}>
         <WithTitleBar

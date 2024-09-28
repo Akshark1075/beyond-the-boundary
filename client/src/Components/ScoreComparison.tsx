@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -29,6 +29,7 @@ import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
 import ARLineGraph from "./ARLineGraph";
 import { Box } from "@react-three/drei";
 import { PositionContext } from "./PlaneWithContent";
+import getUpdatedZIndex from "../utilities/getUpdatedZIndex";
 
 ChartJS.register(
   CategoryScale,
@@ -56,6 +57,7 @@ const Scorecomparison = ({
   isError: boolean;
 }) => {
   const arPos = useContext(PositionContext);
+  const [isDragging, setIsDragging] = useState(false);
   const { x: randomX, y: randomY } = getRandomCoordinates();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -176,6 +178,7 @@ const Scorecomparison = ({
     y = randomY,
     width = 350,
     height = 350,
+    zIndex = 1,
   } = storedScoreComparison ?? {};
 
   if (!storedScoreComparison && !isMobile && !isARMode) {
@@ -187,6 +190,7 @@ const Scorecomparison = ({
         y: y,
         width: width,
         height: height,
+        zIndex: 1,
       },
     ];
     setSelection(newItems);
@@ -199,6 +203,7 @@ const Scorecomparison = ({
     if (option && !isMobile) {
       option.x = x;
       option.y = y;
+      option.zIndex = getUpdatedZIndex(selections, option.name);
       setSelection(newSelections);
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
@@ -210,6 +215,7 @@ const Scorecomparison = ({
     if (option && !isMobile) {
       option.width = w;
       option.height = h;
+      option.zIndex = getUpdatedZIndex(selections, option.name);
       setSelection(newSelections);
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
@@ -227,9 +233,18 @@ const Scorecomparison = ({
       setSize(newWidth, newHeight);
     }
   };
-
+  const handleDragStart = (e: DraggableEvent) => {
+    setIsDragging(true);
+  };
   const handleDragStop = (e: DraggableEvent, d: { x: number; y: number }) => {
+    setIsDragging(false);
     setPosition(d.x, d.y);
+  };
+  const handleResizeStart = (e: DraggableEvent) => {
+    setIsDragging(true);
+  };
+  const handleResizeStop = (e: DraggableEvent) => {
+    setIsDragging(false);
   };
   if ((isLoading || isError) && isARMode) return <Box></Box>;
 
@@ -294,11 +309,15 @@ const Scorecomparison = ({
     <Rnd
       size={{ width: width, height: height }}
       position={{ x: x ?? randomX, y: y ?? randomY }}
+      onDragStart={handleDragStart}
       onResize={handleResize}
+      onResizeStart={handleResizeStart}
+      onResizeStop={handleResizeStop}
       onDragStop={handleDragStop}
       minWidth={350}
       minHeight={350}
       bounds="window"
+      style={{ zIndex: isDragging ? 999999 : zIndex }}
     >
       <div style={{ width: `${width}px` }}>
         <WithTitleBar

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -21,6 +21,7 @@ import { DraggableEvent } from "react-draggable";
 import WithTitleBar from "./WithTitleBar";
 
 import { useTheme } from "@mui/material/styles";
+import getUpdatedZIndex from "../utilities/getUpdatedZIndex";
 const MatchInfoComponent = ({
   width,
   height,
@@ -397,6 +398,7 @@ const MatchInfo = React.memo(
     isError: boolean;
     data: GetInfo | undefined;
   }) => {
+    const [isDragging, setIsDragging] = useState(false);
     const { x: randomX, y: randomY } = getRandomCoordinates();
     const componentRef = React.useRef<HTMLDivElement>(null);
     const theme = useTheme();
@@ -407,6 +409,7 @@ const MatchInfo = React.memo(
       y = randomY,
       width = 350,
       height = 350,
+      zIndex = 1,
     } = storedInfo ?? {};
 
     if (!storedInfo && !isMobile && !isARMode) {
@@ -418,6 +421,7 @@ const MatchInfo = React.memo(
           y: y,
           width: width,
           height: height,
+          zIndex: 1,
         },
       ];
       setSelection(newItems);
@@ -430,6 +434,7 @@ const MatchInfo = React.memo(
       if (option) {
         option.x = x;
         option.y = y;
+        option.zIndex = getUpdatedZIndex(selections, option.name);
         setSelection(newSelections);
         saveArrayToLocalStorage("selectedOptions", newSelections);
       }
@@ -441,6 +446,7 @@ const MatchInfo = React.memo(
       if (option) {
         option.width = w;
         option.height = h;
+        option.zIndex = getUpdatedZIndex(selections, option.name);
         setSelection(newSelections);
         saveArrayToLocalStorage("selectedOptions", newSelections);
       }
@@ -459,8 +465,18 @@ const MatchInfo = React.memo(
       }
     };
 
+    const handleDragStart = (e: DraggableEvent) => {
+      setIsDragging(true);
+    };
     const handleDragStop = (e: DraggableEvent, d: { x: number; y: number }) => {
+      setIsDragging(false);
       setPosition(d.x, d.y);
+    };
+    const handleResizeStart = (e: DraggableEvent) => {
+      setIsDragging(true);
+    };
+    const handleResizeStop = (e: DraggableEvent) => {
+      setIsDragging(false);
     };
     return isARMode || isMobile ? (
       <div
@@ -499,10 +515,14 @@ const MatchInfo = React.memo(
         size={{ width: width, height: height }}
         position={{ x: x ?? randomX, y: y ?? randomY }}
         onResize={handleResize}
+        onResizeStart={handleResizeStart}
+        onResizeStop={handleResizeStop}
+        onDragStart={handleDragStart}
         onDragStop={handleDragStop}
         minWidth={350}
         minHeight={350}
         bounds="window"
+        style={{ zIndex: isDragging ? 999999 : zIndex }}
       >
         <div>
           <WithTitleBar

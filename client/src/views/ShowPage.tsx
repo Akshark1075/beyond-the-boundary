@@ -58,6 +58,7 @@ export interface SelectedOption {
   y: number;
   width: number;
   height: number;
+  zIndex: number;
 }
 export interface Model {
   position: THREE.Vector3 | undefined;
@@ -198,6 +199,7 @@ const ShowPage = () => {
           y: (window.innerHeight - 480) / 2,
           width: 853,
           height: 480,
+          zIndex: 1,
         },
         {
           name: "Match Info",
@@ -205,6 +207,7 @@ const ShowPage = () => {
           y: 20,
           width: 350,
           height: 680,
+          zIndex: 1,
         },
         {
           name: "Squad",
@@ -212,6 +215,7 @@ const ShowPage = () => {
           y: 20,
           width: 350,
           height: 680,
+          zIndex: 1,
         },
       ];
     }
@@ -236,7 +240,6 @@ const ShowPage = () => {
     }
   }, [isARMode]);
 
-  const ref = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
@@ -256,7 +259,7 @@ const ShowPage = () => {
 
   const [shouldShowReticle, setShouldShowReticle] = useState(true);
   const [selectedARComponent, setSelectedARComponent] = useState<string | null>(
-    "Runs per over"
+    "Video"
   );
 
   const placeModel = (
@@ -360,6 +363,10 @@ const ShowPage = () => {
             selections={selections}
             setSelection={setSelection}
             isARMode={true}
+            data={scoresData}
+            isLoading={isScoresDataLoading}
+            isError={isScoresDataError}
+            isSuccess={isScoresDataSuccess}
           />
         );
       case "Video":
@@ -415,6 +422,9 @@ const ShowPage = () => {
             selections={selections}
             setSelection={setSelection}
             isARMode={true}
+            isLoading={isScoresDataLoading}
+            isError={isScoresDataError}
+            data={scoresData}
           />
         );
 
@@ -832,6 +842,7 @@ const ShowPage = () => {
               team2SquadData={team2SquadData}
               isScoresDataLoading={isScoresDataLoading}
               isScoresDataError={isScoresDataError}
+              isScoresDataSuccess={isScoresDataSuccess}
               scoresData={scoresData}
               videoTexture={textureRef.current}
             />
@@ -927,6 +938,9 @@ const ShowPage = () => {
                           selections={selections}
                           setSelection={setSelection}
                           isARMode={false}
+                          isLoading={isScoresDataLoading}
+                          isError={isScoresDataError}
+                          data={scoresData}
                         />
                       ),
                       title: "RPO",
@@ -962,6 +976,10 @@ const ShowPage = () => {
                           selections={selections}
                           setSelection={setSelection}
                           isARMode={false}
+                          data={scoresData}
+                          isLoading={isScoresDataLoading}
+                          isError={isScoresDataError}
+                          isSuccess={isScoresDataSuccess}
                         />
                       ),
                       title: "Wheel",
@@ -996,6 +1014,7 @@ const ShowPage = () => {
                   team2SquadData={team2SquadData}
                   isScoresDataLoading={isScoresDataLoading}
                   isScoresDataError={isScoresDataError}
+                  isScoresDataSuccess={isScoresDataSuccess}
                   scoresData={scoresData}
                   videoTexture={textureRef.current}
                 />

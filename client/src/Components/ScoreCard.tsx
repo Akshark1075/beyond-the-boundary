@@ -26,6 +26,7 @@ import { Rnd, RndResizeCallback } from "react-rnd";
 import { SelectedOption } from "../views/ShowPage";
 import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
 import getRandomCoordinates from "../utilities/getRandomCoordinates";
+import getUpdatedZIndex from "../utilities/getUpdatedZIndex";
 
 export type ScoreCardType = "Batting" | "Bowling";
 
@@ -45,6 +46,7 @@ const BattingScorecard = ({
   selections: SelectedOption[];
   setSelection: (option: SelectedOption[]) => void;
 }) => {
+  const [isDragging, setIsDragging] = React.useState(false);
   const [open, setOpen] = React.useState(true);
   const componentRef = React.useRef<HTMLDivElement>(null);
   const { x: randomX, y: randomY } = getRandomCoordinates();
@@ -58,6 +60,7 @@ const BattingScorecard = ({
     y = randomY,
     width = 350,
     height = 350,
+    zIndex = 1,
   } = storedScorecard ?? {};
   if (!storedScorecard && !isMobile && !isARMode) {
     const newItems = [
@@ -68,6 +71,7 @@ const BattingScorecard = ({
         y: y,
         width: width,
         height: height,
+        zIndex: 1,
       },
     ];
     setSelection(newItems);
@@ -81,6 +85,7 @@ const BattingScorecard = ({
     if (option && !isMobile) {
       option.x = x;
       option.y = y;
+      option.zIndex = getUpdatedZIndex(selections, option.name);
       setSelection(newSelections);
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
@@ -94,6 +99,7 @@ const BattingScorecard = ({
     if (option && !isMobile) {
       option.width = w;
       option.height = h;
+      option.zIndex = getUpdatedZIndex(selections, option.name);
       setSelection(newSelections);
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
@@ -111,7 +117,11 @@ const BattingScorecard = ({
       setSize(newWidth, newHeight);
     }
   };
+  const handleDragStart = (e: DraggableEvent) => {
+    setIsDragging(true);
+  };
   const handleDragStop = (e: DraggableEvent, d: { x: number; y: number }) => {
+    setIsDragging(false);
     setPosition(d.x, d.y);
   };
 
@@ -410,11 +420,13 @@ const BattingScorecard = ({
       size={{ width: width, height: height }}
       position={{ x: x, y: y }}
       onResize={handleResize}
+      onDragStart={handleDragStart}
       onDragStop={handleDragStop}
       minWidth={350}
       minHeight={350}
       bounds="window"
       key={row.batTeamDetails.batTeamName}
+      style={{ zIndex: isDragging ? 999999 : zIndex }}
     >
       <div
         ref={componentRef}
@@ -453,6 +465,7 @@ const BowlingScorecard = ({
   selections: SelectedOption[];
   setSelection: (option: SelectedOption[]) => void;
 }) => {
+  const [isDragging, setIsDragging] = React.useState(false);
   const [open, setOpen] = React.useState(true);
   const componentRef = useRef<HTMLDivElement>(null);
   const { x: randomX, y: randomY } = getRandomCoordinates();
@@ -466,6 +479,7 @@ const BowlingScorecard = ({
     y = randomY,
     width = 350,
     height = 350,
+    zIndex = 1,
   } = storedScorecard ?? {};
 
   if (!storedScorecard && !isMobile && !isARMode) {
@@ -477,6 +491,7 @@ const BowlingScorecard = ({
         y: y,
         width: 350,
         height: 350,
+        zIndex: 1,
       },
     ];
     setSelection(newItems);
@@ -504,6 +519,7 @@ const BowlingScorecard = ({
     if (option && !isMobile) {
       option.x = x;
       option.y = y;
+      option.zIndex = getUpdatedZIndex(selections, option.name);
       setSelection(newSelections);
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
@@ -516,12 +532,23 @@ const BowlingScorecard = ({
     if (option && !isMobile) {
       option.width = w;
       option.height = h;
+      option.zIndex = getUpdatedZIndex(selections, option.name);
       setSelection(newSelections);
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
   };
+  const handleDragStart = (e: DraggableEvent) => {
+    setIsDragging(true);
+  };
   const handleDragStop = (e: DraggableEvent, d: { x: number; y: number }) => {
+    setIsDragging(false);
     setPosition(d.x, d.y);
+  };
+  const handleResizeStart = (e: DraggableEvent) => {
+    setIsDragging(true);
+  };
+  const handleResizeStop = (e: DraggableEvent) => {
+    setIsDragging(false);
   };
   const BowlingScorecardComponent = ({
     width,
@@ -836,11 +863,15 @@ const BowlingScorecard = ({
       size={{ width: width, height: height }}
       position={{ x: x, y: y }}
       onResize={handleResize}
+      onDragStart={handleDragStart}
       onDragStop={handleDragStop}
+      onResizeStart={handleResizeStart}
+      onResizeStop={handleResizeStop}
       minWidth={350}
       minHeight={350}
       bounds="window"
       key={row.bowlTeamDetails.bowlTeamName}
+      style={{ zIndex: isDragging ? 999999 : zIndex }}
     >
       <div
         ref={componentRef}

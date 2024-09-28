@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -23,6 +23,7 @@ import getRandomCoordinates from "../utilities/getRandomCoordinates";
 import { Rnd, RndResizeCallback } from "react-rnd";
 import { DraggableEvent } from "react-draggable";
 import WithTitleBar from "./WithTitleBar";
+import getUpdatedZIndex from "../utilities/getUpdatedZIndex";
 const SquadComponent = ({
   width,
   height,
@@ -240,22 +241,7 @@ const Squad = React.memo(
     team1SquadData: GetSquad | undefined;
     team2SquadData: GetSquad | undefined;
   }) => {
-    // const fetchInfo = async (matchId: string): Promise<GetInfo> => {
-    //   const res = await fetchWithRetry(
-    //     `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}`
-    //   );
-    //   return res;
-    // };
-
-    // const {
-    //   isLoading: isMatchDataLoading,
-    //   isError: isMatchDataError,
-    //   data: matchData,
-    // } = useQuery<GetInfo>({
-    //   queryKey: ["infoData", matchId],
-    //   queryFn: useCallback(() => fetchInfo(matchId), [matchId]),
-    // });
-
+    const [isDragging, setIsDragging] = useState(false);
     const { x: randomX, y: randomY } = getRandomCoordinates();
     const componentRef = React.useRef<HTMLDivElement>(null);
 
@@ -267,6 +253,7 @@ const Squad = React.memo(
       y = randomY,
       width = 350,
       height = 500,
+      zIndex = 1,
     } = storedSquad ?? {};
     if (!storedSquad && !isMobile && !isARMode) {
       const newItems = [
@@ -277,8 +264,10 @@ const Squad = React.memo(
           y: y,
           width: width,
           height: height,
+          zIndex: 1,
         },
       ];
+
       setSelection(newItems);
       saveArrayToLocalStorage("selectedOptions", newItems);
     }
@@ -289,6 +278,7 @@ const Squad = React.memo(
       if (option && !isMobile) {
         option.x = x;
         option.y = y;
+        option.zIndex = getUpdatedZIndex(selections, option.name);
         setSelection(newSelections);
         saveArrayToLocalStorage("selectedOptions", newSelections);
       }
@@ -300,6 +290,7 @@ const Squad = React.memo(
       if (option && !isMobile) {
         option.width = w;
         option.height = h;
+        option.zIndex = getUpdatedZIndex(selections, option.name);
         setSelection(newSelections);
         saveArrayToLocalStorage("selectedOptions", newSelections);
       }
@@ -318,8 +309,18 @@ const Squad = React.memo(
       }
     };
 
+    const handleDragStart = (e: DraggableEvent) => {
+      setIsDragging(true);
+    };
     const handleDragStop = (e: DraggableEvent, d: { x: number; y: number }) => {
       setPosition(d.x, d.y);
+      setIsDragging(false);
+    };
+    const handleResizeStart = (e: DraggableEvent) => {
+      setIsDragging(true);
+    };
+    const handleResizeStop = (e: DraggableEvent) => {
+      setIsDragging(false);
     };
 
     return isARMode ? (
@@ -397,10 +398,14 @@ const Squad = React.memo(
         size={{ width: width, height: height }}
         position={{ x: x ?? randomX, y: y ?? randomY }}
         onResize={handleResize}
+        onDragStart={handleDragStart}
         onDragStop={handleDragStop}
+        onResizeStart={handleResizeStart}
+        onResizeStop={handleResizeStop}
         minWidth={350}
         minHeight={350}
         bounds="window"
+        style={{ zIndex: isDragging ? 999999 : zIndex }}
       >
         <div>
           <WithTitleBar

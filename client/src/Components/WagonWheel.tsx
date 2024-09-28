@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-} from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import WithTitleBar from "./WithTitleBar";
 import { DraggableEvent } from "react-draggable";
@@ -28,9 +22,9 @@ import {
 } from "@mui/material";
 import "../styles/WagonWheel.css";
 import { GetScorecard } from "../types/getScorecard";
-import { useQuery } from "@tanstack/react-query";
-import fetchWithRetry from "../api/fetch";
+
 import { PositionContext } from "./PlaneWithContent";
+import getUpdatedZIndex from "../utilities/getUpdatedZIndex";
 
 interface WagonWheelProps {
   scores: {
@@ -167,13 +161,22 @@ const WagWheel = ({
   setSelection,
   isARMode,
   arPos,
+  isLoading,
+  isError,
+  isSuccess,
+  data,
 }: {
   matchId: string;
   selections: SelectedOption[];
   setSelection: (option: SelectedOption[]) => void;
   isARMode: boolean;
   arPos?: THREE.Vector3;
+  isLoading: boolean;
+  isError: boolean;
+  isSuccess: boolean;
+  data: GetScorecard | undefined;
 }) => {
+  const [isDragging, setIsDragging] = useState(false);
   const { x: randomX, y: randomY } = getRandomCoordinates();
   const storedWagonWheel = selections.find((s) => s.name === `Wagonwheel`);
   const componentRef = React.useRef<HTMLDivElement>(null);
@@ -184,6 +187,7 @@ const WagWheel = ({
     y = randomY,
     width = isMobile ? window.screen.width : 350,
     height = isMobile ? window.screen.width + 20 : 370,
+    zIndex = 1,
   } = storedWagonWheel ?? {};
 
   if (!storedWagonWheel && !isMobile && !isARMode) {
@@ -195,6 +199,7 @@ const WagWheel = ({
         y: y,
         width: width,
         height: height,
+        zIndex: 1,
       },
     ];
     setSelection(newItems);
@@ -207,6 +212,7 @@ const WagWheel = ({
     if (option && !isMobile) {
       option.x = x;
       option.y = y;
+      option.zIndex = getUpdatedZIndex(selections, option.name);
       setSelection(newSelections);
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
@@ -218,6 +224,7 @@ const WagWheel = ({
     if (option && !isMobile) {
       option.width = w;
       option.height = h;
+      option.zIndex = getUpdatedZIndex(selections, option.name);
       setSelection(newSelections);
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
@@ -235,22 +242,22 @@ const WagWheel = ({
       setSize(newWidth, newHeight);
     }
   };
+  const handleDragStart = (e: DraggableEvent) => {
+    setIsDragging(true);
+  };
   const handleDragStop = (e: DraggableEvent, d: { x: number; y: number }) => {
+    setIsDragging(false);
     setPosition(d.x, d.y);
   };
-
-  const fetchOvers = async (matchId: string): Promise<GetScorecard> => {
-    const res = await fetchWithRetry(
-      `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`
-    );
-    return res;
+  const handleResizeStart = (e: DraggableEvent) => {
+    setIsDragging(true);
+  };
+  const handleResizeStop = (e: DraggableEvent) => {
+    setIsDragging(false);
   };
   const [team, setTeam] = React.useState(0);
   const [player, setPlayer] = React.useState("");
-  const { isLoading, error, data, isSuccess } = useQuery<GetScorecard>({
-    queryKey: [`scoresData-${matchId}`],
-    queryFn: useCallback(() => fetchOvers(matchId), [matchId]),
-  });
+
   const handleTeamChange = (event: SelectChangeEvent) => {
     setTeam(Number(event.target.value));
   };
@@ -513,7 +520,7 @@ const WagWheel = ({
             </FormControl>
           </Box>
         </div>
-        {isLoading || error ? (
+        {isLoading || isError ? (
           <>
             <Skeleton height={"2rem"} />
             <Skeleton height={"2rem"} />
@@ -543,10 +550,14 @@ const WagWheel = ({
       size={{ width: width, height: height }}
       position={{ x: x ?? randomX, y: y ?? randomY }}
       onResize={handleResize}
+      onDragStart={handleDragStart}
       onDragStop={handleDragStop}
+      onResizeStart={handleResizeStart}
+      onResizeStop={handleResizeStop}
       minWidth={350}
       minHeight={350}
       bounds="window"
+      style={{ zIndex: isDragging ? 999999 : zIndex }}
     >
       <div style={{ width: `${width}px` }}>
         <WithTitleBar
@@ -610,7 +621,7 @@ const WagWheel = ({
                 </FormControl>
               </Box>
             </Box>
-            {isLoading || error ? (
+            {isLoading || isError ? (
               <>
                 <Skeleton height={"2rem"} />
                 <Skeleton height={"2rem"} />
@@ -644,11 +655,19 @@ const WagonWheelWrapper = ({
   selections,
   setSelection,
   isARMode,
+  isLoading,
+  isError,
+  isSuccess,
+  data,
 }: {
   matchId: string;
   selections: SelectedOption[];
   setSelection: (option: SelectedOption[]) => void;
   isARMode: boolean;
+  isLoading: boolean;
+  isError: boolean;
+  isSuccess: boolean;
+  data: GetScorecard | undefined;
 }) => {
   const arPos = useContext(PositionContext);
   return (
@@ -658,6 +677,10 @@ const WagonWheelWrapper = ({
       setSelection={setSelection}
       isARMode={isARMode}
       arPos={arPos}
+      isLoading={isLoading}
+      isError={isError}
+      isSuccess={isSuccess}
+      data={data}
     />
   );
 };

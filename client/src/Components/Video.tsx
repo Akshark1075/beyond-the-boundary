@@ -1,7 +1,7 @@
 import "../styles/ShowPage.css";
 import { DraggableEvent } from "react-draggable";
 import WithTitleBar from "./WithTitleBar";
-import React, { Suspense, useCallback } from "react";
+import React, { Suspense, useCallback, useState } from "react";
 import { Rnd, RndResizeCallback } from "react-rnd";
 import { SelectedOption } from "../views/ShowPage";
 import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
@@ -17,6 +17,7 @@ import { GetInfo } from "../types/getInfo";
 import { VideoResource } from "../types/getVideo";
 import { Plane, useTexture } from "@react-three/drei";
 import { VideoTexture } from "three";
+import getUpdatedZIndex from "../utilities/getUpdatedZIndex";
 const Video = ({
   selections,
   setSelection,
@@ -31,7 +32,7 @@ const Video = ({
   texture: VideoTexture | null;
 }) => {
   const componentRef = React.useRef<HTMLDivElement>(null);
-
+  const [isDragging, setIsDragging] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const storedVideo = selections.find((s) => s.name === `Video`);
@@ -77,6 +78,7 @@ const Video = ({
     y = (window.innerHeight - 480) / 2,
     width = 853,
     height = 480,
+    zIndex = 1,
   } = storedVideo ?? {};
 
   if (!storedVideo && !isMobile && !isARMode) {
@@ -88,6 +90,7 @@ const Video = ({
         y: y,
         width: width,
         height: height,
+        zIndex: 1,
       },
     ];
     setSelection(newItems);
@@ -100,6 +103,7 @@ const Video = ({
     if (option && !isMobile) {
       option.x = x;
       option.y = y;
+      option.zIndex = getUpdatedZIndex(selections, option.name);
       setSelection(newSelections);
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
@@ -111,6 +115,7 @@ const Video = ({
     if (option && !isMobile) {
       option.width = w;
       option.height = h;
+      option.zIndex = getUpdatedZIndex(selections, option.name);
       setSelection(newSelections);
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
@@ -129,10 +134,19 @@ const Video = ({
     }
   };
 
+  const handleDragStart = (e: DraggableEvent) => {
+    setIsDragging(true);
+  };
   const handleDragStop = (e: DraggableEvent, d: { x: number; y: number }) => {
     setPosition(d.x, d.y);
+    setIsDragging(false);
   };
-
+  const handleResizeStart = (e: DraggableEvent) => {
+    setIsDragging(true);
+  };
+  const handleResizeStop = (e: DraggableEvent) => {
+    setIsDragging(false);
+  };
   // eslint-disable-next-line react/prop-types
   const VideoPlane = () => {
     function FallbackMaterial({ url }: { url: string }) {
@@ -199,11 +213,15 @@ const Video = ({
     <Rnd
       size={{ width: width, height: height }}
       position={{ x: x, y: y }}
+      onDragStart={handleDragStart}
       onResize={handleResize}
+      onResizeStart={handleResizeStart}
+      onResizeStop={handleResizeStop}
       onDragStop={handleDragStop}
       minWidth={500}
       minHeight={300}
       bounds="window"
+      style={{ zIndex: isDragging ? 999999 : zIndex }}
     >
       <div>
         <WithTitleBar

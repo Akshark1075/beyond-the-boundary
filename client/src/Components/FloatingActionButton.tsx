@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@mui/material";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import "../styles/floatingActionButton.css";
 import ScoreCardTable from "./ScoreCard";
 import RunsPerOver from "./RunsPerOver";
@@ -12,12 +12,11 @@ import Squad from "./Squad";
 import FallOfWickets from "./FallOfWickets";
 import MatchInfo from "./MatchInfo";
 import FieldPosition from "./FieldPosition";
-import { Html } from "@react-three/drei";
-import { Interactive, useXR, XRInteractionEvent } from "@react-three/xr";
+import { Interactive } from "@react-three/xr";
 import * as THREE from "three";
 
 import { Text } from "@react-three/drei";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useThree } from "@react-three/fiber";
 import { BufferGeometry } from "three";
 import { fieldPositions } from "../utilities/getFieldPositions";
 import { GetInfo } from "../types/getInfo";
@@ -39,6 +38,7 @@ interface FloatingActionButtonProps {
   team2SquadData: GetSquad | undefined;
   isScoresDataLoading: boolean;
   isScoresDataError: boolean;
+  isScoresDataSuccess: boolean;
   scoresData: GetScorecard | undefined;
   videoTexture: THREE.VideoTexture | null;
 }
@@ -58,6 +58,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   team2SquadData,
   isScoresDataLoading,
   isScoresDataError,
+  isScoresDataSuccess,
   scoresData,
   videoTexture,
 }) => {
@@ -130,6 +131,9 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
             selections={selections}
             setSelection={setSelection}
             isARMode={isARMode}
+            isLoading={isScoresDataLoading}
+            isError={isScoresDataError}
+            data={scoresData}
           />
         )}
         {(scorecardComparison ||
@@ -149,6 +153,10 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
             setSelection={setSelection}
             matchId={matchId ?? ""}
             isARMode={isARMode}
+            data={scoresData}
+            isLoading={isScoresDataLoading}
+            isError={isScoresDataError}
+            isSuccess={isScoresDataSuccess}
           />
         )}
         {(video || selectedComponent === "Video") && (

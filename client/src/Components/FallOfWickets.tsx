@@ -3,12 +3,13 @@ import { Rnd, RndResizeCallback } from "react-rnd";
 import WithTitleBar from "./WithTitleBar";
 import { DraggableEvent } from "react-draggable";
 import { saveArrayToLocalStorage } from "../utilities/localStorageUtils";
-import React from "react";
+import React, { useState } from "react";
 import getRandomCoordinates from "../utilities/getRandomCoordinates";
 import { SelectedOption } from "../views/ShowPage";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { AppBar, Skeleton, Toolbar, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import getUpdatedZIndex from "../utilities/getUpdatedZIndex";
 
 const FallOfWickets = ({
   selections,
@@ -62,6 +63,7 @@ const Fow = ({
   setSelection: (option: SelectedOption[]) => void;
   isARMode: boolean;
 }) => {
+  const [isDragging, setIsDragging] = useState(false);
   const componentRef = React.useRef<HTMLDivElement>(null);
   const { x: randomX, y: randomY } = getRandomCoordinates();
   const theme = useTheme();
@@ -74,14 +76,9 @@ const Fow = ({
     y = randomY,
     width = 350,
     height = 350,
+    zIndex = 1,
   } = storedFallOfWickets ?? {};
 
-  // if (
-  //   selections.find((s) => s.name.includes("Fall of wickets")) &&
-  //   !storedFallOfWickets
-  // ) {
-  //   return <></>;
-  // }
   if (!storedFallOfWickets && !isMobile && !isARMode) {
     const newItems = [
       ...selections,
@@ -91,6 +88,7 @@ const Fow = ({
         y: y,
         width: width,
         height: height,
+        zIndex: 1,
       },
     ];
     setSelection(newItems);
@@ -105,6 +103,7 @@ const Fow = ({
     if (option && !isMobile) {
       option.x = x;
       option.y = y;
+      option.zIndex = getUpdatedZIndex(selections, option.name);
       setSelection(newSelections);
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
@@ -118,6 +117,7 @@ const Fow = ({
     if (option && !isMobile) {
       option.width = w;
       option.height = h;
+      option.zIndex = getUpdatedZIndex(selections, option.name);
       setSelection(newSelections);
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
@@ -135,8 +135,18 @@ const Fow = ({
       setSize(newWidth, newHeight);
     }
   };
+  const handleDragStart = (e: DraggableEvent) => {
+    setIsDragging(true);
+  };
   const handleDragStop = (e: DraggableEvent, d: { x: number; y: number }) => {
     setPosition(d.x, d.y);
+    setIsDragging(false);
+  };
+  const handleResizeStart = (e: DraggableEvent) => {
+    setIsDragging(true);
+  };
+  const handleResizeStop = (e: DraggableEvent) => {
+    setIsDragging(false);
   };
 
   if (isLoading || isError)
@@ -210,11 +220,15 @@ const Fow = ({
         size={{ width: width, height: height }}
         position={{ x: x, y: y }}
         onResize={handleResize}
+        onResizeStart={handleResizeStart}
+        onResizeStop={handleResizeStop}
+        onDragStart={handleDragStart}
         onDragStop={handleDragStop}
         minWidth={350}
         minHeight={350}
         bounds="window"
         key={row.batTeamDetails.batTeamName}
+        style={{ zIndex: isDragging ? 999999 : zIndex }}
       >
         <div
           ref={componentRef}
