@@ -399,12 +399,18 @@ const Squad = React.memo(
         position={{ x: x ?? randomX, y: y ?? randomY }}
         onResize={handleResize}
         onDragStart={handleDragStart}
-        onDragStop={handleDragStop}
+        onDragStop={(e, data) => {
+          const minY = 0; // You can set this to any value to add padding from the top.
+          if (data.y < minY) {
+            handleDragStop(e, { ...data, y: minY });
+          } else {
+            handleDragStop(e, data);
+          }
+        }}
         onResizeStart={handleResizeStart}
         onResizeStop={handleResizeStop}
         minWidth={350}
         minHeight={350}
-        bounds="window"
         style={{ zIndex: isDragging ? 999999 : zIndex }}
       >
         <div>

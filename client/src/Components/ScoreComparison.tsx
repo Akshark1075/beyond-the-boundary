@@ -313,10 +313,16 @@ const Scorecomparison = ({
       onResize={handleResize}
       onResizeStart={handleResizeStart}
       onResizeStop={handleResizeStop}
-      onDragStop={handleDragStop}
+      onDragStop={(e, data) => {
+        const minY = 0; // You can set this to any value to add padding from the top.
+        if (data.y < minY) {
+          handleDragStop(e, { ...data, y: minY });
+        } else {
+          handleDragStop(e, data);
+        }
+      }}
       minWidth={350}
       minHeight={350}
-      bounds="window"
       style={{ zIndex: isDragging ? 999999 : zIndex }}
     >
       <div style={{ width: `${width}px` }}>

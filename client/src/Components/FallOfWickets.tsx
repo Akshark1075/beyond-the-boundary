@@ -223,10 +223,16 @@ const Fow = ({
         onResizeStart={handleResizeStart}
         onResizeStop={handleResizeStop}
         onDragStart={handleDragStart}
-        onDragStop={handleDragStop}
+        onDragStop={(e, data) => {
+          const minY = 0; // You can set this to any value to add padding from the top.
+          if (data.y < minY) {
+            handleDragStop(e, { ...data, y: minY });
+          } else {
+            handleDragStop(e, data);
+          }
+        }}
         minWidth={350}
         minHeight={350}
-        bounds="window"
         key={row.batTeamDetails.batTeamName}
         style={{ zIndex: isDragging ? 999999 : zIndex }}
       >
