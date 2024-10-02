@@ -513,7 +513,7 @@ const WagWheel = ({
                 sx={{ color: "white" }}
                 onChange={handlePlayerChange}
               >
-                {teamBatters.map((b) => (
+                {teamBatters?.map((b) => (
                   <MenuItem value={b.batName}>{b.batName}</MenuItem>
                 ))}
               </Select>
@@ -531,7 +531,7 @@ const WagWheel = ({
         ) : (
           <WagonWheel
             scores={
-              teamBatters.find((b) => b.batName === player) ?? {
+              teamBatters?.find((b) => b.batName === player) ?? {
                 ones: 0,
                 twos: 0,
                 threes: 0,
@@ -563,7 +563,7 @@ const WagWheel = ({
       onResizeStop={handleResizeStop}
       minWidth={350}
       minHeight={350}
-      style={{ zIndex: isDragging ? 999999 : zIndex }}
+      style={{ zIndex: isDragging ? 1101 : zIndex }}
     >
       <div style={{ width: `${width}px` }}>
         <WithTitleBar
@@ -618,7 +618,7 @@ const WagWheel = ({
                     sx={{ color: "white" }}
                     onChange={handlePlayerChange}
                   >
-                    {teamBatters.map((b) => (
+                    {teamBatters?.map((b) => (
                       <MenuItem value={b.batName} key={b.batName}>
                         {b.batName}
                       </MenuItem>
@@ -638,7 +638,7 @@ const WagWheel = ({
             ) : (
               <WagonWheel
                 scores={
-                  teamBatters.find((b) => b.batName === player) ?? {
+                  teamBatters?.find((b) => b.batName === player) ?? {
                     ones: 0,
                     twos: 0,
                     threes: 0,
