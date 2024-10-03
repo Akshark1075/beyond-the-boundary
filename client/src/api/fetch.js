@@ -10,6 +10,7 @@ const apiKeys = [
   "1cc6bc17f9msh16c26c529c9d557p1f4306jsn92513464018a",
   "fb825d76camshc89a23d3b25430ap1d884fjsn5e38a5b81ca1",
 ];
+//Fetch function that retries with new api key on failure
 const fetchWithRetry = async (url, options = {}) => {
   let apiKey = apiKeys[0];
   const newOptions = {

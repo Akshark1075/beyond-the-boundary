@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import ICCRankings from "../Components/ICCRankings";
 import DrawerAppBar from "../Components/Navbar";
-
+//Rankings page
 const Rankings = () => {
   return (
     // @ts-ignore: Unreachable code error

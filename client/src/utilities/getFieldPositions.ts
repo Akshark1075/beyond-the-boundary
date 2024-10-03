@@ -1,3 +1,4 @@
+//Function for getting random field positions
 const allPos = [
   [0.0, 10.0, 1.0], //Keeper
 

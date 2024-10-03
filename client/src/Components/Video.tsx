@@ -120,6 +120,7 @@ const Video = ({
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
   };
+  //Functions for handling resizing
   const handleResize: RndResizeCallback = (
     e,
     direction,
@@ -133,7 +134,7 @@ const Video = ({
       setSize(newWidth, newHeight);
     }
   };
-
+  //Functions for controlling the drag state
   const handleDragStart = (e: DraggableEvent) => {
     setIsDragging(true);
   };
@@ -163,7 +164,7 @@ const Video = ({
       </Plane>
     );
   };
-
+  //Video place for AR Mode
   return isARMode ? (
     <VideoPlane />
   ) : isMobile ? (
@@ -210,6 +211,7 @@ const Video = ({
       </div>
     </div>
   ) : (
+    //Customizable Desktop interface
     <Rnd
       size={{ width: width, height: height }}
       position={{ x: x, y: y }}

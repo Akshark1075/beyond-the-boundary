@@ -42,13 +42,13 @@ const WithXRPlane = ({
     const width = height * (viewSize.width / viewSize.height);
     return { width, height };
   }, [camera, viewSize]);
-
+  //Initializing reference for main mesh and control meshes
   const meshRef = useRef<Mesh<BufferGeometry>>(null);
   const plusMeshRef = useRef<Mesh<BufferGeometry>>(null);
   const minusMeshRef = useRef<Mesh<BufferGeometry>>(null);
   const closeMeshRef = useRef<Mesh<BufferGeometry>>(null);
   const titleRef = useRef<Mesh<BufferGeometry>>(null);
-
+  //Initializing Position and Scale
   const [pos, setPos] = useState(
     position ? position : new THREE.Vector3(-3, 1, 3)
   );
@@ -62,7 +62,7 @@ const WithXRPlane = ({
         )
       : new THREE.Vector3(1, 1, 1)
   );
-
+  //Using useDrag function for implementing draggable meshes
   const bind = useDrag((state) => {
     const {
       movement: [mx, my],
@@ -77,7 +77,7 @@ const WithXRPlane = ({
 
     // threshold for movement sensitivity
     const threshold = 0.1;
-
+    //setting new position
     setPos((prev: any) => {
       // Calculate movement based on the camera's world direction
       const xMove = Math.abs(direction.x) > threshold ? mx / 10000 : 0; // Move along the X-axis
@@ -92,14 +92,14 @@ const WithXRPlane = ({
       return new THREE.Vector3(newX, newY, newZ);
     });
   });
-
+  //Making the meshes look at the camera
   useEffect(() => {
     if (meshRef.current) {
       if (!!meshRef.current.lookAt) meshRef.current.lookAt(camera.position);
       updateControlMeshPositions();
     }
   }, [camera.position, pos]);
-
+  //Update the position of mesh controls
   const updateControlMeshPositions = () => {
     if (meshRef.current && camera) {
       const scaleY = meshRef.current.scale.y;
@@ -108,7 +108,7 @@ const WithXRPlane = ({
       const rightVector = new THREE.Vector3();
       camera.getWorldDirection(rightVector);
       rightVector.cross(camera.up).normalize();
-
+      //Plus Button
       if (plusMeshRef.current) {
         plusMeshRef.current.position.copy(meshRef.current.position);
         plusMeshRef.current.position.add(
@@ -117,7 +117,7 @@ const WithXRPlane = ({
         plusMeshRef.current.position.y += scaleY + 0.2;
         plusMeshRef.current.lookAt(camera.position);
       }
-
+      //Minus Button
       if (minusMeshRef.current) {
         minusMeshRef.current.position.copy(meshRef.current.position);
         minusMeshRef.current.position.add(
@@ -126,6 +126,7 @@ const WithXRPlane = ({
         minusMeshRef.current.position.y += scaleY + 0.2;
         minusMeshRef.current.lookAt(camera.position);
       }
+      //Close Button
       if (closeMeshRef.current) {
         const offset =
           title === `Runs per over` ||
@@ -138,6 +139,7 @@ const WithXRPlane = ({
         closeMeshRef.current.position.y += scaleY + offset; // Move down to the bottom center
         closeMeshRef.current.lookAt(camera.position); // Ensure it faces the camera
       }
+      //Component Title
       if (titleRef.current) {
         const offset =
           title === `Runs per over` ||
@@ -152,7 +154,7 @@ const WithXRPlane = ({
       }
     }
   };
-
+  //Function for scaling up the meshes
   const handleScaleUp = () => {
     if (meshRef.current) {
       const scaleX = meshRef.current.scale.x;
@@ -198,7 +200,7 @@ const WithXRPlane = ({
       updateControlMeshPositions();
     }
   };
-
+  //Function for scaling down the meshes
   const handleScaleDown = () => {
     if (meshRef.current) {
       const scaleX = meshRef.current.scale.x;
@@ -246,6 +248,7 @@ const WithXRPlane = ({
       updateControlMeshPositions();
     }
   };
+  //Function for removing the meshes
   const handleClose = () => {
     if (title === "Video") {
       if (videoRef.current) {
@@ -271,6 +274,7 @@ const WithXRPlane = ({
     });
   };
   const isDraggingRef = useRef(false);
+  //Functions for controlling drag functionality
   const handleDragStart = (event: XRInteractionEvent) => {
     if (isDraggingRef.current) {
       return;
@@ -278,7 +282,6 @@ const WithXRPlane = ({
 
     if (meshRef.current) {
       isDraggingRef.current = true;
-      // meshRef.current.position.copy(event.intersections[0].point);
     }
   };
   const handleDrag = (event: XRInteractionEvent) => {
@@ -315,7 +318,7 @@ const WithXRPlane = ({
   };
 
   const { controllers } = useXR();
-
+  //Functionality for controlling the distance of the meshes from the camera (uses Joystick)
   useFrame(() => {
     // Find the right controller
     const rightController = controllers.find(
@@ -344,7 +347,7 @@ const WithXRPlane = ({
       }
     }
   });
-
+  //Setting width and height for the planes
   const getWidthAndHeight = (title: string) => {
     switch (title) {
       case "Fall of wickets":
@@ -371,7 +374,7 @@ const WithXRPlane = ({
           <Text fontSize={0.1} color="white" fontWeight="bold" ref={titleRef}>
             {title}
           </Text>
-          )
+          ){/**Approach 1: Using 3D Models**/}
           {title === `Runs per over` ||
           title === `Scorecard comparison` ||
           title === `Field positions` ||
@@ -406,6 +409,7 @@ const WithXRPlane = ({
               }
               {...(bind() as any)}
             >
+              {/**Approach 2: Using HTML image textures**/}
               {title === `Field positions` ||
               title === `Video` ||
               title === `Wagonwheel` ? (
@@ -432,7 +436,7 @@ const WithXRPlane = ({
             </mesh>
           )}
         </Interactive>
-
+        {/* Minus Button*/}
         <Interactive onSelect={handleScaleDown}>
           <mesh ref={minusMeshRef}>
             <circleGeometry args={[0.15, 32]} />
@@ -447,7 +451,7 @@ const WithXRPlane = ({
             </Text>
           </mesh>
         </Interactive>
-
+        {/* Plus Button*/}
         <Interactive onSelect={handleScaleUp}>
           <mesh ref={plusMeshRef}>
             <circleGeometry args={[0.15, 32]} />
@@ -462,7 +466,7 @@ const WithXRPlane = ({
             </Text>
           </mesh>
         </Interactive>
-
+        {/* Close Button*/}
         <Interactive onSelect={handleClose}>
           <mesh ref={closeMeshRef}>
             <circleGeometry args={[0.15, 32]} />

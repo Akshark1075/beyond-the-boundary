@@ -15,7 +15,7 @@ export default function Html({
   const { gl } = useThree();
 
   const texture = useTexture(image);
-
+  //Texture Size
   const size = useMemo(() => {
     const imageAspect = texture.image.width / texture.image.height;
     let w = width || sceneSize.width;
@@ -27,7 +27,7 @@ export default function Html({
 
     return { width: w, height: h };
   }, [texture, width, height, sceneSize]);
-
+  //Optimising texture
   useMemo(() => {
     texture.matrixAutoUpdate = false;
     const aspect = size.width / size.height;
@@ -46,10 +46,11 @@ export default function Html({
   );
 }
 const HTMLContent = ({ width, height, texture }) => {
+  //Shaders for the image texture
   const darkenShader = {
     uniforms: {
       map: { value: texture },
-      darkenAmount: { value: 1.3 }, // Adjust this value to change how dark the texture is
+      darkenAmount: { value: 1.3 },
     },
     vertexShader: `
       varying vec2 vUv;

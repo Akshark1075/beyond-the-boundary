@@ -1,3 +1,4 @@
+//Function for getting formatted time
 function getTimeAgo(timestamp: string | number | undefined): string {
   const now = new Date();
   const past = new Date(Number(timestamp)); // Convert timestamp to a number and create a Date object

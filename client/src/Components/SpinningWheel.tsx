@@ -16,6 +16,7 @@ const SpinningWheel: React.FC<SpinningWheelProps> = ({ components }) => {
   const wheelRef = useRef<HTMLDivElement>(null);
 
   const angleStep = 360 / components.length;
+  //Function for controlling the visibility of the wheel
   const handleVisibility = () => {
     resetIdleTimer();
     setVisible((prevVisible) => {
@@ -26,6 +27,7 @@ const SpinningWheel: React.FC<SpinningWheelProps> = ({ components }) => {
       return !prevVisible;
     });
   };
+  //Function for resetting the idle timer
   const resetIdleTimer = () => {
     setIdleTimer((prevTimer) => {
       if (prevTimer) {
@@ -34,6 +36,7 @@ const SpinningWheel: React.FC<SpinningWheelProps> = ({ components }) => {
       return null;
     });
   };
+  //Function for starting the idle timer
   const startIdleTimer = () => {
     setIdleTimer(
       setTimeout(() => {
@@ -42,7 +45,7 @@ const SpinningWheel: React.FC<SpinningWheelProps> = ({ components }) => {
       }, 5000)
     );
   };
-
+  //Attach event touch/click listeners on first launch
   useEffect(() => {
     document.addEventListener("click", handleVisibility);
     document.addEventListener("mousedown", resetIdleTimer);
@@ -53,7 +56,7 @@ const SpinningWheel: React.FC<SpinningWheelProps> = ({ components }) => {
       document.removeEventListener("touchstart", resetIdleTimer); // Clean up touchstart event
     };
   }, []);
-
+  //Handle interactions on the wheel
   const handleInteractionStart = (startEvent: MouseEvent | TouchEvent) => {
     startEvent.preventDefault();
     startEvent.stopPropagation();
@@ -90,7 +93,7 @@ const SpinningWheel: React.FC<SpinningWheelProps> = ({ components }) => {
   const handleMouseDown = (event) => handleInteractionStart(event);
   // @ts-ignore: Unreachable code error
   const handleTouchStart = (event) => handleInteractionStart(event);
-
+  //Update the selected component index
   const updateCurrentIndex = (newRotation: number) => {
     const adjustedRotation = ((newRotation % 360) + 360) % 360;
     const newIndex = Math.floor(adjustedRotation / angleStep);

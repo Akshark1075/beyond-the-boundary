@@ -403,6 +403,7 @@ const MatchInfo = React.memo(
     const componentRef = React.useRef<HTMLDivElement>(null);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+    //Fetching the position and size of stored match info component
     const storedInfo = selections.find((s) => s.name === `Match Info`);
     const {
       x = randomX,
@@ -411,7 +412,7 @@ const MatchInfo = React.memo(
       height = 350,
       zIndex = 1,
     } = storedInfo ?? {};
-
+    //If the component is being used for the first time, store to local storage
     if (!storedInfo && !isMobile && !isARMode) {
       const newItems = [
         ...selections,
@@ -427,7 +428,7 @@ const MatchInfo = React.memo(
       setSelection(newItems);
       saveArrayToLocalStorage("selectedOptions", newItems);
     }
-
+    //Function for setting the new position
     const setPosition = (x: number, y: number) => {
       const newSelections = [...selections];
       const option = newSelections.find((s) => s.name === `Match Info`);
@@ -439,7 +440,7 @@ const MatchInfo = React.memo(
         saveArrayToLocalStorage("selectedOptions", newSelections);
       }
     };
-
+    //Function for setting the new size
     const setSize = (w: number, h: number) => {
       const newSelections = [...selections];
       const option = newSelections.find((s) => s.name === `Match Info`);
@@ -451,6 +452,7 @@ const MatchInfo = React.memo(
         saveArrayToLocalStorage("selectedOptions", newSelections);
       }
     };
+    //Function for handling resizing
     const handleResize: RndResizeCallback = (
       e,
       direction,
@@ -464,7 +466,7 @@ const MatchInfo = React.memo(
         setSize(newWidth, newHeight);
       }
     };
-
+    //functions for controlling the state of dragging
     const handleDragStart = (e: DraggableEvent) => {
       setIsDragging(true);
     };
@@ -478,6 +480,7 @@ const MatchInfo = React.memo(
     const handleResizeStop = (e: DraggableEvent) => {
       setIsDragging(false);
     };
+    /*Interface for Mobile and AR Mode */
     return isARMode || isMobile ? (
       <div
         style={{
@@ -511,6 +514,7 @@ const MatchInfo = React.memo(
         />
       </div>
     ) : (
+      /*Customizable UI for Desktops, Laptops */
       <Rnd
         size={{ width: width, height: height }}
         position={{ x: x ?? randomX, y: y ?? randomY }}
@@ -519,7 +523,7 @@ const MatchInfo = React.memo(
         onResizeStop={handleResizeStop}
         onDragStart={handleDragStart}
         onDragStop={(e, data) => {
-          const minY = 0; // You can set this to any value to add padding from the top.
+          const minY = 0;
           if (data.y < minY) {
             handleDragStop(e, { ...data, y: minY });
           } else {

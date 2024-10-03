@@ -99,6 +99,7 @@ const ShowPage = () => {
   const { matchId = "" } = useParams();
   const [searchParams] = useSearchParams();
   const isLive = searchParams.get("isLive");
+  //Functions for fetching data for stats
   const fetchScorecard = async (matchId: string): Promise<GetScorecard> => {
     const res = await fetchWithRetry(
       `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/hscard`
@@ -121,6 +122,7 @@ const ShowPage = () => {
 
     return res;
   };
+  //Fetching Match Data
   const {
     isLoading: isMatchDataLoading,
     isError: isMatchDataError,
@@ -135,6 +137,7 @@ const ShowPage = () => {
   });
   const team1Id = matchData?.matchInfo.team1.id;
   const team2Id = matchData?.matchInfo.team2.id;
+  //Fetching Team1 Squad
   const {
     isLoading: isTeam1SquadDataLoading,
     isError: isTeam1SquadDataError,
@@ -149,7 +152,7 @@ const ShowPage = () => {
     enabled: !!matchId && !!team1Id,
     staleTime: 30000,
   });
-
+  //Fetching Team2 Squad
   const {
     isLoading: isTeam2SquadDataLoading,
     isError: isTeam2SquadDataError,
@@ -164,6 +167,7 @@ const ShowPage = () => {
     enabled: !!matchId && !!team2Id,
     staleTime: 30000,
   });
+  //Fetching Scorecard
   const {
     isLoading: isScoresDataLoading,
     isError: isScoresDataError,
@@ -185,7 +189,7 @@ const ShowPage = () => {
     [team2SquadData]
   );
   const memoizedScoresData = useMemo(() => scoresData, [scoresData]);
-
+  //Setting up default UI on first launch
   useEffect(() => {
     // Retrieve the array from local storage on component mount
     let storedItems = getArrayFromLocalStorage("selectedOptions");
@@ -241,7 +245,7 @@ const ShowPage = () => {
   }, [isARMode]);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
-
+  //Setting up the canvas for AR Mode
   useEffect(() => {
     const canvas = document.getElementById("canvas");
     if (canvas) {
@@ -261,7 +265,7 @@ const ShowPage = () => {
   const [selectedARComponent, setSelectedARComponent] = useState<string | null>(
     "Video"
   );
-
+  //Function for placing the models
   const placeModel = (
     e: XRInteractionEvent,
     component: JSX.Element,
@@ -293,6 +297,7 @@ const ShowPage = () => {
     setShouldShowReticle(false);
   };
   const textureRef = useRef<THREE.VideoTexture | null>(null);
+  //Creating video texture
   useEffect(() => {
     if (selectedARComponent === "Video") {
       const video = document.createElement("video");
@@ -308,6 +313,7 @@ const ShowPage = () => {
       textureRef.current = new THREE.VideoTexture(video);
     }
   }, [selectedARComponent]);
+  //Function for giving AR Component based on selection
   const getARComponent = (componentName: string) => {
     switch (componentName) {
       case "Match Info":
@@ -446,6 +452,8 @@ const ShowPage = () => {
   const lastUrl3 = useRef<string>(null);
   const lastUrl4 = useRef<string>(null);
   const lastUrl5 = useRef<string>(null);
+
+  //Initializing state with base64 encoded blank image
   const [matchInfoImage, setMatchInfoImage] = useState(
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
   );
@@ -463,7 +471,7 @@ const ShowPage = () => {
   );
 
   const matchInfoNodeRef = useRef<HTMLDivElement | null>(null);
-
+  // Rendering the MatchInfo component to a string and setting it as innerHTML of the node
   useEffect(() => {
     const node = document.createElement("div");
 
@@ -493,7 +501,7 @@ const ShowPage = () => {
   ]);
 
   const squadNodeRef = useRef<HTMLDivElement | null>(null);
-
+  // Rendering the Squad component to a string and setting it as innerHTML of the node
   useEffect(() => {
     const node = document.createElement("div");
     node.innerHTML = renderToString(
@@ -532,7 +540,7 @@ const ShowPage = () => {
   ]);
 
   const fowNodeRef = useRef<HTMLDivElement | null>(null);
-
+  // Rendering the Fall of wickets component to a string and setting it as innerHTML of the node
   useEffect(() => {
     const node = document.createElement("div");
     node.innerHTML = renderToString(
@@ -561,7 +569,7 @@ const ShowPage = () => {
   ]);
 
   const battingScorecardNodeRef = useRef<HTMLDivElement | null>(null);
-
+  // Rendering the Batting scorecard component to a string and setting it as innerHTML of the node
   useEffect(() => {
     const node = document.createElement("div");
     node.innerHTML = renderToString(
@@ -591,7 +599,7 @@ const ShowPage = () => {
   ]);
 
   const bowlingScorecardNodeRef = useRef<HTMLDivElement | null>(null);
-
+  // Rendering the Bowling scorecard component to a string and setting it as innerHTML of the node
   useEffect(() => {
     const node = document.createElement("div");
     node.innerHTML = renderToString(
@@ -620,6 +628,7 @@ const ShowPage = () => {
     setSelection,
   ]);
 
+  // Convert the Match Info node to an image blob using domtoimage with a transparent background
   useEffect(() => {
     const node = matchInfoNodeRef.current;
 
@@ -648,6 +657,7 @@ const ShowPage = () => {
       };
     }
   }, [isMatchDataSuccess, matchId, matchData]);
+  // Convert the Squad node to an image blob using domtoimage with a transparent background
   useEffect(() => {
     const node = squadNodeRef.current;
     if (node) {
@@ -684,7 +694,7 @@ const ShowPage = () => {
     memoizedTeam1SquadData,
     memoizedTeam2SquadData,
   ]);
-
+  // Convert the Fall of wickets node to an image blob using domtoimage with a transparent background
   useEffect(() => {
     const node = fowNodeRef.current;
     if (node) {
@@ -713,7 +723,7 @@ const ShowPage = () => {
       };
     }
   }, [isScoresDataSuccess, matchId, memoizedScoresData]);
-
+  // Convert the batting scorecard node to an image blob using domtoimage with a transparent background
   useEffect(() => {
     const node = battingScorecardNodeRef.current;
     if (node) {
@@ -742,7 +752,7 @@ const ShowPage = () => {
       };
     }
   }, [isScoresDataSuccess, matchId, memoizedScoresData]);
-
+  // Convert the bowling scorecard node to an image blob using domtoimage with a transparent background
   useEffect(() => {
     const node = bowlingScorecardNodeRef.current;
     if (node) {
@@ -774,8 +784,6 @@ const ShowPage = () => {
 
   return (
     <>
-      {/* <div id="overlay" className="overlay" ref={ref} /> */}
-
       <Canvas
         id="canvas"
         style={{ width: "1px", height: "1px", visibility: "hidden" }}
@@ -855,6 +863,7 @@ const ShowPage = () => {
         <Box className={"h-full sm:flex overflow-y-auto "}>
           <DrawerAppBar />;
           <Box className="mt-20 sm:mt-28 w-full ">
+            {/*Showing spinning wheel on mobile screens */}
             {isMobile ? (
               <>
                 <SpinningWheel
@@ -1000,6 +1009,7 @@ const ShowPage = () => {
                 />
               </>
             ) : (
+              /*Showing floating button on mobile screens */
               <>
                 <FloatingActionButton
                   selections={selections}
@@ -1023,6 +1033,7 @@ const ShowPage = () => {
           </Box>
         </Box>
       )}
+      {/*Showing AR Button on headsets only */}
       {!isMobile && (
         <ARButton
           sessionInit={{

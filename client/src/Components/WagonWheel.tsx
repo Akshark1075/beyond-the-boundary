@@ -178,6 +178,7 @@ const WagWheel = ({
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const { x: randomX, y: randomY } = getRandomCoordinates();
+  //Fetching the position and size of stored wagonwheel component
   const storedWagonWheel = selections.find((s) => s.name === `Wagonwheel`);
   const componentRef = React.useRef<HTMLDivElement>(null);
   const theme = useTheme();
@@ -189,7 +190,7 @@ const WagWheel = ({
     height = isMobile ? window.screen.width + 20 : 370,
     zIndex = 1,
   } = storedWagonWheel ?? {};
-
+  //If the component is being used for the first time, store to local storage
   if (!storedWagonWheel && !isMobile && !isARMode) {
     const newItems = [
       ...selections,
@@ -205,7 +206,7 @@ const WagWheel = ({
     setSelection(newItems);
     saveArrayToLocalStorage("selectedOptions", newItems);
   }
-
+  //Function for setting the new position
   const setPosition = (x: number, y: number) => {
     const newSelections = [...selections];
     const option = newSelections.find((s) => s.name === `Wagonwheel`);
@@ -217,7 +218,7 @@ const WagWheel = ({
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
   };
-
+  //Function for setting the new size
   const setSize = (w: number, h: number) => {
     const newSelections = [...selections];
     const option = newSelections.find((s) => s.name === `Wagonwheel`);
@@ -229,6 +230,7 @@ const WagWheel = ({
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
   };
+  //Function for handling resizing
   const handleResize: RndResizeCallback = (
     e,
     direction,
@@ -242,6 +244,7 @@ const WagWheel = ({
       setSize(newWidth, newHeight);
     }
   };
+  //Functions for controlling the drag state
   const handleDragStart = (e: DraggableEvent) => {
     setIsDragging(true);
   };
@@ -272,6 +275,7 @@ const WagWheel = ({
   const teamBatters = Object.values(
     data?.scoreCard[team]?.batTeamDetails.batsmenData ?? {}
   );
+  //Creating random angles for runs
   const randomOnesAngles = useMemo(() => {
     if (!teamBatters || teamBatters?.length === 0) return [];
     return Array.from(
@@ -389,7 +393,7 @@ const WagWheel = ({
       </group>
     );
   };
-
+  //AR Interface
   return isARMode ? (
     <>
       <mesh>
@@ -448,7 +452,8 @@ const WagWheel = ({
         }
       />
     </>
-  ) : isMobile ? (
+  ) : //Mobile interface
+  isMobile ? (
     <div
       style={{
         width: window.screen.width,
@@ -546,6 +551,7 @@ const WagWheel = ({
       </div>
     </div>
   ) : (
+    //Customizable Desktop interface
     <Rnd
       size={{ width: width, height: height }}
       position={{ x: x ?? randomX, y: y ?? randomY }}

@@ -165,7 +165,7 @@ const RunsPerOver = React.memo(
       height = 350,
       zIndex = 1,
     } = storedRunsPerOver ?? {};
-
+    //If the component is being used for the first time, store to local storage
     if (!storedRunsPerOver && !isMobile && !isARMode) {
       const newItems = [
         ...selections,
@@ -181,7 +181,7 @@ const RunsPerOver = React.memo(
       setSelection(newItems);
       saveArrayToLocalStorage("selectedOptions", newItems);
     }
-
+    //Function for setting new position
     const setPosition = (x: number, y: number) => {
       const newSelections = [...selections];
       const option = newSelections.find((s) => s.name === `Runs per over`);
@@ -193,7 +193,7 @@ const RunsPerOver = React.memo(
         saveArrayToLocalStorage("selectedOptions", newSelections);
       }
     };
-
+    //Function for setting new size
     const setSize = (w: number, h: number) => {
       const newSelections = [...selections];
       const option = newSelections.find((s) => s.name === `Runs per over`);
@@ -205,6 +205,7 @@ const RunsPerOver = React.memo(
         saveArrayToLocalStorage("selectedOptions", newSelections);
       }
     };
+    //Function for handling resizing
     const handleResize: RndResizeCallback = (
       e,
       direction,
@@ -218,6 +219,7 @@ const RunsPerOver = React.memo(
         setSize(newWidth, newHeight);
       }
     };
+    //Functions for controlling the drag state
     const handleDragStart = (e: DraggableEvent) => {
       setIsDragging(true);
     };
@@ -233,13 +235,14 @@ const RunsPerOver = React.memo(
     };
 
     if ((isLoading || isError) && isARMode) return <Box></Box>;
-
+    //Displaying 3D graph on AR Mode
     return isARMode ? (
       <ARBarGraph
         data={data ? chartData.datasets[0].data : undefined}
         position={arPos}
       />
-    ) : isMobile ? (
+    ) : /*Mobile interface */
+    isMobile ? (
       <Card
         style={{
           width: `${window.screen.width}px`,
@@ -288,6 +291,7 @@ const RunsPerOver = React.memo(
         </div>
       </Card>
     ) : (
+      /*Customizable desktop interface */
       <Rnd
         size={{ width: width, height: height }}
         position={{ x: x ?? randomX, y: y ?? randomY }}

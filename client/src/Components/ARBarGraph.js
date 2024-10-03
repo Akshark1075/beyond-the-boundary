@@ -1,6 +1,6 @@
-import React, { useRef, useEffect } from "react";
+import React from "react";
 import { Box, Line, Text } from "@react-three/drei";
-
+//Component for building the graph based on data points
 const BarGraph = ({ data }) => {
   const barWidth = 0.1;
   const spacing = 0.02;
@@ -30,7 +30,7 @@ const BarGraph = ({ data }) => {
     </>
   );
 };
-
+//Wrapper component for displaying graph and axis
 const ARBarGraph = ({ data, position }) => {
   const barWidth = 0.1;
   const spacing = 0.02;
@@ -68,7 +68,7 @@ const ARBarGraph = ({ data, position }) => {
         {/* Thin horizontal box */}
         <meshBasicMaterial color="white" />
       </mesh>
-
+      {/*Labels */}
       <Text
         position={[-0.15 - graphWidth, 1.2, 0]}
         fontSize={0.1}
@@ -85,6 +85,7 @@ const ARBarGraph = ({ data, position }) => {
       >
         Overs
       </Text>
+      {/*Ticks*/}
       {[2, 4, 6, 8, 10].map((tick) => (
         <Line
           key={tick}
@@ -96,6 +97,7 @@ const ARBarGraph = ({ data, position }) => {
           lineWidth={1}
         />
       ))}
+      {/* Y-axis labels for Runs */}
       {[2, 4, 6, 8, 10, 12, 14, 16, 18, 20].map((tick) => (
         <Text
           key={tick}
@@ -107,6 +109,7 @@ const ARBarGraph = ({ data, position }) => {
           {tick}
         </Text>
       ))}
+      {/* X-axis labels for Overs */}
       {data?.map((_, index) => (
         <Text
           key={index}

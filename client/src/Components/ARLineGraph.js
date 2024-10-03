@@ -2,7 +2,7 @@ import React from "react";
 import { Vector3 } from "three";
 import { Text } from "@react-three/drei";
 import * as THREE from "three";
-
+//Component for creating line graph based on data points
 const CustomLine = ({ points, color, position }) => {
   // Create a curve from the points
   const curve = new THREE.CatmullRomCurve3(
@@ -18,7 +18,7 @@ const CustomLine = ({ points, color, position }) => {
     </mesh>
   );
 };
-
+//Wrapper component for displaying graph and axis
 const ARLineGraph = ({ data, position }) => {
   const maxRuns = data
     ? Math.max(...data.map((team) => Math.max(...team.data)))

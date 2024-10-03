@@ -1,3 +1,4 @@
+//Function for getting updated z index for component being dragged
 import { SelectedOption } from "../views/ShowPage";
 
 const getUpdatedZIndex = (items: SelectedOption[], title: string): number => {

@@ -1,3 +1,4 @@
+//Functions for getting random coordinates for stats
 function getRandomCoordinates() {
   const minWidth = 350;
   const minHeight = 350;

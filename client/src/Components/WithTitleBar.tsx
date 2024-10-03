@@ -6,7 +6,7 @@ import "../styles/index.css";
 import NewWindow from "react-new-window";
 import { deleteFromLocalStorage } from "../utilities/localStorageUtils";
 import { SelectedOption } from "../views/ShowPage";
-
+//Title bar component for displaying controls
 const WithTitleBar = ({
   title,
   children,
@@ -80,6 +80,7 @@ const WithTitleBar = ({
         />
       </div>
     ) : (
+      //Opens the component in new window
       <NewWindow
         title={title}
         features={{ width: width, height: height }}

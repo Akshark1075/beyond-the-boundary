@@ -1,3 +1,4 @@
+//Local storage utility functions
 import { SelectedOption } from "../views/ShowPage";
 
 export const saveArrayToLocalStorage = (key: string, array: any[]) => {

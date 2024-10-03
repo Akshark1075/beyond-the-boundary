@@ -33,6 +33,7 @@ const FieldPos: React.FC<FieldPositionProps> = ({
   const { x: randomX, y: randomY } = getRandomCoordinates();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  //Fetching the position and size of stored field position component
   const storedFieldPosition = selections.find(
     (s) => s.name === `Field positions`
   );
@@ -45,7 +46,7 @@ const FieldPos: React.FC<FieldPositionProps> = ({
     height = isMobile ? window.screen.width + 20 : 370,
     zIndex = 1,
   } = storedFieldPosition ?? {};
-
+  //If the component is being used for the first time, store to local storage
   if (!storedFieldPosition && !isMobile && !isARMode) {
     const newItems = [
       ...selections,
@@ -61,7 +62,7 @@ const FieldPos: React.FC<FieldPositionProps> = ({
     setSelection(newItems);
     saveArrayToLocalStorage("selectedOptions", newItems);
   }
-
+  //Function for setting the new position
   const setPosition = (x: number, y: number) => {
     const newSelections = [...selections];
     const option = newSelections.find((s) => s.name === `Field positions`);
@@ -73,7 +74,7 @@ const FieldPos: React.FC<FieldPositionProps> = ({
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
   };
-
+  //Function for setting the new size
   const setSize = (w: number, h: number) => {
     const newSelections = [...selections];
     const option = newSelections.find((s) => s.name === `Field positions`);
@@ -85,7 +86,7 @@ const FieldPos: React.FC<FieldPositionProps> = ({
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
   };
-
+  //Function for handling resizing
   const handleResize: RndResizeCallback = (
     e,
     direction,
@@ -99,7 +100,7 @@ const FieldPos: React.FC<FieldPositionProps> = ({
       setSize(newWidth, newHeight);
     }
   };
-
+  //functions for controlling the state of dragging
   const handleDragStart = (e: DraggableEvent) => {
     setIsDragging(true);
   };
@@ -283,7 +284,7 @@ const FieldPos: React.FC<FieldPositionProps> = ({
     );
   };
   const meshRef = useRef<Mesh<BufferGeometry>>(null);
-
+  /*Displaying 3D Model on AR Mode */
   return isARMode ? (
     <>
       <mesh ref={meshRef} renderOrder={1}>
@@ -362,7 +363,8 @@ const FieldPos: React.FC<FieldPositionProps> = ({
         );
       })}
     </>
-  ) : isMobile ? (
+  ) : /*Mobile interface*/
+  isMobile ? (
     <div
       style={{
         width: window.screen.width,
@@ -384,6 +386,7 @@ const FieldPos: React.FC<FieldPositionProps> = ({
       {<div ref={mountRef} />}
     </div>
   ) : (
+    /*Customizable UI for Desktops, Laptops */
     <Rnd
       size={{ width: width, height: height }}
       position={{ x: x ?? randomX, y: y ?? randomY }}
@@ -392,7 +395,7 @@ const FieldPos: React.FC<FieldPositionProps> = ({
       onResizeStop={handleResizeStop}
       onDragStart={handleDragStart}
       onDragStop={(e, data) => {
-        const minY = 0; // You can set this to any value to add padding from the top.
+        const minY = 0;
         if (data.y < minY) {
           handleDragStop(e, { ...data, y: minY });
         } else {
@@ -420,7 +423,7 @@ const FieldPos: React.FC<FieldPositionProps> = ({
     </Rnd>
   );
 };
-
+//Field position wrapper
 const FieldPosition: React.FC<FieldPositionProps> = (props) => {
   const arPos = useContext(PositionContext);
   return (

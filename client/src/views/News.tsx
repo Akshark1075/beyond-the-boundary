@@ -15,7 +15,7 @@ import { useCallback } from "react";
 import DrawerAppBar from "../Components/Navbar";
 import { Link } from "react-router-dom";
 import getTimeAgo from "../utilities/getTimeAgo";
-
+//News Page
 const News = () => {
   const fetchNews = async (): Promise<GetNews> => {
     const res = await fetchWithRetry(

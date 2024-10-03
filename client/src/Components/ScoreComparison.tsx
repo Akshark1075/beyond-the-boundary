@@ -61,6 +61,7 @@ const Scorecomparison = ({
   const { x: randomX, y: randomY } = getRandomCoordinates();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  //Fetching the position and size of stored score component component
   const storedScoreComparison = selections.find(
     (s) => s.name === `Scorecard comparison`
   );
@@ -180,7 +181,7 @@ const Scorecomparison = ({
     height = 350,
     zIndex = 1,
   } = storedScoreComparison ?? {};
-
+  //If the component is being used for the first time, store to local storage
   if (!storedScoreComparison && !isMobile && !isARMode) {
     const newItems = [
       ...selections,
@@ -196,7 +197,7 @@ const Scorecomparison = ({
     setSelection(newItems);
     saveArrayToLocalStorage("selectedOptions", newItems);
   }
-
+  //Function for setting the new position
   const setPosition = (x: number, y: number) => {
     const newSelections = [...selections];
     const option = newSelections.find((s) => s.name === `Scorecard comparison`);
@@ -208,7 +209,7 @@ const Scorecomparison = ({
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
   };
-
+  //Function for setting the new size
   const setSize = (w: number, h: number) => {
     const newSelections = [...selections];
     const option = newSelections.find((s) => s.name === `Scorecard comparison`);
@@ -220,6 +221,7 @@ const Scorecomparison = ({
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
   };
+  //Functions for resizing
   const handleResize: RndResizeCallback = (
     e,
     direction,
@@ -233,6 +235,7 @@ const Scorecomparison = ({
       setSize(newWidth, newHeight);
     }
   };
+  //Functions for controlling the drag state
   const handleDragStart = (e: DraggableEvent) => {
     setIsDragging(true);
   };
@@ -247,13 +250,14 @@ const Scorecomparison = ({
     setIsDragging(false);
   };
   if ((isLoading || isError) && isARMode) return <Box></Box>;
-
+  //3D graph for AR Mode
   return isARMode ? (
     <ARLineGraph
       data={chartData.datasets}
       position={[arPos?.x, arPos?.y, arPos?.z]}
     />
-  ) : isMobile ? (
+  ) : //Mobile Interface
+  isMobile ? (
     <div
       style={{
         width: `${window.screen.width}px`,
@@ -306,6 +310,7 @@ const Scorecomparison = ({
       </div>
     </div>
   ) : (
+    //Customisable Desktop interface
     <Rnd
       size={{ width: width, height: height }}
       position={{ x: x ?? randomX, y: y ?? randomY }}

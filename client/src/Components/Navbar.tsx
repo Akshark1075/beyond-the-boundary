@@ -25,7 +25,7 @@ const navItems = [
   { title: "News", path: "/news" },
   { title: "Rankings", path: "/rankings" },
 ];
-
+//Component for displaying responsive Navbar|Drawer
 export default function DrawerAppBar(props: Props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);

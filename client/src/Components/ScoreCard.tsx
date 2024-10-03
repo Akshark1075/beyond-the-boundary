@@ -52,6 +52,7 @@ const BattingScorecard = ({
   const { x: randomX, y: randomY } = getRandomCoordinates();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  //Fetching the position and size of batting scorecard component
   const storedScorecard = selections.find(
     (s) => s.name === `Batting Scorecard ${row.inningsId}`
   );
@@ -77,6 +78,7 @@ const BattingScorecard = ({
     setSelection(newItems);
     saveArrayToLocalStorage("selectedOptions", newItems);
   }
+  //Function for setting the new position
   const setPosition = (x: number, y: number) => {
     const newSelections = [...selections];
     const option = newSelections.find(
@@ -90,7 +92,7 @@ const BattingScorecard = ({
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
   };
-
+  //Function for setting the new size
   const setSize = (w: number, h: number) => {
     const newSelections = [...selections];
     const option = newSelections.find(
@@ -104,6 +106,7 @@ const BattingScorecard = ({
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
   };
+  //Function for resizing the componenr
   const handleResize: RndResizeCallback = (
     e,
     direction,
@@ -117,6 +120,7 @@ const BattingScorecard = ({
       setSize(newWidth, newHeight);
     }
   };
+  //Functions for controlling the drag state
   const handleDragStart = (e: DraggableEvent) => {
     setIsDragging(true);
   };
@@ -190,6 +194,7 @@ const BattingScorecard = ({
           size="small"
           aria-label="a dense table"
         >
+          {/*Collapsable table body */}
           <Collapse in={open} timeout="auto" unmountOnExit>
             <TableHead>
               <TableRow className="bg-slate-300">
@@ -477,6 +482,7 @@ const BowlingScorecard = ({
   const { x: randomX, y: randomY } = getRandomCoordinates();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  //Fetching the position and size of stored bowling scorecard component
   const storedScorecard = selections.find(
     (s) => s.name === `Bowling Scorecard ${row.inningsId}` && !isMobile
   );
@@ -487,7 +493,7 @@ const BowlingScorecard = ({
     height = 350,
     zIndex = 1,
   } = storedScorecard ?? {};
-
+  //If the component is being used for the first time, store to local storage
   if (!storedScorecard && !isMobile && !isARMode) {
     const newItems = [
       ...selections,
@@ -503,7 +509,7 @@ const BowlingScorecard = ({
     setSelection(newItems);
     saveArrayToLocalStorage("selectedOptions", newItems);
   }
-
+  //Function for resizing the component
   const handleResize: RndResizeCallback = (
     e,
     direction,
@@ -517,6 +523,7 @@ const BowlingScorecard = ({
       setSize(newWidth, newHeight);
     }
   };
+  //Function for setting the new position
   const setPosition = (x: number, y: number) => {
     const newSelections = [...selections];
     const option = newSelections.find(
@@ -530,6 +537,7 @@ const BowlingScorecard = ({
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
   };
+  //Function for setting the new size
   const setSize = (w: number, h: number) => {
     const newSelections = [...selections];
     const option = newSelections.find(
@@ -543,6 +551,7 @@ const BowlingScorecard = ({
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
   };
+  //Functions for controlling the drag state
   const handleDragStart = (e: DraggableEvent) => {
     setIsDragging(true);
   };
@@ -556,6 +565,7 @@ const BowlingScorecard = ({
   const handleResizeStop = (e: DraggableEvent) => {
     setIsDragging(false);
   };
+  //Component for displaying Bowling Scorecard
   const BowlingScorecardComponent = ({
     width,
     height,
@@ -622,6 +632,7 @@ const BowlingScorecard = ({
           size="small"
           aria-label="a dense table"
         >
+          {/*Collapsable table body */}
           <Collapse in={open} timeout="auto" unmountOnExit>
             <TableHead>
               <TableRow className="bg-slate-300">
@@ -839,7 +850,7 @@ const BowlingScorecard = ({
       </TableContainer>
     );
   };
-
+  //Mobile and AR component
   return isMobile || isARMode ? (
     <div
       style={{
@@ -865,6 +876,7 @@ const BowlingScorecard = ({
       <BowlingScorecardComponent />
     </div>
   ) : (
+    //Customizable desktop interface
     <Rnd
       size={{ width: width, height: height }}
       position={{ x: x, y: y }}
@@ -905,7 +917,7 @@ const BowlingScorecard = ({
     </Rnd>
   );
 };
-
+//Wrapper component for batting and bowling scorecard
 export default function ScoreCardTable({
   type,
 
@@ -925,6 +937,7 @@ export default function ScoreCardTable({
   isLoading: boolean;
   isError: boolean;
 }) {
+  //ARMode
   if (isARMode) {
     if (data?.scoreCard) {
       if (type === "Batting") {
@@ -954,6 +967,7 @@ export default function ScoreCardTable({
       }
     }
   }
+  //Non AR Mode
   return (
     <>
       {data?.scoreCard.map((row) => {

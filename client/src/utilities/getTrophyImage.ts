@@ -1,3 +1,4 @@
+//Function for getting trophy images
 const getTrophyImage = (seriesName: string) => {
   if (seriesName.toLocaleLowerCase().includes("ashes")) return "ashesLogo.png";
   else if (

@@ -1,5 +1,5 @@
 import { useXR } from "@react-three/xr";
-
+//Component for updating the state of isARMode
 const WithXR = ({
   setIsARMode,
 }: {

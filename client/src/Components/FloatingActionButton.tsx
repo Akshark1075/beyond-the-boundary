@@ -75,8 +75,9 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
       setSelectedComponent(component);
     }
   };
-
+  //Function for rendering the selected components
   const renderComponent = () => {
+    /*Find selected components*/
     const battingScorecard = selections.find((s) =>
       s.name.includes("Batting Scorecard")
     );
@@ -316,12 +317,13 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
     { title: "Field positions", key: "Field positions" },
     { title: "Video", key: "Video" },
   ];
-
+  //Dynamic menu based on selections
   const filteredOptions = components.filter(
     (c) => !selections.find((s) => s.name === c.key && !isARMode)
   );
 
   return (
+    /*Desktops and laptops*/
     <>
       {!isARMode ? (
         <>
@@ -353,6 +355,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
           {renderComponent()}
         </>
       ) : (
+        /*AR Menu */
         <ARFloatingActionButton
           components={components}
           handleMenuItemClick={handleMenuItemClick}
@@ -361,6 +364,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
     </>
   );
 };
+//Floating Menu button for AR
 const ARFloatingActionButton = ({
   components,
   handleMenuItemClick,
@@ -414,6 +418,7 @@ const ARFloatingActionButton = ({
       >
         {"Menu"}
       </Text>
+      {/* Menu Items */}
       {open && (
         <mesh
           ref={menuRef}

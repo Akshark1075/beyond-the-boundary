@@ -10,7 +10,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { AppBar, Skeleton, Toolbar, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import getUpdatedZIndex from "../utilities/getUpdatedZIndex";
-
+//Component for displaying the Fall of Wickets timeline
 const FallOfWickets = ({
   selections,
   setSelection,
@@ -45,7 +45,7 @@ const FallOfWickets = ({
     </>
   );
 };
-
+//Wrapper component for fall of wickets
 const Fow = ({
   row,
 
@@ -68,6 +68,7 @@ const Fow = ({
   const { x: randomX, y: randomY } = getRandomCoordinates();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  //Fetching the position and size of stored fallof wickets component
   const storedFallOfWickets = selections.find(
     (s) => s.name === `Fall of wickets ${row.inningsId}`
   );
@@ -78,7 +79,7 @@ const Fow = ({
     height = 350,
     zIndex = 1,
   } = storedFallOfWickets ?? {};
-
+  //If the component is being used for the first time, store to local storage
   if (!storedFallOfWickets && !isMobile && !isARMode) {
     const newItems = [
       ...selections,
@@ -94,7 +95,7 @@ const Fow = ({
     setSelection(newItems);
     saveArrayToLocalStorage("selectedOptions", newItems);
   }
-
+  //Function for setting the new position
   const setPosition = (x: number, y: number) => {
     const newSelections = [...selections];
     const option = newSelections.find(
@@ -108,7 +109,7 @@ const Fow = ({
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
   };
-
+  //Function for setting the new size
   const setSize = (w: number, h: number) => {
     const newSelections = [...selections];
     const option = newSelections.find(
@@ -122,6 +123,7 @@ const Fow = ({
       saveArrayToLocalStorage("selectedOptions", newSelections);
     }
   };
+  //Function for handling resizing
   const handleResize: RndResizeCallback = (
     e,
     direction,
@@ -135,6 +137,7 @@ const Fow = ({
       setSize(newWidth, newHeight);
     }
   };
+  //functions for controlling the state of dragging
   const handleDragStart = (e: DraggableEvent) => {
     setIsDragging(true);
   };
@@ -148,7 +151,7 @@ const Fow = ({
   const handleResizeStop = (e: DraggableEvent) => {
     setIsDragging(false);
   };
-
+  //Display Loader incase of network delay
   if (isLoading || isError)
     return (
       <div
@@ -181,6 +184,7 @@ const Fow = ({
       </div>
     );
   else {
+    /*Adapting based on user's device*/
     return isMobile || isARMode ? (
       <div
         style={{
@@ -216,6 +220,7 @@ const Fow = ({
         )}
       </div>
     ) : (
+      /*Customizable UI for Desktops, Laptops */
       <Rnd
         size={{ width: width, height: height }}
         position={{ x: x, y: y }}
@@ -224,7 +229,7 @@ const Fow = ({
         onResizeStop={handleResizeStop}
         onDragStart={handleDragStart}
         onDragStop={(e, data) => {
-          const minY = 0; // You can set this to any value to add padding from the top.
+          const minY = 0;
           if (data.y < minY) {
             handleDragStop(e, { ...data, y: minY });
           } else {

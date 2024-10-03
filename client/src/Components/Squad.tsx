@@ -24,6 +24,7 @@ import { Rnd, RndResizeCallback } from "react-rnd";
 import { DraggableEvent } from "react-draggable";
 import WithTitleBar from "./WithTitleBar";
 import getUpdatedZIndex from "../utilities/getUpdatedZIndex";
+//Component for displaying squad details of both teams
 const SquadComponent = ({
   width,
   height,
@@ -247,6 +248,7 @@ const Squad = React.memo(
 
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+    //Fetching the position and size of stored squad component
     const storedSquad = selections.find((s) => s.name === `Squad`);
     const {
       x = randomX,
@@ -255,6 +257,7 @@ const Squad = React.memo(
       height = 500,
       zIndex = 1,
     } = storedSquad ?? {};
+    //If the component is being used for the first time, store to local storage
     if (!storedSquad && !isMobile && !isARMode) {
       const newItems = [
         ...selections,
@@ -271,7 +274,7 @@ const Squad = React.memo(
       setSelection(newItems);
       saveArrayToLocalStorage("selectedOptions", newItems);
     }
-
+    //Function for setting the new position
     const setPosition = (x: number, y: number) => {
       const newSelections = [...selections];
       const option = newSelections.find((s) => s.name === `Squad`);
@@ -283,7 +286,7 @@ const Squad = React.memo(
         saveArrayToLocalStorage("selectedOptions", newSelections);
       }
     };
-
+    //Function for setting the new size
     const setSize = (w: number, h: number) => {
       const newSelections = [...selections];
       const option = newSelections.find((s) => s.name === `Squad`);
@@ -295,6 +298,7 @@ const Squad = React.memo(
         saveArrayToLocalStorage("selectedOptions", newSelections);
       }
     };
+    //Function for handling resizing
     const handleResize: RndResizeCallback = (
       e,
       direction,
@@ -308,7 +312,7 @@ const Squad = React.memo(
         setSize(newWidth, newHeight);
       }
     };
-
+    //Functions for handling the drag state
     const handleDragStart = (e: DraggableEvent) => {
       setIsDragging(true);
     };
@@ -322,7 +326,7 @@ const Squad = React.memo(
     const handleResizeStop = (e: DraggableEvent) => {
       setIsDragging(false);
     };
-
+    //AR interface
     return isARMode ? (
       <div
         style={{
@@ -358,7 +362,8 @@ const Squad = React.memo(
           isARMode={isARMode}
         />
       </div>
-    ) : isMobile ? (
+    ) : //Mobile Interface
+    isMobile ? (
       <div
         style={{
           width: "100%",
@@ -394,6 +399,7 @@ const Squad = React.memo(
         />
       </div>
     ) : (
+      //Customisable Desktop interface
       <Rnd
         size={{ width: width, height: height }}
         position={{ x: x ?? randomX, y: y ?? randomY }}

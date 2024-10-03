@@ -1,5 +1,5 @@
 import $ from "jquery";
-
+//script for controlling the open state of floating action button
 $(document).ready(function () {
   // Event handler for the floating button click
   $(".floatingButtonWrap").on("click", function (e) {

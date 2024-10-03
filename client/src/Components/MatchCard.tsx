@@ -124,6 +124,7 @@ const fetchMatches = async (type: string): Promise<GetLiveMatches> => {
   );
   return res;
 };
+//Component for presenting Match summary on the home page
 function MatchCard({ type }: MatchCardProps): JSX.Element {
   const { isPending, error, data } = useQuery<GetLiveMatches>({
     queryKey: [`matchesData-${type}`],

@@ -41,6 +41,7 @@ const fetchRankings = async (
   );
   return res;
 };
+//Component for presenting player and team rankings
 const ICCRankings = () => {
   const categoriesTitles = ["Batting", "Bowling", "All-rounders", "Teams"];
   const categories: categories[] = [

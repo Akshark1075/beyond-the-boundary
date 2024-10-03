@@ -20,7 +20,7 @@ const Reticle = ({
   const [textPosition, setTextPosition] = useState<[number, number, number]>([
     0, 0, 0,
   ]);
-
+  //Hittesting for placing the meshes
   useHitTest((hitMatrix: Matrix4) => {
     if (reticleRef.current) {
       const position = new Vector3();
@@ -34,7 +34,7 @@ const Reticle = ({
       setTextPosition([position.x, position.y - 0.3, position.z]);
     }
   });
-
+  //Place the meshes on clicking the reticle
   const handleSelect = (e: XRInteractionEvent) => {
     placeModel(e, component, title);
   };
@@ -48,8 +48,8 @@ const Reticle = ({
           <ringGeometry args={[0.1, 0.25, 32]} />
           <meshStandardMaterial color={"white"} />
         </mesh>
-        {/* Dynamically positioned text using position prop */}( )
       </Interactive>
+      {/*Info text*/}
       <Text
         renderOrder={2}
         rotation-x={-Math.PI / 2}
@@ -61,7 +61,7 @@ const Reticle = ({
                 reticleRef.current.position.z,
               ]
             : undefined
-        } // Dynamic position
+        }
         fontSize={0.05}
         color="#E50914"
         anchorX="center"
